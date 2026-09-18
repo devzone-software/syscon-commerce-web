@@ -22,9 +22,12 @@ cp .env.example .env
 composer install
 php artisan key:generate
 npm ci
-npm run dev
-php artisan serve
 ```
+
+Inicia `npm run dev` en una terminal y `php artisan serve` en otra. Abre
+`http://127.0.0.1:8000` en el navegador; el puerto 5173 es solo para los
+recursos de Vite. Si quieres ejecutar únicamente `php artisan serve`, detén
+Vite y ejecuta `npm run build` antes de abrir la página.
 
 Configura `JAVA_API_URL` en `.env` antes de probar datos reales. Si Laravel se ejecuta fuera de Docker y el backend publica Nginx en el puerto 80, usa `JAVA_API_URL=http://localhost`. El `JWT_SECRET` debe coincidir exactamente con el del Auth Service y tener al menos 32 bytes aleatorios; Laravel lo usa para verificar la firma HS256 y las autoridades del token. No uses variables `VITE_*` para estos secretos. `APP_KEY` debe ser única y persistente.
 
