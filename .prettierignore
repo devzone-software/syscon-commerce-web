@@ -1,0 +1,13 @@
+node_modules/
+vendor/
+public/
+storage/
+bootstrap/cache/
+resources/css/
+resources/views/
+*.php
+composer.lock
+package-lock.json
+docker-compose.yml
+Dockerfile
+infra/

@@ -6,4 +6,18 @@ import type { Payment, Product } from '../types';
 import { ProductImage } from '../components/ProductImage';
 import { useData, ErrorBox, Loading, Empty, ProductCard } from '../ui';
 
-export function NotFound() { return <div className="container page"><Empty title="Página no encontrada" text="La dirección que buscas no existe." action={<Link className="button button-primary" to="/">Volver al inicio</Link>} /></div>; }
+export function NotFound() {
+  return (
+    <div className="container page">
+      <Empty
+        title="Página no encontrada"
+        text="La dirección que buscas no existe."
+        action={
+          <Link className="button button-primary" to="/">
+            Volver al inicio
+          </Link>
+        }
+      />
+    </div>
+  );
+}
