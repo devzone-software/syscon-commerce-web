@@ -11,6 +11,7 @@ import { InventoryAdmin } from './InventoryAdmin';
 import { OrdersAdmin } from './OrdersAdmin';
 import { PaymentsAdmin } from './PaymentsAdmin';
 import { ProductsAdmin } from './ProductsAdmin';
+import { ReportsAdmin } from './ReportsAdmin';
 import { SuppliersAdmin } from './SuppliersAdmin';
 import { TaxonomyAdmin } from './TaxonomyAdmin';
 
@@ -73,6 +74,12 @@ const sections: Section[] = [
     group: 'Facturación',
     permission: permissions.invoicesSubmit,
     element: <BillingAdmin />,
+  },
+  {
+    path: 'reportes',
+    label: 'Catálogo e inventario',
+    group: 'Reportes',
+    element: <ReportsAdmin />,
   },
 ];
 

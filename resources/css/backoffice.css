@@ -291,6 +291,17 @@
   min-height: 36px;
   padding: 6px 14px;
 }
+.bo-bar-cell {
+  width: 22%;
+  min-width: 90px;
+  vertical-align: middle;
+}
+.bo-bar {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--store-brand);
+}
 .bo-main .data-table .stock-badge {
   margin-left: 6px;
 }
