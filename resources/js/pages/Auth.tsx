@@ -22,6 +22,9 @@ export function Auth({ register = false }: { register?: boolean }) {
     try {
       if (register) await api.register(email, password);
       await api.login(email, password);
+      // Confirm the new session before leaving: reloadUser() alone swallows errors, which
+      // would send the visitor straight back to this form without explanation.
+      await api.me();
       await reloadUser();
       navigate(from, { replace: true });
     } catch (e) {

@@ -125,4 +125,31 @@ class GatewayTest extends TestCase
         $this->withSession($session)->postJson('/web-api/admin/invoices', [...$base, 'type' => '07'])->assertUnprocessable();
         $this->withSession($session)->postJson('/web-api/admin/invoices', $base)->assertOk()->assertJsonPath('data.status', 'DRAFT');
     }
+
+    public function test_login_rejects_tokens_the_web_cannot_verify(): void
+    {
+        config(['services.java.jwt_secret' => str_repeat('b', 40)]);
+        Http::fake(['java.test/api/auth/login' => Http::response(['success' => true, 'data' => ['accessToken' => $this->token(), 'refreshToken' => 'refresh-secret']], 200)]);
+        $this->postJson('/web-api/login', ['email' => 'admin@example.com', 'password' => 'very-long-password'])->assertStatus(502)->assertDontSee('refresh-secret');
+        $this->assertNull(session('syscon.refresh'));
+        $this->getJson('/web-api/me')->assertUnauthorized();
+    }
+
+    public function test_missing_jwt_secret_is_reported_as_configuration_error(): void
+    {
+        config(['services.java.jwt_secret' => null]);
+        Http::fake();
+        $this->postJson('/web-api/login', ['email' => 'admin@example.com', 'password' => 'very-long-password'])->assertStatus(500);
+        $this->withSession(['syscon' => ['access' => $this->token(), 'refresh' => 'refresh-secret']])->getJson('/web-api/me')->assertStatus(500);
+        Http::assertNothingSent();
+    }
+
+    public function test_logout_invalidates_the_session(): void
+    {
+        Http::fake(['java.test/api/auth/logout' => Http::response(['success' => true, 'data' => null], 200)]);
+        $this->withSession(['syscon' => ['access' => $this->token(), 'refresh' => 'refresh-secret']])
+            ->postJson('/web-api/logout')->assertOk()->assertHeader('X-CSRF-TOKEN');
+        $this->assertNull(session('syscon.refresh'));
+        $this->getJson('/web-api/me')->assertUnauthorized();
+    }
 }

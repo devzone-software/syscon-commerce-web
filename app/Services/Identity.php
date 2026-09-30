@@ -4,9 +4,15 @@ namespace App\Services;
 
 class Identity
 {
+    /** The shared HS256 secret must match the Auth Service (which requires at least 32 bytes). */
+    public function configured(): bool
+    {
+        return strlen((string) config('services.java.jwt_secret')) >= 32;
+    }
+
     public function claims(?string $token): ?array
     {
-        if (! $token || ! config('services.java.jwt_secret')) {
+        if (! $token || ! $this->configured()) {
             return null;
         }
         $parts = explode('.', $token);

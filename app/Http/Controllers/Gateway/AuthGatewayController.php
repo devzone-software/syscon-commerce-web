@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Gateway;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AuthGatewayController extends GatewayController
 {
@@ -16,8 +17,14 @@ class AuthGatewayController extends GatewayController
     public function login(Request $request): JsonResponse
     {
         $data = $request->validate(['email' => 'required|email', 'password' => 'required|string']);
+        if ($error = $this->requireIdentityConfig()) return $error;
         $result = $this->api->request('POST', '/api/auth/login', $data);
         if ($result['status'] === 200 && isset($result['body']['data']['accessToken'], $result['body']['data']['refreshToken'])) {
+            // Keep the session only if /me will be able to read this token afterwards.
+            if (! $this->identity->claims($result['body']['data']['accessToken'])) {
+                Log::error('El Auth Service emitió un token que la web no puede verificar: revisa que JWT_SECRET coincida y que el emisor sea syscon-auth.');
+                return response()->json(['success' => false, 'message' => 'No se pudo validar la sesión emitida por el servicio de autenticación. Contacta al administrador.'], 502);
+            }
             $request->session()->regenerate();
             session(['syscon.access' => $result['body']['data']['accessToken'], 'syscon.refresh' => $result['body']['data']['refreshToken'], 'syscon.email' => $data['email']]);
             return response()->json(['success' => true, 'message' => 'Autenticado.', 'data' => null])->header('X-CSRF-TOKEN', csrf_token());
@@ -36,6 +43,7 @@ class AuthGatewayController extends GatewayController
 
     public function me(): JsonResponse
     {
+        if ($error = $this->requireIdentityConfig()) return $error;
         if ($error = $this->requireLogin()) return $error;
         $result = $this->api->authenticated('GET', '/api/auth/me');
         if ($result['status'] !== 200) return $this->reply($result);
