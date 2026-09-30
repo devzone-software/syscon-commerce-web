@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { PageHeader } from '../../components/backoffice/PageHeader';
-import { downloadCsv, stockBy, toCsv, type StockSummary } from '../../lib/inventory';
+import { downloadCsv, toCsv } from '../../lib/csv';
+import { stockBy, type StockSummary } from '../../lib/inventory';
 import { api } from '../../services/api';
 import { money } from '../../state';
 import { useData, ErrorBox, Loading, Empty } from '../../ui';

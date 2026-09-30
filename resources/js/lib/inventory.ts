@@ -35,22 +35,3 @@ export function stockBy(products: Product[], key: 'category' | 'brand'): StockSu
     .map(([name, items]) => ({ name, ...stockTotals(items) }))
     .sort((a, b) => b.saleValue - a.saleValue || a.name.localeCompare(b.name, 'es'));
 }
-
-/** Builds a CSV (semicolon separated, as used in Peru's spreadsheet locale) with quoting. */
-export function toCsv(headers: string[], rows: (string | number)[][]): string {
-  const cell = (value: string | number) => {
-    const text = String(value);
-    return /[";\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-  };
-  return [headers, ...rows].map((row) => row.map(cell).join(';')).join('\r\n');
-}
-
-export function downloadCsv(filename: string, csv: string) {
-  // The BOM lets spreadsheet applications detect UTF-8 accents.
-  const url = URL.createObjectURL(new Blob(['﻿', csv], { type: 'text/csv;charset=utf-8' }));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
-}

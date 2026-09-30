@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Product } from '../types';
-import { stockBy, stockTotals, toCsv } from './inventory';
+import { toCsv } from './csv';
+import { stockBy, stockTotals } from './inventory';
 
 const product = (id: string, patch: Partial<Product>): Product => ({
   id,
