@@ -1,4 +1,5 @@
 import type {
+  Invoice,
   Order,
   Payment,
   Product,
@@ -90,4 +91,16 @@ export const api = {
   supplierJobs: () => request<SupplierJob[]>('/admin/supplier-jobs'),
   supplierHistory: (jobId: string) =>
     request<SupplierHistory[]>(`/admin/supplier-jobs/${encodeURIComponent(jobId)}/history`),
+  createInvoice: (invoice: {
+    orderId: string;
+    type: string;
+    serialNumber: string;
+    customerDocumentType: string;
+    customerDocumentNumber: string;
+    customerName: string;
+    referencedSerialNumber: string | null;
+  }) => request<Invoice>('/admin/invoices', { method: 'POST', body: json(invoice) }),
+  invoice: (id: string) => request<Invoice>(`/admin/invoices/${encodeURIComponent(id)}`),
+  submitInvoice: (id: string) =>
+    request<Invoice>(`/admin/invoices/${encodeURIComponent(id)}/submit`, { method: 'POST' }),
 };

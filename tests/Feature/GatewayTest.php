@@ -112,4 +112,17 @@ class GatewayTest extends TestCase
         $this->withSession($session)->postJson('/web-api/admin/suppliers', ['name' => 'P', 'feedUrl' => 'http://p.test/feed.csv', 'minIntervalMinutes' => 15])->assertUnprocessable();
         $this->withSession($session)->postJson('/web-api/admin/suppliers', ['name' => 'P', 'feedUrl' => 'https://p.test/feed.csv', 'minIntervalMinutes' => 15])->assertOk();
     }
+
+    public function test_invoices_validate_series_and_references(): void
+    {
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            'java.test/api/invoices' => Http::response(['success' => true, 'data' => ['id' => 'i1', 'status' => 'DRAFT']], 200),
+        ]);
+        $session = ['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'invoices:submit']), 'refresh' => 'r']];
+        $base = ['orderId' => '00000000-0000-0000-0000-0000000000aa', 'type' => '03', 'serialNumber' => 'B001-1', 'customerDocumentType' => '1', 'customerDocumentNumber' => '12345678', 'customerName' => 'Cliente'];
+        $this->withSession($session)->postJson('/web-api/admin/invoices', [...$base, 'serialNumber' => 'B001-0'])->assertUnprocessable();
+        $this->withSession($session)->postJson('/web-api/admin/invoices', [...$base, 'type' => '07'])->assertUnprocessable();
+        $this->withSession($session)->postJson('/web-api/admin/invoices', $base)->assertOk()->assertJsonPath('data.status', 'DRAFT');
+    }
 }

@@ -5,6 +5,7 @@ import { CloseIcon, MenuIcon } from '../../components/icons';
 import { can, canUseBackoffice, permissions, type Permission } from '../../lib/auth';
 import { useShop } from '../../state';
 import { Empty } from '../../ui';
+import { BillingAdmin } from './BillingAdmin';
 import { Dashboard } from './Dashboard';
 import { OrdersAdmin } from './OrdersAdmin';
 import { PaymentsAdmin } from './PaymentsAdmin';
@@ -57,6 +58,13 @@ const sections: Section[] = [
     group: 'Ventas',
     permission: permissions.paymentsConfirm,
     element: <PaymentsAdmin />,
+  },
+  {
+    path: 'facturacion',
+    label: 'Comprobantes',
+    group: 'Facturación',
+    permission: permissions.invoicesSubmit,
+    element: <BillingAdmin />,
   },
 ];
 

@@ -50,3 +50,15 @@ export type SupplierHistory = {
   level: string;
   message: string | null;
 };
+
+/** InvoiceService.View from invoice-service. */
+export type Invoice = {
+  id: string;
+  orderId: string;
+  type: string;
+  serialNumber: string;
+  status: string;
+  error: string | null;
+  sunatCode: string | null;
+  sunatDescription: string | null;
+};

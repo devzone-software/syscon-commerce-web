@@ -1,16 +1,19 @@
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { IdLookup } from '../../components/backoffice/IdLookup';
 import { PageHeader } from '../../components/backoffice/PageHeader';
 import { OrderLines } from '../../components/orders/OrderLines';
 import { OrderTimeline } from '../../components/orders/OrderTimeline';
 import { StatusBadge } from '../../components/shared/StatusBadge';
+import { can, permissions } from '../../lib/auth';
 import { allowedTransitions, orderStatusLabels, shortId, statusLabel } from '../../lib/orders';
 import { api } from '../../services/api';
+import { useShop } from '../../state';
 import type { Order } from '../../types';
 import { useData, ErrorBox, Loading } from '../../ui';
 
 function OrderDetail({ id }: { id: string }) {
+  const { user } = useShop();
   const { data, loading, error, reload } = useData<Order>(() => api.order(id), [id]);
   const [busy, setBusy] = useState('');
   const [message, setMessage] = useState('');
@@ -36,6 +39,10 @@ function OrderDetail({ id }: { id: string }) {
   if (loading) return <Loading />;
   if (error || !data) return <ErrorBox message={error || 'Pedido no encontrado.'} retry={reload} />;
   const options = allowedTransitions(data.status);
+  // invoice-service only bills orders that were paid.
+  const invoiceable =
+    can(user, permissions.invoicesSubmit) &&
+    ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'].includes(data.status);
 
   return (
     <div className="bo-detail-grid">
@@ -71,6 +78,14 @@ function OrderDetail({ id }: { id: string }) {
           </p>
         )}
         {actionError && <ErrorBox message={actionError} />}
+        {invoiceable && (
+          <Link
+            className="button button-secondary full"
+            to={`/admin/facturacion?pedido=${data.id}`}
+          >
+            Emitir comprobante
+          </Link>
+        )}
         {data.status === 'PAYMENT_PENDING' && (
           <p className="notice">
             El pedido pasa a “Pagado” cuando se confirma su pago manual en la sección Pagos.

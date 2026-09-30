@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Gateway\AuthGatewayController;
 use App\Http\Controllers\Gateway\CatalogGatewayController;
+use App\Http\Controllers\Gateway\InvoiceGatewayController;
 use App\Http\Controllers\Gateway\OrderGatewayController;
 use App\Http\Controllers\Gateway\PaymentGatewayController;
 use App\Http\Controllers\Gateway\SupplierGatewayController;
@@ -21,6 +22,9 @@ Route::prefix('web-api')->group(function () {
     Route::post('/admin/products', [CatalogGatewayController::class, 'saveProduct']);
     Route::patch('/admin/orders/{id}/status', [OrderGatewayController::class, 'orderStatus'])->whereUuid('id');
     Route::post('/admin/payments/{id}/confirm', [PaymentGatewayController::class, 'confirmPayment'])->whereUuid('id');
+    Route::post('/admin/invoices', [InvoiceGatewayController::class, 'create']);
+    Route::get('/admin/invoices/{id}', [InvoiceGatewayController::class, 'show'])->whereUuid('id');
+    Route::post('/admin/invoices/{id}/submit', [InvoiceGatewayController::class, 'submit'])->whereUuid('id');
     Route::match(['get', 'post'], '/admin/suppliers', [SupplierGatewayController::class, 'suppliers']);
     Route::post('/admin/suppliers/{id}/run', [SupplierGatewayController::class, 'run'])->whereUuid('id');
     Route::get('/admin/supplier-jobs', [SupplierGatewayController::class, 'jobs']);
