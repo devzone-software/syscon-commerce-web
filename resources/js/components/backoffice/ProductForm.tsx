@@ -35,6 +35,7 @@ export function ProductForm({
   editing,
   categories,
   brands,
+  existingSkus = [],
   onSaved,
   onCancel,
 }: {
@@ -42,6 +43,8 @@ export function ProductForm({
   editing: boolean;
   categories: string[];
   brands: string[];
+  /** Published SKUs: saving a new product with one of them updates that product. */
+  existingSkus?: string[];
   onSaved: (message: string) => void;
   onCancel: () => void;
 }) {
@@ -51,6 +54,7 @@ export function ProductForm({
   const [error, setError] = useState('');
   const set = (patch: Partial<ProductInput>) => setForm((current) => ({ ...current, ...patch }));
   const describedBy = (id: keyof ProductInput) => (errors[id] ? `product-${id}-error` : undefined);
+  const overwrites = !editing && existingSkus.includes(form.sku.trim());
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -62,7 +66,7 @@ export function ProductForm({
     setError('');
     try {
       await api.saveProduct(product);
-      onSaved(editing ? 'Producto actualizado.' : 'Producto guardado.');
+      onSaved(editing || overwrites ? 'Producto actualizado.' : 'Producto guardado.');
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -92,9 +96,14 @@ export function ProductForm({
             onChange={(e) => set({ sku: e.target.value })}
             readOnly={editing}
             aria-invalid={Boolean(errors.sku)}
-            aria-describedby={describedBy('sku')}
+            aria-describedby={describedBy('sku') ?? (overwrites ? 'product-sku-exists' : undefined)}
             required
           />
+          {overwrites && (
+            <small id="product-sku-exists" className="field-warning" role="status">
+              Ya existe un producto publicado con este SKU: al guardar se reemplazarán sus datos.
+            </small>
+          )}
         </Field>
         <Field id="product-name" label="Nombre" error={errors.name}>
           <input
@@ -194,7 +203,7 @@ export function ProductForm({
       </label>
       <div className="form-actions">
         <button type="submit" className="button button-primary" disabled={busy}>
-          {busy ? 'Guardando…' : 'Guardar producto'}
+          {busy ? 'Guardando…' : overwrites ? 'Actualizar producto existente' : 'Guardar producto'}
         </button>
         <button type="button" className="button button-secondary" onClick={onCancel}>
           Cancelar

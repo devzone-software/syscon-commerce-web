@@ -90,6 +90,7 @@ export function ProductsAdmin() {
           editing={Boolean(editing)}
           categories={categories}
           brands={brands}
+          existingSkus={products.map((product) => product.sku)}
           onSaved={saved}
           onCancel={closeForm}
         />
