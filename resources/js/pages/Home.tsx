@@ -8,7 +8,7 @@ import { CallToAction } from '../components/home/CallToAction';
 import { CategorySection } from '../components/home/CategorySection';
 import { FeaturedProducts } from '../components/home/FeaturedProducts';
 import { Hero } from '../components/home/Hero';
-import { groupProducts, pickFeatured } from '../components/home/catalogSummary';
+import { groupProducts, pickFeatured } from '../lib/catalog';
 
 export function Home() {
   const { data, loading, error, reload } = useData(api.products);

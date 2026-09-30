@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowIcon } from '../icons';
-import { productCount, type CatalogGroup } from './catalogSummary';
+import { productCount, type CatalogGroup } from '../../lib/catalog';
 import { SectionHeading } from './SectionHeading';
 
 export function CategorySection({ categories }: { categories: CatalogGroup[] }) {

@@ -1,0 +1,225 @@
+/* Catalog page and shared pagination. Uses the tokens declared in home.css. */
+.catalog-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+.catalog-sidebar {
+  position: sticky;
+  top: 96px;
+}
+.catalog-filters-toggle {
+  display: none;
+}
+.catalog-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--store-surface);
+  border: 1px solid var(--store-line);
+  border-radius: var(--store-radius);
+  padding: 8px 18px 16px;
+}
+.facet {
+  border: 0;
+  border-bottom: 1px solid var(--store-line);
+  margin: 0;
+  padding: 12px 0 14px;
+  min-width: 0;
+}
+.facet:last-child {
+  border-bottom: 0;
+}
+.facet legend {
+  padding: 12px 0 8px;
+  font: 700 13px Manrope, sans-serif;
+  color: var(--store-ink);
+}
+.facet-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 0 8px;
+  margin: 0 -8px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--store-ink-soft);
+  cursor: pointer;
+}
+.facet-option:hover {
+  background: var(--store-soft);
+}
+.facet-option input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--store-brand);
+  flex-shrink: 0;
+}
+.facet-option input:focus-visible {
+  outline: 2px solid var(--store-brand);
+  outline-offset: 2px;
+}
+.facet-option span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.facet-option:has(input:checked) span {
+  color: var(--store-ink);
+  font-weight: 700;
+}
+.facet-option small {
+  font-size: 12px;
+  color: var(--store-muted);
+}
+.facet-more {
+  border: 0;
+  background: none;
+  padding: 6px 0 0;
+  color: var(--store-brand-strong);
+  font-size: 13px;
+  font-weight: 700;
+}
+.catalog-toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.catalog-count {
+  margin: 0;
+  font-size: 14px;
+  color: var(--store-ink-soft);
+  font-weight: 600;
+}
+.catalog-sort {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--store-muted);
+}
+.catalog-sort select {
+  padding: 9px 12px;
+  font-size: 14px;
+}
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.active-filters ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 10px 0 14px;
+  border: 1px solid #cfe3e8;
+  border-radius: 999px;
+  background: var(--store-soft);
+  color: var(--store-brand-strong);
+  font-size: 13px;
+  font-weight: 600;
+}
+.chip svg {
+  width: 14px;
+  height: 14px;
+}
+.chip:hover {
+  border-color: var(--store-brand);
+}
+.product-grid.catalog-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+  font-size: 14px;
+  color: var(--store-ink-soft);
+}
+.pager button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--store-line);
+  border-radius: 9px;
+  background: var(--store-surface);
+  color: var(--store-ink);
+  font-weight: 600;
+}
+.pager button:hover:not(:disabled) {
+  border-color: var(--store-brand);
+  color: var(--store-brand-strong);
+}
+.pager button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1024px) {
+  .catalog-layout {
+    grid-template-columns: 220px 1fr;
+    gap: 22px;
+  }
+  .product-grid.catalog-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .catalog-layout {
+    grid-template-columns: 1fr;
+  }
+  .catalog-sidebar {
+    position: static;
+  }
+  .catalog-filters-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+    border: 1px solid var(--store-line);
+    border-radius: 10px;
+    background: var(--store-surface);
+    color: var(--store-ink);
+    font-weight: 700;
+  }
+  #catalog-filters {
+    display: none;
+    margin-top: 10px;
+  }
+  #catalog-filters.is-open {
+    display: block;
+  }
+  .catalog-toolbar-row {
+    flex-wrap: wrap;
+  }
+  .catalog-sort {
+    width: 100%;
+  }
+  .catalog-sort select {
+    flex: 1;
+  }
+  .product-grid.catalog-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { productCount, type CatalogGroup } from './catalogSummary';
+import { productCount, type CatalogGroup } from '../../lib/catalog';
 import { SectionHeading } from './SectionHeading';
 
 export function BrandSection({ brands }: { brands: CatalogGroup[] }) {
