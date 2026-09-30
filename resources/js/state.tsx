@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { api } from './services/api';
-import { addToCart, cartUnits, setCartQuantity } from './lib/cart';
+import { addToCart, cartUnits, setCartQuantity, syncCart } from './lib/cart';
 import type { CartLine, Product, User } from './types';
 
 type State = {
@@ -12,6 +12,7 @@ type State = {
   add: (product: Product, quantity?: number) => void;
   setQuantity: (id: string, quantity: number) => void;
   clear: () => void;
+  refreshProducts: (products: Product[]) => void;
   count: number;
 };
 const Context = createContext<State | null>(null);
@@ -52,6 +53,8 @@ export function StateProvider({ children }: { children: ReactNode }) {
   const setQuantity = (id: string, quantity: number) =>
     setCart((current) => setCartQuantity(current, id, quantity));
   const clear = () => setCart([]);
+  const refreshProducts = (products: Product[]) =>
+    setCart((current) => syncCart(current, products));
   const logout = async () => {
     await api.logout();
     setUser(null);
@@ -66,6 +69,7 @@ export function StateProvider({ children }: { children: ReactNode }) {
       add,
       setQuantity,
       clear,
+      refreshProducts,
       count: cartUnits(cart),
     }),
     [user, loadingUser, cart],

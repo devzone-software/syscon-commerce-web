@@ -1,0 +1,119 @@
+/* Cart and order summary (the summary is reused by checkout). */
+.cart-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.cart-clear-confirm {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 13px;
+  color: var(--store-ink-soft);
+}
+.cart-lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--store-surface);
+  border: 1px solid var(--store-line);
+  border-radius: var(--store-radius);
+}
+.cart-line {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: 18px;
+  padding: 18px;
+  border-bottom: 1px solid var(--store-line);
+}
+.cart-line:last-child {
+  border-bottom: 0;
+}
+.cart-line.has-issue {
+  background: #fffaf6;
+}
+.cart-line-media {
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #f2f7f9;
+  overflow: hidden;
+}
+.cart-line-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8px;
+}
+.cart-line-media .image-fallback {
+  font-size: 9px;
+}
+.cart-line-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.cart-line-name {
+  font: 700 15px/1.4 Manrope, sans-serif;
+  color: var(--store-ink);
+  overflow-wrap: anywhere;
+}
+.cart-line-name:hover {
+  color: var(--store-brand-strong);
+}
+.cart-line-meta {
+  font-size: 13px;
+  color: var(--store-muted);
+}
+.cart-line-issue {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #9a4a2f;
+}
+.cart-line-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+}
+.cart-line-total {
+  font-size: 17px;
+  color: var(--store-ink);
+}
+.cart-continue {
+  display: inline-block;
+  margin-top: 18px;
+}
+.order-summary {
+  position: sticky;
+  top: 96px;
+}
+.order-summary .notice {
+  margin: 0 0 14px;
+}
+
+@media (max-width: 700px) {
+  .cart-line {
+    grid-template-columns: 72px 1fr;
+    gap: 12px;
+    padding: 14px;
+  }
+  .cart-line-media {
+    width: 72px;
+    height: 72px;
+  }
+  .cart-line-actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+  }
+  .order-summary {
+    position: static;
+  }
+}

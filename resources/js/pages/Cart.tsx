@@ -1,83 +1,102 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { money, useShop } from '../state';
-import { ProductImage } from '../components/ProductImage';
+import { CartLineItem } from '../components/cart/CartLineItem';
+import { OrderSummary } from '../components/cart/OrderSummary';
+import { useCartReview } from '../hooks/useCartReview';
+import { useShop } from '../state';
 import { Empty } from '../ui';
 
 export function Cart() {
-  const { cart, setQuantity } = useShop();
-  const total = cart.reduce((sum, l) => sum + Number(l.product.price) * l.quantity, 0);
-  return (
-    <div className="container page">
-      <div className="page-heading">
-        <span className="eyebrow accent">TU SELECCIÓN</span>
-        <h1>Carrito de compras</h1>
-      </div>
-      {!cart.length ? (
+  const { cart, setQuantity, clear } = useShop();
+  const { issues, checking, error } = useCartReview();
+  const [confirmClear, setConfirmClear] = useState(false);
+
+  if (!cart.length)
+    return (
+      <div className="container page">
+        <div className="page-heading">
+          <span className="eyebrow accent">TU SELECCIÓN</span>
+          <h1>Carrito de compras</h1>
+        </div>
         <Empty
           title="Tu carrito está vacío"
-          text="Explora nuestro catálogo para encontrar productos."
+          text="Explora el catálogo y agrega los productos que necesitas."
           action={
             <Link className="button button-primary" to="/catalogo">
               Ir al catálogo
             </Link>
           }
         />
-      ) : (
-        <div className="cart-layout">
-          <div className="cart-list">
-            {cart.map(({ product, quantity }) => (
-              <div className="cart-row" key={product.id}>
-                <div className="cart-thumb">
-                  <ProductImage product={product} />
-                </div>
-                <div className="cart-info">
-                  <Link to={`/producto/${product.id}`}>{product.name}</Link>
-                  <span>
-                    {product.brand || 'SYSCON'} · SKU {product.sku}
-                  </span>
-                  <button className="link-button" onClick={() => setQuantity(product.id, 0)}>
-                    Eliminar
-                  </button>
-                </div>
-                <div className="cart-controls">
-                  <strong>{money(Number(product.price) * quantity)}</strong>
-                  <div className="stepper">
-                    <button
-                      onClick={() => setQuantity(product.id, quantity - 1)}
-                      aria-label="Reducir cantidad"
-                    >
-                      −
-                    </button>
-                    <span>{quantity}</span>
-                    <button
-                      onClick={() => setQuantity(product.id, quantity + 1)}
-                      disabled={quantity >= product.stock}
-                      aria-label="Aumentar cantidad"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+      </div>
+    );
+
+  return (
+    <div className="container page">
+      <div className="page-heading cart-heading">
+        <div>
+          <span className="eyebrow accent">TU SELECCIÓN</span>
+          <h1>Carrito de compras</h1>
+        </div>
+        {confirmClear ? (
+          <div className="cart-clear-confirm" role="group" aria-label="Confirmar vaciado">
+            <span>¿Vaciar el carrito?</span>
+            <button type="button" className="link-button" onClick={clear}>
+              Sí, vaciar
+            </button>
+            <button type="button" className="link-button" onClick={() => setConfirmClear(false)}>
+              Cancelar
+            </button>
           </div>
-          <aside className="summary-card">
-            <h2>Resumen</h2>
-            <div>
-              <span>Productos ({cart.reduce((n, l) => n + l.quantity, 0)})</span>
-              <strong>{money(total)}</strong>
-            </div>
-            <div className="summary-total">
-              <span>Total estimado</span>
-              <strong>{money(total)}</strong>
-            </div>
-            <p>El precio y el stock se confirman al crear el pedido.</p>
+        ) : (
+          <button type="button" className="link-button" onClick={() => setConfirmClear(true)}>
+            Vaciar carrito
+          </button>
+        )}
+      </div>
+      <div className="cart-layout">
+        <div>
+          {error && (
+            <p className="notice" role="status">
+              No se pudo verificar la disponibilidad actual: {error} El stock se validará al crear
+              el pedido.
+            </p>
+          )}
+          <ul className="cart-lines">
+            {cart.map((line) => (
+              <CartLineItem
+                key={line.product.id}
+                line={line}
+                issue={issues.get(line.product.id)}
+                onQuantity={(quantity) => setQuantity(line.product.id, quantity)}
+                onRemove={() => setQuantity(line.product.id, 0)}
+              />
+            ))}
+          </ul>
+          <Link className="arrow-link cart-continue" to="/catalogo">
+            ← Seguir comprando
+          </Link>
+        </div>
+        <OrderSummary lines={cart}>
+          {issues.size > 0 && (
+            <p className="notice error" role="alert">
+              Revisa los productos marcados antes de continuar.
+            </p>
+          )}
+          {checking ? (
+            <button type="button" className="button button-primary full" disabled>
+              Verificando disponibilidad…
+            </button>
+          ) : issues.size > 0 ? (
+            <button type="button" className="button button-primary full" disabled>
+              Continuar compra
+            </button>
+          ) : (
             <Link className="button button-primary full" to="/checkout">
               Continuar compra →
             </Link>
-          </aside>
-        </div>
-      )}
+          )}
+        </OrderSummary>
+      </div>
     </div>
   );
 }

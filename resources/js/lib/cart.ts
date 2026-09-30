@@ -28,3 +28,39 @@ export function setCartQuantity(lines: CartLine[], id: string, quantity: number)
 export const cartUnits = (lines: CartLine[]) => lines.reduce((n, line) => n + line.quantity, 0);
 export const cartTotal = (lines: CartLine[]) =>
   lines.reduce((sum, line) => sum + Number(line.product.price) * line.quantity, 0);
+
+/** Refreshes the stored product snapshots with current catalog data; quantities are kept. */
+export function syncCart(lines: CartLine[], products: Product[]): CartLine[] {
+  const current = new Map(products.map((product) => [product.id, product]));
+  let changed = false;
+  const next = lines.map((line) => {
+    const fresh = current.get(line.product.id);
+    if (!fresh || JSON.stringify(fresh) === JSON.stringify(line.product)) return line;
+    changed = true;
+    return { ...line, product: fresh };
+  });
+  return changed ? next : lines;
+}
+
+export type CartIssue = 'unavailable' | 'out-of-stock' | 'exceeds-stock';
+
+/**
+ * Lines that would be rejected when creating the order. Without catalog data only the
+ * stored stock can be checked.
+ */
+export function reviewCart(lines: CartLine[], products: Product[] | null) {
+  const published = products ? new Set(products.map((product) => product.id)) : null;
+  const issues = new Map<string, CartIssue>();
+  for (const { product, quantity } of lines) {
+    if (published && !published.has(product.id)) issues.set(product.id, 'unavailable');
+    else if (product.stock < 1) issues.set(product.id, 'out-of-stock');
+    else if (quantity > product.stock) issues.set(product.id, 'exceeds-stock');
+  }
+  return issues;
+}
+
+export const issueMessages: Record<CartIssue, string> = {
+  unavailable: 'Este producto ya no está publicado en el catálogo. Quítalo para continuar.',
+  'out-of-stock': 'Este producto se agotó. Quítalo para continuar.',
+  'exceeds-stock': 'La cantidad supera el stock disponible.',
+};

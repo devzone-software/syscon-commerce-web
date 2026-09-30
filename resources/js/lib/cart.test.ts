@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Product } from '../types';
-import { addToCart, cartTotal, cartUnits, setCartQuantity } from './cart';
+import { addToCart, cartTotal, cartUnits, reviewCart, setCartQuantity, syncCart } from './cart';
 import { relatedProducts } from './catalog';
 
 const product = (id: string, patch: Partial<Product> = {}): Product => ({
@@ -48,5 +48,30 @@ describe('related products', () => {
     ];
     expect(relatedProducts(current, list).map((p) => p.id)).toEqual(['c', 'b']);
     expect(relatedProducts(product('z', { category: null }), list)).toEqual([]);
+  });
+});
+
+describe('cart review', () => {
+  it('refreshes snapshots and keeps the same array when nothing changed', () => {
+    const lines = addToCart([], product('a'), 2);
+    expect(syncCart(lines, [product('a')])).toBe(lines);
+    const synced = syncCart(lines, [product('a', { price: 20, stock: 1 })]);
+    expect(synced[0].product.price).toBe(20);
+    expect(synced[0].quantity).toBe(2);
+  });
+  it('flags unpublished, sold out and excessive lines', () => {
+    const lines = [
+      { product: product('a', { stock: 1 }), quantity: 2 },
+      { product: product('b', { stock: 0 }), quantity: 1 },
+      { product: product('c'), quantity: 1 },
+      { product: product('d'), quantity: 1 },
+    ];
+    const issues = reviewCart(lines, [lines[0].product, lines[1].product, lines[3].product]);
+    expect(Object.fromEntries(issues)).toEqual({
+      a: 'exceeds-stock',
+      b: 'out-of-stock',
+      c: 'unavailable',
+    });
+    expect(reviewCart(lines, null).has('c')).toBe(false);
   });
 });
