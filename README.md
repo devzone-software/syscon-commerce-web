@@ -76,6 +76,24 @@ npm run format:check
 npm run build
 ```
 
+## Datos demo (solo desarrollo local)
+
+`scripts/demo/catalog-demo.jsonl` contiene 25 productos ficticios con SKU `DEMO-` y marcas
+ficticias con prefijo `Demo`. `scripts/demo/seed-catalog.sh` los carga en el stack Docker de
+`syscon-commerce-platform` usando el upsert por SKU que ya expone catalog-service para
+importaciones (`POST /api/catalog/internal/products`); la petición se ejecuta dentro del
+contenedor `catalog`, que ya tiene `SERVICE_TOKEN`.
+
+```bash
+scripts/demo/seed-catalog.sh              # carga o restablece los productos demo (idempotente)
+scripts/demo/seed-catalog.sh --unpublish  # los oculta del catálogo (active=false)
+```
+
+Requiere el servicio `catalog` en ejecución; `SYSCON_PLATFORM_DIR` indica otra ruta de la
+plataforma (por defecto `../syscon-commerce-platform`). Volver a ejecutarlo restablece precio y
+stock de los productos demo. El backend no tiene endpoint para eliminar productos. No lo ejecutes
+contra producción.
+
 ## Rutas del BFF (`/web-api`)
 
 Laravel valida la entrada, conserva el JWT en la sesión y aplica el mismo permiso que el servicio

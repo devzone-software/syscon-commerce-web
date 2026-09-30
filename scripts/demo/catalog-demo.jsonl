@@ -1,0 +1,25 @@
+{"sku":"DEMO-RTR-AX1500","name":"Router inalámbrico Wi-Fi 6 AX1500","price":189.90,"stock":24,"imageUrl":null,"category":"Routers","brand":"Demo NetForge","active":true}
+{"sku":"DEMO-RTR-GB-ENT","name":"Router empresarial Gigabit con 5 puertos WAN/LAN","price":649.00,"stock":6,"imageUrl":null,"category":"Routers","brand":"Demo NetForge","active":true}
+{"sku":"DEMO-SW-GB-08","name":"Switch Gigabit no administrable de 8 puertos","price":119.00,"stock":40,"imageUrl":null,"category":"Switches","brand":"Demo Linkora","active":true}
+{"sku":"DEMO-SW-GB-24","name":"Switch Gigabit administrable de 24 puertos","price":899.00,"stock":3,"imageUrl":null,"category":"Switches","brand":"Demo Linkora","active":true}
+{"sku":"DEMO-AP-WIFI6","name":"Access Point Wi-Fi 6 de techo PoE","price":459.00,"stock":12,"imageUrl":null,"category":"Access Points","brand":"Demo NetForge","active":true}
+{"sku":"DEMO-CBL-C6-1M","name":"Cable UTP Cat 6 de 1 metro","price":6.50,"stock":350,"imageUrl":null,"category":"Cables de red","brand":"Demo Cablex","active":true}
+{"sku":"DEMO-CBL-C6-5M","name":"Cable UTP Cat 6 de 5 metros","price":14.90,"stock":180,"imageUrl":null,"category":"Cables de red","brand":"Demo Cablex","active":true}
+{"sku":"DEMO-CBL-C6-10M","name":"Cable UTP Cat 6 de 10 metros","price":24.90,"stock":0,"imageUrl":null,"category":"Cables de red","brand":"Demo Cablex","active":true}
+{"sku":"DEMO-CON-RJ45-C6","name":"Conector RJ45 Cat 6 (bolsa de 50 unidades)","price":29.90,"stock":75,"imageUrl":null,"category":"Accesorios de red","brand":"Demo Cablex","active":true}
+{"sku":"DEMO-PP-C6-24","name":"Patch Panel Cat 6 de 24 puertos","price":159.00,"stock":9,"imageUrl":null,"category":"Accesorios de red","brand":"Demo Cablex","active":true}
+{"sku":"DEMO-RCK-6U","name":"Rack mural de 6U con puerta de vidrio","price":329.00,"stock":5,"imageUrl":null,"category":"Racks","brand":"Demo Rackon","active":true}
+{"sku":"DEMO-RCK-9U","name":"Rack mural de 9U con ventilación","price":449.00,"stock":2,"imageUrl":null,"category":"Racks","brand":"Demo Rackon","active":true}
+{"sku":"DEMO-CAM-IP-FHD","name":"Cámara IP Full HD para interiores","price":199.00,"stock":18,"imageUrl":null,"category":"Cámaras IP","brand":"Demo Vistra","active":true}
+{"sku":"DEMO-CAM-IP-POE","name":"Cámara IP PoE tipo bullet para exteriores","price":289.00,"stock":1,"imageUrl":null,"category":"Cámaras IP","brand":"Demo Vistra","active":true}
+{"sku":"DEMO-ADP-USB-WIFI","name":"Adaptador USB Wi-Fi AC1200","price":59.90,"stock":33,"imageUrl":null,"category":"Conectividad","brand":"Demo Linkora","active":true}
+{"sku":"DEMO-ADP-USB-ETH","name":"Adaptador USB 3.0 a Ethernet Gigabit","price":49.90,"stock":27,"imageUrl":null,"category":"Conectividad","brand":"Demo Linkora","active":true}
+{"sku":"DEMO-NIC-PCIE-GB","name":"Tarjeta de red PCIe Gigabit","price":69.00,"stock":0,"imageUrl":null,"category":"Conectividad","brand":"Demo NetForge","active":true}
+{"sku":"DEMO-SSD-480","name":"Disco SSD SATA de 480 GB","price":139.00,"stock":22,"imageUrl":null,"category":"Almacenamiento","brand":"Demo DataCore","active":true}
+{"sku":"DEMO-SSD-1TB","name":"Disco SSD NVMe de 1 TB","price":299.00,"stock":8,"imageUrl":null,"category":"Almacenamiento","brand":"Demo DataCore","active":true}
+{"sku":"DEMO-RAM-DDR4-8","name":"Memoria RAM DDR4 de 8 GB 3200 MHz","price":99.00,"stock":30,"imageUrl":null,"category":"Memorias","brand":"Demo DataCore","active":true}
+{"sku":"DEMO-RAM-DDR4-16","name":"Memoria RAM DDR4 de 16 GB 3200 MHz","price":179.00,"stock":14,"imageUrl":null,"category":"Memorias","brand":"Demo DataCore","active":true}
+{"sku":"DEMO-KBD-USB","name":"Teclado USB en español","price":39.90,"stock":60,"imageUrl":null,"category":"Periféricos","brand":"Demo Inputex","active":true}
+{"sku":"DEMO-MSE-USB","name":"Mouse óptico USB","price":24.90,"stock":85,"imageUrl":null,"category":"Periféricos","brand":"Demo Inputex","active":true}
+{"sku":"DEMO-UPS-600","name":"UPS interactivo de 600 VA","price":239.00,"stock":4,"imageUrl":null,"category":"Energía","brand":"Demo Voltara","active":true}
+{"sku":"DEMO-ORG-CBL-1U","name":"Organizador de cables horizontal 1U","price":45.00,"stock":16,"imageUrl":null,"category":"Accesorios de red","brand":"Demo Rackon","active":false}
