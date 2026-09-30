@@ -25,3 +25,7 @@ export const can = (user: User | null, permission: Permission) =>
 /** Staff access: any permission that unlocks a backoffice section. */
 export const canUseBackoffice = (user: User | null) =>
   Object.values(permissions).some((permission) => can(user, permission));
+
+/** Only same-site paths are accepted as post-login destinations. */
+export const safeRedirect = (value: unknown, fallback = '/cuenta') =>
+  typeof value === 'string' && /^\/(?![/\\])/.test(value) ? value : fallback;

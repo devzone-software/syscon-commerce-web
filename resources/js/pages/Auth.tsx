@@ -1,12 +1,16 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { safeRedirect } from '../lib/auth';
 import { api } from '../services/api';
 import { useShop } from '../state';
 import { ErrorBox } from '../ui';
 
 export function Auth({ register = false }: { register?: boolean }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { reloadUser } = useShop();
+  // Page requested before RequireAuth sent the visitor here, e.g. the checkout.
+  const from = safeRedirect((location.state as { from?: unknown } | null)?.from);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,7 +23,7 @@ export function Auth({ register = false }: { register?: boolean }) {
       if (register) await api.register(email, password);
       await api.login(email, password);
       await reloadUser();
-      navigate('/cuenta');
+      navigate(from, { replace: true });
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -66,7 +70,7 @@ export function Auth({ register = false }: { register?: boolean }) {
         </form>
         <p className="auth-switch">
           {register ? '¿Ya tienes cuenta?' : '¿Aún no tienes cuenta?'}{' '}
-          <Link to={register ? '/ingresar' : '/registro'}>
+          <Link to={register ? '/ingresar' : '/registro'} state={location.state}>
             {register ? 'Ingresa aquí' : 'Regístrate'}
           </Link>
         </p>

@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { money, useShop } from './state';
 import type { Product } from './types';
 import { ProductImage } from './components/ProductImage';
@@ -120,11 +120,16 @@ export function Layout({ children }: { children: ReactNode }) {
 }
 export function RequireAuth({ children }: { children: ReactNode }) {
   const { user, loadingUser } = useShop();
+  const location = useLocation();
   if (loadingUser)
     return (
       <div className="container page">
         <Loading />
       </div>
     );
-  return user ? children : <Navigate to="/ingresar" replace />;
+  return user ? (
+    children
+  ) : (
+    <Navigate to="/ingresar" replace state={{ from: location.pathname + location.search }} />
+  );
 }
