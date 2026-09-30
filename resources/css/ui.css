@@ -1,0 +1,133 @@
+/* Shared interface pieces: status badges, data tables, detail lists and form fields. */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.status-badge.tone-success {
+  background: #e6f5ee;
+  color: #1c6b49;
+}
+.status-badge.tone-warning {
+  background: #fdf3e3;
+  color: #8a5a17;
+}
+.status-badge.tone-danger {
+  background: #fdecea;
+  color: #9a3a2e;
+}
+.status-badge.tone-info {
+  background: var(--store-soft);
+  color: var(--store-brand-strong);
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.data-table th,
+.data-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--store-line);
+  text-align: left;
+  vertical-align: top;
+}
+.data-table thead th {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--store-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.data-table td strong {
+  display: block;
+  color: var(--store-ink);
+  overflow-wrap: anywhere;
+}
+.data-table td small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--store-muted);
+}
+.data-table tfoot th,
+.data-table tfoot td {
+  border-bottom: 0;
+  font-weight: 700;
+}
+.data-table .num {
+  text-align: right;
+  white-space: nowrap;
+}
+.data-table tbody tr:hover {
+  background: #fafcfd;
+}
+
+.detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 18px;
+}
+.detail-list div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+.detail-list dt {
+  color: var(--store-muted);
+}
+.detail-list dd {
+  margin: 0;
+  text-align: right;
+  color: var(--store-ink);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.detail-list code {
+  font-size: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--store-ink);
+}
+.field small {
+  font-weight: 400;
+  color: var(--store-muted);
+}
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}

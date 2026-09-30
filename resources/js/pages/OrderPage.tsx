@@ -1,18 +1,29 @@
 import { useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { CheckoutSteps } from '../components/checkout/CheckoutSteps';
+import { OrderLines } from '../components/orders/OrderLines';
+import { OrderTimeline } from '../components/orders/OrderTimeline';
+import { PaymentDetails } from '../components/orders/PaymentDetails';
+import { StatusBadge } from '../components/shared/StatusBadge';
+import { orderStatusLabels, shortId, statusLabel } from '../lib/orders';
 import { api } from '../services/api';
-import { money } from '../state';
 import type { Payment } from '../types';
 import { useData, ErrorBox, Loading } from '../ui';
 
 export function OrderPage() {
   const { id = '' } = useParams();
   const [params] = useSearchParams();
+  const location = useLocation();
+  const isNew = params.get('nuevo') === '1';
   const { data, error, loading, reload } = useData(() => api.order(id), [id]);
-  const [payment, setPayment] = useState<Payment | null>(null);
+  const [payment, setPayment] = useState<Payment | null>(
+    (location.state as { payment?: Payment | null } | null)?.payment ?? null,
+  );
   const [payError, setPayError] = useState('');
   const [busy, setBusy] = useState(false);
-  const pay = async () => {
+
+  // POST /payments returns the existing MANUAL request for the order when there is one.
+  const requestPayment = async () => {
     setBusy(true);
     setPayError('');
     try {
@@ -23,11 +34,13 @@ export function OrderPage() {
       setBusy(false);
     }
   };
+
   return (
     <div className="container page">
       <div className="page-heading">
-        <span className="eyebrow accent">{params.get('pagar') ? 'PASO 3 DE 3' : 'TU COMPRA'}</span>
-        <h1>Pedido {id.slice(0, 8).toUpperCase()}</h1>
+        {isNew && <CheckoutSteps current={3} />}
+        <span className="eyebrow accent">{isNew ? 'PEDIDO CREADO' : 'MI PEDIDO'}</span>
+        <h1>Pedido {shortId(id)}</h1>
       </div>
       {loading ? (
         <Loading />
@@ -36,53 +49,52 @@ export function OrderPage() {
       ) : (
         data && (
           <div className="order-layout">
-            <div className="white-card">
-              <div className="order-top">
-                <h2>Detalle del pedido</h2>
-                <span className="status">{data.status}</span>
-              </div>
-              {data.details.map((item) => (
-                <div className="checkout-line" key={item.productId}>
-                  <span>
-                    {item.name} × {item.quantity}
-                  </span>
-                  <strong>{money(Number(item.unitPrice) * item.quantity)}</strong>
+            <div>
+              {isNew && (
+                <p className="notice success" role="status">
+                  Tu pedido se creó correctamente. El precio y el stock fueron confirmados.
+                </p>
+              )}
+              <section className="white-card" aria-labelledby="order-status-title">
+                <div className="order-top">
+                  <h2 id="order-status-title">Estado</h2>
+                  <StatusBadge status={data.status} labels={orderStatusLabels} />
                 </div>
-              ))}
-              <div className="checkout-line total-line">
-                <span>Total</span>
-                <strong>{money(Number(data.total))}</strong>
-              </div>
+                <OrderTimeline status={data.status} />
+              </section>
+              <section className="white-card" aria-labelledby="order-lines-title">
+                <h2 id="order-lines-title">Productos</h2>
+                <OrderLines order={data} />
+              </section>
             </div>
-            <aside className="summary-card">
-              <h2>Pago</h2>
+            <aside className="summary-card" aria-labelledby="order-payment-title">
+              <h2 id="order-payment-title">Pago</h2>
+              {payment && <PaymentDetails payment={payment} />}
               {data.status === 'PAYMENT_PENDING' ? (
                 <>
                   <p>
-                    El método disponible actualmente es pago manual. Un administrador confirmará la
-                    referencia tras verificarlo.
+                    El método disponible es el pago manual. Un administrador confirmará el pago tras
+                    verificarlo; conserva el identificador de la solicitud.
                   </p>
                   {payError && <ErrorBox message={payError} />}
-                  {payment ? (
-                    <div className="notice success">
-                      <strong>Solicitud de pago creada</strong>
-                      <br />
-                      ID: {payment.id}
-                      <br />
-                      Estado: {payment.status}
-                      <br />
-                      Conserva este identificador para consultar el pago.
-                    </div>
-                  ) : (
-                    <button className="button button-primary full" disabled={busy} onClick={pay}>
-                      {busy ? 'Procesando…' : 'Solicitar pago manual →'}
+                  {!payment && (
+                    <button
+                      type="button"
+                      className="button button-primary full"
+                      disabled={busy}
+                      onClick={requestPayment}
+                    >
+                      {busy ? 'Procesando…' : 'Ver o solicitar pago manual'}
                     </button>
                   )}
                 </>
               ) : (
-                <p>
-                  Estado actual: <strong>{data.status}</strong>.
-                </p>
+                !payment && (
+                  <p>
+                    Estado del pedido:{' '}
+                    <strong>{statusLabel(orderStatusLabels, data.status)}</strong>.
+                  </p>
+                )
               )}
               <Link className="arrow-link" to="/cuenta/pedidos">
                 Ver todos mis pedidos →
