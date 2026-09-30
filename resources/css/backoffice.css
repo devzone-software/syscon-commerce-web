@@ -291,6 +291,35 @@
   min-height: 36px;
   padding: 6px 14px;
 }
+.bo-import-confirm {
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid #f1d9ad;
+  border-radius: 10px;
+  background: #fffaf0;
+}
+.bo-import-confirm .facet-option {
+  align-items: flex-start;
+  margin: 0;
+}
+.bo-import-confirm .facet-option input {
+  margin-top: 3px;
+}
+.bo-import-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.bo-import-progress progress {
+  width: 100%;
+  height: 10px;
+  accent-color: var(--store-brand);
+}
+.bo-import-progress p {
+  margin: 0;
+  font-size: 14px;
+}
 .bo-bar-cell {
   width: 22%;
   min-width: 90px;

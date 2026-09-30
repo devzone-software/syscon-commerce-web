@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { PageHeader } from '../../components/backoffice/PageHeader';
 import { ProductForm } from '../../components/backoffice/ProductForm';
 import { StockBadge } from '../../components/product/StockBadge';
@@ -68,13 +68,18 @@ export function ProductsAdmin() {
         description="Productos publicados en el catálogo. El backend solo lista los productos activos."
         actions={
           !formOpen && (
-            <button
-              type="button"
-              className="button button-primary"
-              onClick={() => update({ nuevo: '1', editar: '' })}
-            >
-              Nuevo producto
-            </button>
+            <>
+              <Link className="button button-secondary" to="/admin/carga-masiva">
+                Importar / exportar
+              </Link>
+              <button
+                type="button"
+                className="button button-primary"
+                onClick={() => update({ nuevo: '1', editar: '' })}
+              >
+                Nuevo producto
+              </button>
+            </>
           )
         }
       />

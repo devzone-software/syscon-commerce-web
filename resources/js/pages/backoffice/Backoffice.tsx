@@ -10,6 +10,7 @@ import { Dashboard } from './Dashboard';
 import { InventoryAdmin } from './InventoryAdmin';
 import { OrdersAdmin } from './OrdersAdmin';
 import { PaymentsAdmin } from './PaymentsAdmin';
+import { ProductBulkAdmin } from './ProductBulkAdmin';
 import { ProductsAdmin } from './ProductsAdmin';
 import { ReportsAdmin } from './ReportsAdmin';
 import { SuppliersAdmin } from './SuppliersAdmin';
@@ -32,6 +33,13 @@ const sections: Section[] = [
     group: 'Catálogo',
     permission: permissions.catalogWrite,
     element: <ProductsAdmin />,
+  },
+  {
+    path: 'carga-masiva',
+    label: 'Carga masiva',
+    group: 'Catálogo',
+    permission: permissions.catalogWrite,
+    element: <ProductBulkAdmin />,
   },
   {
     path: 'categorias',
