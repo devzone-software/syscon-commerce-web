@@ -27,6 +27,7 @@ Estado del backend verificado en el commit `7030697` de `syscon-commerce-platfor
 | `ProductView.description` | — | campo nuevo | `description: string \| null` | El detalle de producto no tiene descripción. |
 | `ProductView.unit` | — | campo nuevo | `unit: string` (por ejemplo `NIU`, `MTR`) | No existe unidad de medida; también la necesita el XML UBL. |
 | `/api/catalog/products/{id}` | DELETE | (`catalog:write`) | — | No se puede eliminar ni archivar un producto, ni retirar los datos demo sin SQL manual. |
+| `/api/catalog/products/bulk` | POST | `{ items: ProductInput[], mode: "upsert" }` (`catalog:write`) | `{ created, updated, errors: [{ index, sku, message }] }` en una transacción | La carga masiva de la web hace una petición por fila: sin atomicidad, lenta en archivos grandes y cada fila repite la verificación de sesión. |
 | Almacenamiento de imágenes | POST | archivo de imagen | `{ imageUrl }` | Hoy solo se guarda una URL externa (`image_url` varchar 255). |
 | `POST /api/catalog/products` | POST | quitar `stock` del alta cuando exista inventario | — | El stock debe cambiar solo mediante movimientos. |
 

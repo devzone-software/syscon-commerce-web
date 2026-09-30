@@ -18,7 +18,7 @@ Aplicación Laravel 12 + React 19 + TypeScript + Tailwind para el backend [SYSCO
 | Sección | Permiso |
 | --- | --- |
 | Panel, reportes de catálogo e inventario | cualquier permiso de personal |
-| Productos, categorías y marcas, existencias | `catalog:write` |
+| Productos, carga masiva CSV, categorías y marcas, existencias | `catalog:write` |
 | Proveedores (sincronización de feeds) | `suppliers:manage` |
 | Pedidos (consulta por ID y cambio de estado) | `orders:manage` |
 | Pagos (consulta por ID y confirmación manual) | `payments:confirm` |
@@ -117,6 +117,12 @@ Java (`requirePermission`), sin depender del nombre del rol.
 - La sincronización de proveedores sobrescribe precio y stock propios.
 - La facturación no está homologada: el XML no incluye IGV y se envía directo a SUNAT, no a un OSE.
 - El catálogo devuelve la lista completa; filtros y paginación se hacen en el navegador.
+- La carga masiva envía un upsert por fila porque no existe un endpoint masivo ni transaccional.
+
+## Pendientes de integración (entorno local)
+
+- `auth` de la plataforma se reinicia en bucle: `AdminBootstrap` exige `ADMIN_PASSWORD` de al menos 16 caracteres y el `.env` local tiene uno más corto. Mientras no se corrija, no es posible iniciar sesión ni probar el backoffice contra el backend real.
+- La imagen Docker de la web (`:8081`) se construyó antes de los cambios de esta rama; debe reconstruirse para ver la interfaz actual.
 - Los detalles y los contratos propuestos están en [docs/API-NECESARIAS.md](docs/API-NECESARIAS.md).
 
 ## Estructura
