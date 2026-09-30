@@ -119,11 +119,13 @@ Java (`requirePermission`), sin depender del nombre del rol.
 - El catálogo devuelve la lista completa; filtros y paginación se hacen en el navegador.
 - La carga masiva envía un upsert por fila porque no existe un endpoint masivo ni transaccional.
 
-## Pendientes de integración (entorno local)
+## Diagnóstico de sesión
 
-- `auth` de la plataforma se reinicia en bucle: `AdminBootstrap` exige `ADMIN_PASSWORD` de al menos 16 caracteres y el `.env` local tiene uno más corto. Mientras no se corrija, no es posible iniciar sesión ni probar el backoffice contra el backend real.
-- La imagen Docker de la web (`:8081`) se construyó antes de los cambios de esta rama; debe reconstruirse para ver la interfaz actual.
-- Los detalles y los contratos propuestos están en [docs/API-NECESARIAS.md](docs/API-NECESARIAS.md).
+Si el login responde 200 pero la sesión no se mantiene, revisa `JWT_SECRET` en el `.env` de la
+web: debe ser idéntico al del Auth Service (mínimo 32 bytes). Si falta, `/web-api/login` y
+`/web-api/me` responden 500 y `storage/logs/laravel.log` indica el problema; si no coincide, el
+login responde 502 y no guarda la sesión. Tras cambiar `.env`, recrea el contenedor con
+`docker compose up -d app` (sin `-v`).
 
 ## Estructura
 
