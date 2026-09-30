@@ -69,4 +69,34 @@ class GatewayTest extends TestCase
             ->postJson('/web-api/admin/products', [])->assertForbidden();
         Http::assertSentCount(1);
     }
+
+    public function test_staff_permission_is_enough_without_admin_role(): void
+    {
+        $id = '00000000-0000-0000-0000-0000000000aa';
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            "java.test/api/orders/$id/status/PROCESSING" => Http::response(['success' => true, 'data' => ['id' => $id, 'status' => 'PROCESSING']], 200),
+        ]);
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_OPERATOR', 'orders:manage']), 'refresh' => 'refresh-secret']])
+            ->patchJson("/web-api/admin/orders/$id/status", ['status' => 'PROCESSING'])->assertOk()->assertJsonPath('data.status', 'PROCESSING');
+    }
+
+    public function test_admin_role_without_permission_is_rejected(): void
+    {
+        Http::fake(['java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200)]);
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_ADMIN']), 'refresh' => 'refresh-secret']])
+            ->postJson('/web-api/admin/payments/00000000-0000-0000-0000-0000000000aa/confirm', ['reference' => 'op-1'])->assertForbidden();
+    }
+
+    public function test_saving_a_product_clears_catalog_caches(): void
+    {
+        Cache::put('catalog.categories', ['status' => 200, 'body' => ['success' => true, 'data' => []]], 60);
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            'java.test/api/catalog/products' => Http::response(['success' => true, 'data' => ['id' => '1']], 200),
+        ]);
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'catalog:write']), 'refresh' => 'refresh-secret']])
+            ->postJson('/web-api/admin/products', ['sku' => 'A1', 'name' => 'Router', 'price' => 10, 'stock' => 2, 'active' => true])->assertOk();
+        $this->assertNull(Cache::get('catalog.categories'));
+    }
 }
