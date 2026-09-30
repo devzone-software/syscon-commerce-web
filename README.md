@@ -4,11 +4,29 @@ Aplicación Laravel 12 + React 19 + TypeScript + Tailwind para el backend [SYSCO
 
 ## Funciones
 
-- Landing, catálogo público, búsqueda, filtros y paginación local; detalle de producto y carrito.
-- Registro, login, renovación automática del token, logout y roles `CUSTOMER`/`ADMIN`.
-- Creación de pedidos, historial personal, detalle y solicitud de pago `MANUAL`.
-- Administración: alta/actualización de producto por SKU, cambio de estado de pedido y confirmación de pago manual mediante ID.
-- Estados de carga y error, diseño adaptable y caché de catálogo de 60 segundos.
+**Tienda pública**
+
+- Home con categorías, selección de productos y marcas calculadas del catálogo real.
+- Catálogo con búsqueda sin tildes, filtros por categoría, marca y disponibilidad, orden y paginación.
+- Detalle de producto con cantidad limitada por stock y productos relacionados.
+- Carrito persistente que sincroniza precio y stock con el catálogo y bloquea productos no disponibles.
+- Checkout con pago `MANUAL` y página de pedido con estado, detalle y solicitud de pago.
+- Cuenta del cliente: resumen, pedidos recientes y listado filtrable.
+
+**Backoffice** (`/admin`, layout propio, secciones visibles según permisos)
+
+| Sección | Permiso |
+| --- | --- |
+| Panel, reportes de catálogo e inventario | cualquier permiso de personal |
+| Productos, categorías y marcas, existencias | `catalog:write` |
+| Proveedores (sincronización de feeds) | `suppliers:manage` |
+| Pedidos (consulta por ID y cambio de estado) | `orders:manage` |
+| Pagos (consulta por ID y confirmación manual) | `payments:confirm` |
+| Comprobantes (emisión, consulta y envío) | `invoices:submit` |
+
+POS, caja, sucursales, almacenes, movimientos, kardex, clientes, listados globales y reportes de
+ventas dependen de APIs que el backend aún no ofrece. Están detalladas en
+[docs/API-NECESARIAS.md](docs/API-NECESARIAS.md); la web no las simula.
 
 ## Requisitos
 
@@ -43,43 +61,55 @@ docker compose build
 docker compose up -d
 ```
 
-La web escucha solo en `127.0.0.1:8080`. En Hostinger VPS coloca Nginx o Caddy del host delante con certificado TLS y proxy a ese puerto; configura renovación del certificado y redirección HTTP→HTTPS. Usa `SESSION_SECURE_COOKIE=true`, `APP_ENV=production` y `APP_DEBUG=false` en producción. El proxy Java debe ser accesible desde el contenedor; `host.docker.internal` se resuelve al host mediante `host-gateway` en Compose. Si el backend corre en otra red o servidor, ajusta `JAVA_API_URL` y restringe su acceso por red. Conserva el volumen `sessions` durante despliegues para no cerrar sesiones activas.
+La web escucha solo en `127.0.0.1:8081`. En Hostinger VPS coloca Nginx o Caddy del host delante con certificado TLS y proxy a ese puerto; configura renovación del certificado y redirección HTTP→HTTPS. Usa `SESSION_SECURE_COOKIE=true`, `APP_ENV=production` y `APP_DEBUG=false` en producción. El proxy Java debe ser accesible desde el contenedor; `host.docker.internal` se resuelve al host mediante `host-gateway` en Compose. Si el backend corre en otra red o servidor, ajusta `JAVA_API_URL` y restringe su acceso por red. Conserva el volumen `sessions` durante despliegues para no cerrar sesiones activas.
 
 Para generar `APP_KEY` sin PHP instalado en el host, ejecuta `docker run --rm php:8.3-cli php -r 'echo "base64:".base64_encode(random_bytes(32)).PHP_EOL;'` y copia el resultado a `.env`. El archivo `.env` no se incluye en la imagen; Compose inyecta sus valores al iniciar el contenedor.
 
-`docker-compose.yml` construye el código PHP y los assets, copia estos últimos a un volumen de solo lectura para Nginx y no expone PHP-FPM. Para probar localmente, visita `http://localhost:8080` y cambia `APP_URL` a esa dirección. Antes de publicar, comprueba también las limitaciones operativas del backend descritas en su README, especialmente reserva de stock concurrente, homologación SUNAT y pasarelas de pago.
+`docker-compose.yml` construye el código PHP y los assets, copia estos últimos a un volumen de solo lectura para Nginx y no expone PHP-FPM. Para probar localmente, visita `http://localhost:8081` y cambia `APP_URL` a esa dirección. Antes de publicar, comprueba también las limitaciones operativas del backend descritas en su README, especialmente reserva de stock concurrente, homologación SUNAT y pasarelas de pago.
 
 ## Verificación
 
 ```bash
 php artisan test
 npm test
+npm run format:check
 npm run build
 ```
 
-## Contratos reales y límites
+## Rutas del BFF (`/web-api`)
 
-| Función | API Java usada | Estado |
+Laravel valida la entrada, conserva el JWT en la sesión y aplica el mismo permiso que el servicio
+Java (`requirePermission`), sin depender del nombre del rol.
+
+| Ruta web | API Java | Acceso |
 | --- | --- | --- |
-| Catálogo | `GET /api/catalog/products`, `categories`, `brands`, `products/{id}` | Operativa |
-| Auth | `POST /api/auth/register`, `login`, `refresh`, `logout`; `GET /api/auth/me` | Operativa |
-| Pedidos | `GET/POST /api/orders`, `GET /api/orders/{id}` | Operativa para el cliente actual |
-| Pagos | `POST /api/payments`, `GET /api/payments/{id}` | Solo proveedor `MANUAL` disponible en Java |
-| Admin | `POST /api/catalog/products`, `PATCH /api/orders/{id}/status/{status}`, `POST /api/payments/{id}/confirm` | Operativa con permisos Java |
-| Comprobantes del cliente | Ningún endpoint de lista/consulta personal | Pendiente en Java |
-| Clientes, pedidos globales y reportes de admin | Ningún endpoint global | Pendiente en Java |
-| Mercado Pago / Culqi | Adaptadores no configurados en Java | Pendiente de backend, credenciales y webhooks |
-| Rol OPERATOR | No hay asignación ni endpoints de gestión en Auth Service | Pendiente en Java |
-| Promociones comerciales | No hay endpoint de promociones | Pendiente en Java; la portada usa solo mensajes generales |
+| `GET catalog/{products,categories,brands}`, `GET product/{id}` | `/api/catalog/...` | Público (caché de 60 s) |
+| `POST register`, `login`, `logout`; `GET me` | `/api/auth/...` | `me` devuelve roles y permisos |
+| `GET/POST orders`, `GET orders/{id}` | `/api/orders` | Sesión |
+| `POST payments`, `GET payments/{id}` | `/api/payments` | Sesión; solo proveedor `MANUAL` |
+| `POST admin/products` | `POST /api/catalog/products` | `catalog:write` |
+| `PATCH admin/orders/{id}/status` | `PATCH /api/orders/{id}/status/{status}` | `orders:manage` |
+| `POST admin/payments/{id}/confirm` | `POST /api/payments/{id}/confirm` | `payments:confirm` |
+| `POST admin/invoices`, `GET admin/invoices/{id}`, `POST admin/invoices/{id}/submit` | `/api/invoices` | `invoices:submit` |
+| `GET/POST admin/suppliers`, `POST admin/suppliers/{id}/run`, `GET admin/supplier-jobs[/{id}/history]` | `/api/suppliers` | `suppliers:manage` |
 
-El catálogo Java devuelve una lista completa sin parámetros de búsqueda, filtros o paginación; la web aplica estas operaciones en el navegador. Para catálogos grandes deberá añadirse paginación y búsqueda en Java. El endpoint `/api/auth/me` devuelve solo el ID: el correo visible en la cuenta proviene de la sesión de login; editar perfil requiere un endpoint nuevo. Los pagos manuales se confirman desde administración con el ID y una referencia verificada fuera de esta aplicación.
+## Límites conocidos del backend
+
+- El stock solo cambia al guardar un producto o sincronizar un proveedor (ambos **reemplazan** el valor); ningún pedido lo descuenta.
+- La sincronización de proveedores sobrescribe precio y stock propios.
+- La facturación no está homologada: el XML no incluye IGV y se envía directo a SUNAT, no a un OSE.
+- El catálogo devuelve la lista completa; filtros y paginación se hacen en el navegador.
+- Los detalles y los contratos propuestos están en [docs/API-NECESARIAS.md](docs/API-NECESARIAS.md).
 
 ## Estructura
 
 - `app/Services/JavaApi.php`: cliente HTTP y rotación de refresh token.
 - `app/Services/Identity.php`: validación de firma, emisor y vencimiento del JWT.
-- `app/Http/Controllers/GatewayController.php`: rutas permitidas, validación y sesión.
+- `app/Http/Controllers/Gateway/`: un controlador por módulo (`Auth`, `Catalog`, `Order`, `Payment`, `Invoice`, `Supplier`) sobre una base común con `requirePermission`.
 - `resources/js/services/api.ts`: cliente del navegador para `/web-api`.
-- `resources/js/state.tsx`: sesión visible y carrito local.
-- `resources/js/app.tsx`, `pages/`, `ui.tsx`: rutas con carga diferida, páginas y componentes compartidos.
+- `resources/js/state.tsx`: sesión visible y carrito local; las operaciones del carrito están en `lib/cart.ts`.
+- `resources/js/lib/`: reglas sin interfaz y con pruebas (catálogo, carrito, pedidos, permisos, facturación, inventario, validaciones).
+- `resources/js/components/`: `layout`, `home`, `catalog`, `product`, `cart`, `checkout`, `orders`, `account`, `backoffice` y `shared`.
+- `resources/js/pages/`: páginas de la tienda; `pages/backoffice/` contiene el backoffice.
+- `resources/css/`: `app.css` (base) importa los estilos por área (`home`, `catalog`, `product`, `cart`, `ui`, `checkout`, `account`, `backoffice`).
 - `infra/nginx.conf`, `Dockerfile`, `docker-compose.yml`: despliegue.
