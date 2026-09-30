@@ -1,10 +1,7 @@
-import { useMemo, useState, type FormEvent } from 'react';
-import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { api } from '../services/api';
-import { money, useShop } from '../state';
-import type { Payment, Product } from '../types';
-import { ProductImage } from '../components/ProductImage';
-import { useData, ErrorBox, Loading, Empty, ProductCard } from '../ui';
+import { money } from '../state';
+import { useData, ErrorBox, Loading, Empty } from '../ui';
 
 export function Orders() {
   const { data, error, loading, reload } = useData(api.orders);

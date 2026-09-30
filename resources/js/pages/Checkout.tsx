@@ -1,10 +1,8 @@
-import { useMemo, useState, type FormEvent } from 'react';
-import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { money, useShop } from '../state';
-import type { Payment, Product } from '../types';
-import { ProductImage } from '../components/ProductImage';
-import { useData, ErrorBox, Loading, Empty, ProductCard } from '../ui';
+import { ErrorBox } from '../ui';
 
 export function Checkout() {
   const { cart, clear, user } = useShop();

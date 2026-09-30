@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, NavLink, Navigate, useNavigate } from 'react-router-dom';
 import { money, useShop } from './state';
 import type { Product } from './types';

@@ -1,10 +1,9 @@
-import { useMemo, useState, type FormEvent } from 'react';
-import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { money, useShop } from '../state';
-import type { Payment, Product } from '../types';
 import { ProductImage } from '../components/ProductImage';
-import { useData, ErrorBox, Loading, Empty, ProductCard } from '../ui';
+import { useData, ErrorBox, Loading } from '../ui';
 
 export function ProductPage() {
   const { id = '' } = useParams();
