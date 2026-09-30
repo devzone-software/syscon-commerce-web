@@ -4,6 +4,7 @@ use App\Http\Controllers\Gateway\AuthGatewayController;
 use App\Http\Controllers\Gateway\CatalogGatewayController;
 use App\Http\Controllers\Gateway\OrderGatewayController;
 use App\Http\Controllers\Gateway\PaymentGatewayController;
+use App\Http\Controllers\Gateway\SupplierGatewayController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('web-api')->group(function () {
@@ -20,6 +21,10 @@ Route::prefix('web-api')->group(function () {
     Route::post('/admin/products', [CatalogGatewayController::class, 'saveProduct']);
     Route::patch('/admin/orders/{id}/status', [OrderGatewayController::class, 'orderStatus'])->whereUuid('id');
     Route::post('/admin/payments/{id}/confirm', [PaymentGatewayController::class, 'confirmPayment'])->whereUuid('id');
+    Route::match(['get', 'post'], '/admin/suppliers', [SupplierGatewayController::class, 'suppliers']);
+    Route::post('/admin/suppliers/{id}/run', [SupplierGatewayController::class, 'run'])->whereUuid('id');
+    Route::get('/admin/supplier-jobs', [SupplierGatewayController::class, 'jobs']);
+    Route::get('/admin/supplier-jobs/{id}/history', [SupplierGatewayController::class, 'history'])->whereUuid('id');
 });
 
 Route::get('/{any?}', fn () => view('app'))->where('any', '^(?!web-api|up).*$');

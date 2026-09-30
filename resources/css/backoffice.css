@@ -274,6 +274,15 @@
   background: #fff7f5;
   font-size: 14px;
 }
+.bo-inline-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.bo-inline-confirm .button {
+  min-height: 36px;
+  padding: 6px 14px;
+}
 .bo-main .data-table .stock-badge {
   margin-left: 6px;
 }

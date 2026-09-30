@@ -34,10 +34,24 @@ export const statusLabel = (labels: Record<string, string>, status: string) =>
   labels[status] ?? status;
 
 export function statusTone(status: string): 'success' | 'warning' | 'danger' | 'info' {
-  if (['PAID', 'DELIVERED', 'APPROVED', 'ACCEPTED'].includes(status)) return 'success';
+  if (['PAID', 'DELIVERED', 'APPROVED', 'ACCEPTED', 'SUCCEEDED'].includes(status)) return 'success';
   if (['CANCELLED', 'REJECTED', 'FAILED'].includes(status)) return 'danger';
-  if (['PAYMENT_PENDING', 'PENDING', 'DRAFT'].includes(status)) return 'warning';
+  if (['PAYMENT_PENDING', 'PENDING', 'DRAFT', 'RUNNING'].includes(status)) return 'warning';
   return 'info';
 }
 
 export const shortId = (id: string) => id.slice(0, 8).toUpperCase();
+
+/** ScrapingJob states set by supplier-service. */
+export const supplierJobLabels: Record<string, string> = {
+  RUNNING: 'En ejecución',
+  SUCCEEDED: 'Completado',
+  FAILED: 'Fallido',
+};
+
+export const formatDateTime = (value: string | null) =>
+  value
+    ? new Intl.DateTimeFormat('es-PE', { dateStyle: 'short', timeStyle: 'short' }).format(
+        new Date(value),
+      )
+    : '—';

@@ -9,6 +9,7 @@ import { Dashboard } from './Dashboard';
 import { OrdersAdmin } from './OrdersAdmin';
 import { PaymentsAdmin } from './PaymentsAdmin';
 import { ProductsAdmin } from './ProductsAdmin';
+import { SuppliersAdmin } from './SuppliersAdmin';
 import { TaxonomyAdmin } from './TaxonomyAdmin';
 
 type Section = {
@@ -35,6 +36,13 @@ const sections: Section[] = [
     group: 'Catálogo',
     permission: permissions.catalogWrite,
     element: <TaxonomyAdmin />,
+  },
+  {
+    path: 'proveedores',
+    label: 'Proveedores',
+    group: 'Catálogo',
+    permission: permissions.suppliersManage,
+    element: <SuppliersAdmin />,
   },
   {
     path: 'pedidos',

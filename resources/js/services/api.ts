@@ -1,4 +1,12 @@
-import type { Order, Payment, Product, User } from '../types';
+import type {
+  Order,
+  Payment,
+  Product,
+  Supplier,
+  SupplierHistory,
+  SupplierJob,
+  User,
+} from '../types';
 
 type Envelope<T> = { success: boolean; message?: string; data: T };
 export class ApiError extends Error {
@@ -74,4 +82,12 @@ export const api = {
       method: 'POST',
       body: json({ reference }),
     }),
+  suppliers: () => request<Supplier[]>('/admin/suppliers'),
+  createSupplier: (supplier: { name: string; feedUrl: string; minIntervalMinutes: number }) =>
+    request<Supplier>('/admin/suppliers', { method: 'POST', body: json(supplier) }),
+  runSupplier: (id: string) =>
+    request<SupplierJob>(`/admin/suppliers/${encodeURIComponent(id)}/run`, { method: 'POST' }),
+  supplierJobs: () => request<SupplierJob[]>('/admin/supplier-jobs'),
+  supplierHistory: (jobId: string) =>
+    request<SupplierHistory[]>(`/admin/supplier-jobs/${encodeURIComponent(jobId)}/history`),
 };

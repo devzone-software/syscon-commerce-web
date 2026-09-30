@@ -27,3 +27,26 @@ export type Payment = {
 };
 export type User = { id: string; email: string; roles: string[]; permissions?: string[] };
 export type CartLine = { product: Product; quantity: number };
+
+/** Entities returned as-is by supplier-service. */
+export type Supplier = {
+  id: string;
+  name: string;
+  feedUrl: string;
+  active: boolean;
+  minIntervalMinutes: number;
+};
+export type SupplierJob = {
+  id: string;
+  supplier: Supplier;
+  startedAt: string | null;
+  finishedAt: string | null;
+  status: string;
+  imported: number;
+};
+export type SupplierHistory = {
+  id: string;
+  occurredAt: string;
+  level: string;
+  message: string | null;
+};

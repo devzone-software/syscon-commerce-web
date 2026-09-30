@@ -99,4 +99,17 @@ class GatewayTest extends TestCase
             ->postJson('/web-api/admin/products', ['sku' => 'A1', 'name' => 'Router', 'price' => 10, 'stock' => 2, 'active' => true])->assertOk();
         $this->assertNull(Cache::get('catalog.categories'));
     }
+
+    public function test_suppliers_require_permission_and_https_feed(): void
+    {
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            'java.test/api/suppliers' => Http::response(['success' => true, 'data' => ['id' => 's1']], 200),
+        ]);
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'catalog:write']), 'refresh' => 'r']])
+            ->getJson('/web-api/admin/suppliers')->assertForbidden();
+        $session = ['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'suppliers:manage']), 'refresh' => 'r']];
+        $this->withSession($session)->postJson('/web-api/admin/suppliers', ['name' => 'P', 'feedUrl' => 'http://p.test/feed.csv', 'minIntervalMinutes' => 15])->assertUnprocessable();
+        $this->withSession($session)->postJson('/web-api/admin/suppliers', ['name' => 'P', 'feedUrl' => 'https://p.test/feed.csv', 'minIntervalMinutes' => 15])->assertOk();
+    }
 }
