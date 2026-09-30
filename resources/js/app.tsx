@@ -24,70 +24,83 @@ const Orders = lazy(() => import('./pages/Orders').then((module) => ({ default: 
 const Account = lazy(() =>
   import('./pages/Account').then((module) => ({ default: module.Account })),
 );
-const Admin = lazy(() => import('./pages/Admin').then((module) => ({ default: module.Admin })));
+const Backoffice = lazy(() =>
+  import('./pages/backoffice/Backoffice').then((module) => ({ default: module.Backoffice })),
+);
 const About = lazy(() => import('./pages/About').then((module) => ({ default: module.About })));
 const NotFound = lazy(() =>
   import('./pages/NotFound').then((module) => ({ default: module.NotFound })),
 );
 
+function StoreRoutes() {
+  return (
+    <Layout>
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/catalogo" element={<Catalog />} />
+          <Route path="/producto/:id" element={<ProductPage />} />
+          <Route path="/carrito" element={<Cart />} />
+          <Route path="/ingresar" element={<Auth />} />
+          <Route path="/registro" element={<Auth register />} />
+          <Route
+            path="/checkout"
+            element={
+              <RequireAuth>
+                <Checkout />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/pedido/:id"
+            element={
+              <RequireAuth>
+                <OrderPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/cuenta"
+            element={
+              <RequireAuth>
+                <Account />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/cuenta/pedidos"
+            element={
+              <RequireAuth>
+                <Orders />
+              </RequireAuth>
+            }
+          />
+          <Route path="/nosotros" element={<About />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </Layout>
+  );
+}
+
 function App() {
   return (
     <StateProvider>
       <BrowserRouter>
-        <Layout>
-          <Suspense fallback={<Loading />}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/catalogo" element={<Catalog />} />
-              <Route path="/producto/:id" element={<ProductPage />} />
-              <Route path="/carrito" element={<Cart />} />
-              <Route path="/ingresar" element={<Auth />} />
-              <Route path="/registro" element={<Auth register />} />
-              <Route
-                path="/checkout"
-                element={
-                  <RequireAuth>
-                    <Checkout />
-                  </RequireAuth>
-                }
-              />
-              <Route
-                path="/pedido/:id"
-                element={
-                  <RequireAuth>
-                    <OrderPage />
-                  </RequireAuth>
-                }
-              />
-              <Route
-                path="/cuenta"
-                element={
-                  <RequireAuth>
-                    <Account />
-                  </RequireAuth>
-                }
-              />
-              <Route
-                path="/cuenta/pedidos"
-                element={
-                  <RequireAuth>
-                    <Orders />
-                  </RequireAuth>
-                }
-              />
-              <Route
-                path="/admin"
-                element={
-                  <RequireAuth>
-                    <Admin />
-                  </RequireAuth>
-                }
-              />
-              <Route path="/nosotros" element={<About />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </Layout>
+        <Suspense fallback={<Loading />}>
+          <Routes>
+            {/* The backoffice has its own layout, separate from the public store. */}
+            <Route
+              path="/admin/*"
+              element={
+                <RequireAuth>
+                  <Backoffice />
+                </RequireAuth>
+              }
+            />
+            <Route path="*" element={<StoreRoutes />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </StateProvider>
   );

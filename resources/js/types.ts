@@ -13,6 +13,7 @@ export type Order = {
   id: string;
   status: string;
   total: number;
+  customerId?: string;
   details: { productId: string; sku: string; name: string; quantity: number; unitPrice: number }[];
 };
 export type Payment = {

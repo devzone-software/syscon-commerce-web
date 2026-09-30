@@ -131,3 +131,19 @@
   gap: 10px;
   align-items: center;
 }
+.field-error {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #9a3a2e;
+}
+.field input[aria-invalid='true'] {
+  border-color: #c9533f;
+}
+.button-danger {
+  background: #b3412f;
+  color: #fff;
+}
+.button-danger:hover:not(:disabled) {
+  background: #97321f;
+}
