@@ -314,7 +314,7 @@ input:focus-visible {
   letter-spacing: -0.03em;
   color: var(--store-ink);
 }
-.card-product-stock {
+.stock-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -322,14 +322,14 @@ input:focus-visible {
   font-weight: 600;
   color: #1f7a55;
 }
-.card-product-stock::before {
+.stock-badge::before {
   content: '';
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: currentColor;
 }
-.card-product-stock.out {
+.stock-badge.out {
   color: #9a6a45;
 }
 .card-product-add {

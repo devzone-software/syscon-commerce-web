@@ -4,6 +4,7 @@ import { money, useShop } from './state';
 import type { Product } from './types';
 import { ProductImage } from './components/ProductImage';
 import { CartIcon } from './components/icons';
+import { StockBadge } from './components/product/StockBadge';
 import { Footer } from './components/layout/Footer';
 import { Header } from './components/layout/Header';
 
@@ -71,7 +72,6 @@ export function Empty({
 }
 export function ProductCard({ product }: { product: Product }) {
   const { add } = useShop();
-  const available = product.stock > 0;
   return (
     <article className="card-product">
       <Link
@@ -93,9 +93,7 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="card-product-footer">
           <div>
             <strong className="card-product-price">{money(Number(product.price))}</strong>
-            <span className={`card-product-stock${available ? '' : ' out'}`}>
-              {available ? 'Disponible' : 'Sin stock'}
-            </span>
+            <StockBadge stock={product.stock} />
           </div>
           <button
             type="button"

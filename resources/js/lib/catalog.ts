@@ -109,3 +109,17 @@ export function paginate<T>(items: T[], requestedPage: number, size: number) {
   const page = Math.min(Math.max(1, Math.floor(requestedPage) || 1), pages);
   return { items: items.slice((page - 1) * size, page * size), page, pages };
 }
+
+/** Products sharing the category (or the brand when there is no category), in stock first. */
+export function relatedProducts(product: Product, products: Product[], limit = 4): Product[] {
+  const key: 'category' | 'brand' | null = product.category
+    ? 'category'
+    : product.brand
+      ? 'brand'
+      : null;
+  if (!key) return [];
+  return products
+    .filter((other) => other.id !== product.id && other[key] === product[key])
+    .sort((a, b) => Number(b.stock > 0) - Number(a.stock > 0))
+    .slice(0, limit);
+}

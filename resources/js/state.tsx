@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { api } from './services/api';
+import { addToCart, cartUnits, setCartQuantity } from './lib/cart';
 import type { CartLine, Product, User } from './types';
 
 type State = {
@@ -8,7 +9,7 @@ type State = {
   reloadUser: () => Promise<void>;
   logout: () => Promise<void>;
   cart: CartLine[];
-  add: (product: Product) => void;
+  add: (product: Product, quantity?: number) => void;
   setQuantity: (id: string, quantity: number) => void;
   clear: () => void;
   count: number;
@@ -46,33 +47,10 @@ export function StateProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem(key, JSON.stringify(cart));
   }, [cart]);
-  const add = (product: Product) =>
-    setCart((current) => {
-      if (product.stock < 1) return current;
-      const found = current.find((line) => line.product.id === product.id);
-      if (found)
-        return current.map((line) =>
-          line.product.id === product.id
-            ? { ...line, product, quantity: Math.min(product.stock, line.quantity + 1) }
-            : line,
-        );
-      return [...current, { product, quantity: 1 }];
-    });
+  const add = (product: Product, quantity = 1) =>
+    setCart((current) => addToCart(current, product, quantity));
   const setQuantity = (id: string, quantity: number) =>
-    setCart((current) =>
-      current.flatMap((line) =>
-        line.product.id !== id
-          ? [line]
-          : quantity <= 0 || line.product.stock < 1
-            ? []
-            : [
-                {
-                  ...line,
-                  quantity: Math.min(line.product.stock, Math.max(1, Math.floor(quantity))),
-                },
-              ],
-      ),
-    );
+    setCart((current) => setCartQuantity(current, id, quantity));
   const clear = () => setCart([]);
   const logout = async () => {
     await api.logout();
@@ -88,7 +66,7 @@ export function StateProvider({ children }: { children: ReactNode }) {
       add,
       setQuantity,
       clear,
-      count: cart.reduce((n, line) => n + line.quantity, 0),
+      count: cartUnits(cart),
     }),
     [user, loadingUser, cart],
   );
