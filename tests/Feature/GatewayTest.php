@@ -46,6 +46,15 @@ class GatewayTest extends TestCase
         $this->getJson('/web-api/me')->assertOk()->assertJsonPath('data.email', 'cliente@example.com')->assertJsonPath('data.roles.0', 'ROLE_CUSTOMER');
     }
 
+    public function test_me_separates_roles_from_permissions(): void
+    {
+        Http::fake(['java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200)]);
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'orders:manage']), 'refresh' => 'refresh-secret', 'email' => 'admin@example.com']])
+            ->getJson('/web-api/me')->assertOk()
+            ->assertJsonPath('data.roles', ['ROLE_ADMIN'])
+            ->assertJsonPath('data.permissions', ['orders:manage']);
+    }
+
     public function test_order_requires_session_and_valid_lines(): void
     {
         $this->postJson('/web-api/orders', ['items' => []])->assertUnauthorized();

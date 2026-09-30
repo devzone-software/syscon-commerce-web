@@ -79,7 +79,13 @@ class GatewayController extends Controller
         if ($result['status'] !== 200) return $this->reply($result);
         $claims = $this->identity->claims(session('syscon.access'));
         if (! $claims) return response()->json(['success' => false, 'message' => 'Sesión inválida.'], 401);
-        return response()->json(['success' => true, 'data' => ['id' => $claims['sub'], 'email' => session('syscon.email'), 'roles' => array_values(array_filter($claims['authorities'] ?? [], fn ($a) => str_starts_with($a, 'ROLE_')))]]);
+        $authorities = $claims['authorities'] ?? [];
+        return response()->json(['success' => true, 'data' => [
+            'id' => $claims['sub'],
+            'email' => session('syscon.email'),
+            'roles' => array_values(array_filter($authorities, fn ($a) => str_starts_with($a, 'ROLE_'))),
+            'permissions' => array_values(array_filter($authorities, fn ($a) => ! str_starts_with($a, 'ROLE_'))),
+        ]]);
     }
 
     public function orders(Request $request): JsonResponse

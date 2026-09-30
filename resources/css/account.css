@@ -1,0 +1,114 @@
+/* Customer account: side navigation and order cards. */
+.account-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+.account-nav {
+  position: sticky;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  background: var(--store-surface);
+  border: 1px solid var(--store-line);
+  border-radius: var(--store-radius);
+}
+.account-nav a,
+.account-nav button {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: var(--store-ink-soft);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+.account-nav a:hover,
+.account-nav button:hover {
+  background: var(--store-soft);
+  color: var(--store-brand-strong);
+}
+.account-nav a.active {
+  background: var(--store-soft);
+  color: var(--store-brand-strong);
+}
+.account-nav button {
+  margin-top: 6px;
+  border-top: 1px solid var(--store-line);
+  border-radius: 0 0 9px 9px;
+}
+.account-content {
+  min-width: 0;
+}
+.order-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.order-card {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--store-line);
+  border-radius: 12px;
+  background: var(--store-surface);
+}
+.order-card:hover {
+  border-color: var(--store-brand);
+}
+.order-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.order-card-main strong {
+  color: var(--store-ink);
+}
+.order-card-main small {
+  font-size: 13px;
+  color: var(--store-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.order-card-total {
+  color: var(--store-ink);
+  white-space: nowrap;
+}
+
+@media (max-width: 800px) {
+  .account-layout {
+    grid-template-columns: 1fr;
+  }
+  .account-nav {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .account-nav button {
+    margin-top: 0;
+    border-top: 0;
+    border-radius: 9px;
+  }
+}
+@media (max-width: 520px) {
+  .order-card {
+    grid-template-columns: 1fr auto;
+  }
+  .order-card-total {
+    grid-column: 2;
+  }
+}

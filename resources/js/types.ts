@@ -24,5 +24,5 @@ export type Payment = {
   paymentUrl?: string | null;
   externalReference?: string | null;
 };
-export type User = { id: string; email: string; roles: string[] };
+export type User = { id: string; email: string; roles: string[]; permissions?: string[] };
 export type CartLine = { product: Product; quantity: number };

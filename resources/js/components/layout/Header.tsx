@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { canUseBackoffice } from '../../lib/auth';
 import { useShop } from '../../state';
 import { CartIcon, CloseIcon, MenuIcon, SearchIcon, UserIcon } from '../icons';
 
@@ -28,7 +29,7 @@ export function Header() {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const isAdmin = user?.roles.includes('ROLE_ADMIN') ?? false;
+  const staff = canUseBackoffice(user);
 
   useEffect(() => {
     setOpen(false);
@@ -89,9 +90,9 @@ export function Header() {
                 <UserIcon />
                 <span>Mi cuenta</span>
               </Link>
-              {isAdmin && (
+              {staff && (
                 <Link to="/admin" className="store-action store-action-text">
-                  Admin
+                  Backoffice
                 </Link>
               )}
               <button className="store-action store-action-text" onClick={signOut}>
@@ -139,7 +140,7 @@ export function Header() {
                 Mi cuenta
               </NavLink>
               <NavLink to="/cuenta/pedidos">Mis pedidos</NavLink>
-              {isAdmin && <NavLink to="/admin">Admin</NavLink>}
+              {staff && <NavLink to="/admin">Backoffice</NavLink>}
               <button type="button" onClick={signOut}>
                 Salir
               </button>
