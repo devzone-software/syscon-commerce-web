@@ -7,6 +7,7 @@ import { useShop } from '../../state';
 import { Empty } from '../../ui';
 import { BillingAdmin } from './BillingAdmin';
 import { Dashboard } from './Dashboard';
+import { InventoryAdmin } from './InventoryAdmin';
 import { OrdersAdmin } from './OrdersAdmin';
 import { PaymentsAdmin } from './PaymentsAdmin';
 import { ProductsAdmin } from './ProductsAdmin';
@@ -44,6 +45,13 @@ const sections: Section[] = [
     group: 'Catálogo',
     permission: permissions.suppliersManage,
     element: <SuppliersAdmin />,
+  },
+  {
+    path: 'existencias',
+    label: 'Existencias',
+    group: 'Inventario',
+    permission: permissions.catalogWrite,
+    element: <InventoryAdmin />,
   },
   {
     path: 'pedidos',
