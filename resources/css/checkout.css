@@ -1,46 +1,5 @@
 /* Checkout steps, payment option and order status timeline. */
-.checkout-steps {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 22px;
-  margin: 0 0 18px;
-  padding: 0;
-  list-style: none;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--store-muted);
-}
-.checkout-steps li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.checkout-steps li span {
-  width: 24px;
-  height: 24px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  border: 1px solid var(--store-line);
-  background: var(--store-surface);
-  font-size: 12px;
-}
-.checkout-steps .is-done {
-  color: var(--store-ink-soft);
-}
-.checkout-steps .is-done span {
-  background: var(--store-soft);
-  border-color: var(--store-soft);
-  color: var(--store-brand-strong);
-}
-.checkout-steps .is-current {
-  color: var(--store-ink);
-}
-.checkout-steps .is-current span {
-  background: var(--store-brand);
-  border-color: var(--store-brand);
-  color: #fff;
-}
+
 .checkout-card-head {
   display: flex;
   align-items: baseline;
