@@ -67,22 +67,6 @@ function StoreRoutes() {
               </RequireAuth>
             }
           />
-          <Route
-            path="/cuenta"
-            element={
-              <RequireAuth>
-                <Account />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/cuenta/pedidos"
-            element={
-              <RequireAuth>
-                <Orders />
-              </RequireAuth>
-            }
-          />
           <Route path="/nosotros" element={<About />} />
           <Route path="/categorias" element={<Categories />} />
           <Route path="/ofertas" element={<Offers />} />
@@ -113,6 +97,23 @@ function App() {
             <Route path="/ingresar" element={<Auth />} />
             <Route path="/registro" element={<Auth register />} />
             <Route path="/recuperar" element={<Recover />} />
+            {/* The customer portal has its own sidebar layout (Figma "Client / Mi cuenta"). */}
+            <Route
+              path="/cuenta"
+              element={
+                <RequireAuth>
+                  <Account />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/cuenta/pedidos"
+              element={
+                <RequireAuth>
+                  <Orders />
+                </RequireAuth>
+              }
+            />
             <Route path="*" element={<StoreRoutes />} />
           </Routes>
         </Suspense>

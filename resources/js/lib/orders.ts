@@ -1,3 +1,5 @@
+import type { Order } from '../types';
+
 /** Order and payment states defined by order-service and payment-service. */
 export const orderStatusLabels: Record<string, string> = {
   CREATED: 'Creado',
@@ -41,6 +43,28 @@ export function statusTone(status: string): 'success' | 'warning' | 'danger' | '
 }
 
 export const shortId = (id: string) => id.slice(0, 8).toUpperCase();
+
+/** Share of the forward path already covered, for the "último pedido" progress bar. */
+export const orderProgress = (status: string) => {
+  const step = orderFlow.indexOf(status);
+  return step < 0 ? 0 : Math.round((step / (orderFlow.length - 1)) * 100);
+};
+
+const closed = ['DELIVERED', 'CANCELLED'];
+/** Figures of the customer dashboard, computed from GET /orders (newest first). */
+export function accountSummary(orders: Order[]) {
+  const active = orders.filter((order) => !closed.includes(order.status));
+  return {
+    count: orders.length,
+    active: active.length,
+    pendingPayment: orders.filter((order) => order.status === 'PAYMENT_PENDING').length,
+    // Only confirmed purchases count towards the spent amount.
+    spent: orders
+      .filter((order) => !['CANCELLED', 'CREATED', 'PAYMENT_PENDING'].includes(order.status))
+      .reduce((sum, order) => sum + Number(order.total), 0),
+    current: active[0] ?? null,
+  };
+}
 
 /** ScrapingJob states set by supplier-service. */
 export const supplierJobLabels: Record<string, string> = {

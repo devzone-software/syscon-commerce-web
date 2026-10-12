@@ -144,3 +144,44 @@ export const CheckIcon = ({ size }: { size?: number }) => (
     <path d="m5 12 5 5 9-10" />
   </Icon>
 );
+export const GridIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <rect x="4" y="4" width="7" height="7" rx="1" />
+    <rect x="13" y="4" width="7" height="7" rx="1" />
+    <rect x="4" y="13" width="7" height="7" rx="1" />
+    <rect x="13" y="13" width="7" height="7" rx="1" />
+  </Icon>
+);
+export const BoxIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M4 7h16v13H4zM3 4h18v3H3zM10 11h4" />
+  </Icon>
+);
+export const HelpIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01" />
+  </Icon>
+);
+export const StoreIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M4 10v10h16V10M3 10l2-6h14l2 6M3 10h18M9 20v-6h6v6" />
+  </Icon>
+);
+export const LogoutIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M15 4h4v16h-4M10 16l-4-4 4-4M6 12h10" />
+  </Icon>
+);
+export const SearchIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.5-3.5" />
+  </Icon>
+);
+export const ChatIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M4 5h16v11H8l-4 4V5Z" />
+    <path d="M8 9h8M8 12h5" />
+  </Icon>
+);
