@@ -132,6 +132,16 @@ export function paginate<T>(items: T[], requestedPage: number, size: number) {
   return { items: items.slice((page - 1) * size, page * size), page, pages };
 }
 
+/** Page numbers with gaps, e.g. 1 2 3 4 5 … 12. */
+export function pageNumbers(page: number, pages: number): (number | null)[] {
+  if (pages <= 7) return Array.from({ length: pages }, (_, index) => index + 1);
+  const around = new Set([1, pages, page - 1, page, page + 1]);
+  if (page <= 4) [2, 3, 4, 5].forEach((n) => around.add(n));
+  if (page >= pages - 3) [pages - 4, pages - 3, pages - 2, pages - 1].forEach((n) => around.add(n));
+  const sorted = [...around].filter((n) => n >= 1 && n <= pages).sort((a, b) => a - b);
+  return sorted.flatMap((n, index) => (index && n - sorted[index - 1] > 1 ? [null, n] : [n]));
+}
+
 /** Products sharing the category (or the brand when there is no category), in stock first. */
 export function relatedProducts(product: Product, products: Product[], limit = 4): Product[] {
   const key: 'category' | 'brand' | null = product.category
