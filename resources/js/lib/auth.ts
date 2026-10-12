@@ -59,3 +59,17 @@ export function initials(user: Identity) {
   const letters = words.length > 1 ? words[0][0] + words[1][0] : (words[0] ?? '?').slice(0, 2);
   return letters.toUpperCase();
 }
+
+/** The backend only enforces the length; the other rules feed the strength meter. */
+export const MIN_PASSWORD = 12;
+export function passwordChecks(password: string) {
+  const checks = [
+    { label: `Mín. ${MIN_PASSWORD} caract.`, ok: password.length >= MIN_PASSWORD },
+    { label: 'Mayús. y minús.', ok: /[a-zà-ÿñ]/.test(password) && /[A-ZÀ-ÝÑ]/.test(password) },
+    { label: 'Al menos 1 núm.', ok: /\d/.test(password) },
+    { label: 'Carácter especial', ok: /[^\p{L}\d]/u.test(password) },
+  ];
+  const passed = checks.filter((check) => check.ok).length;
+  const strength = !password ? '' : passed <= 1 ? 'Débil' : passed <= 3 ? 'Media' : 'Fuerte';
+  return { checks, passed, strength };
+}

@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { can, canUseBackoffice, displayName, initials, roleLabel, safeRedirect } from './auth';
+import {
+  can,
+  canUseBackoffice,
+  displayName,
+  initials,
+  passwordChecks,
+  roleLabel,
+  safeRedirect,
+} from './auth';
 
 const user = (permissions?: string[]) => ({ id: '1', email: 'a@b.pe', roles: [], permissions });
 
@@ -36,5 +44,15 @@ describe('user identity from the e-mail', () => {
     const user = { email: 'x@mail.com', firstName: 'María José', lastName: 'Quispe' };
     expect(displayName(user)).toBe('María');
     expect(initials(user)).toBe('MQ');
+  });
+});
+
+describe('password strength', () => {
+  it('rates the password with the four rules shown in the sign up form', () => {
+    expect(passwordChecks('').strength).toBe('');
+    expect(passwordChecks('abc').strength).toBe('Débil');
+    expect(passwordChecks('abcdefghijkl1').passed).toBe(2);
+    expect(passwordChecks('TechSyscon2026!').strength).toBe('Fuerte');
+    expect(passwordChecks('TechSyscon2026!').checks.every((check) => check.ok)).toBe(true);
   });
 });

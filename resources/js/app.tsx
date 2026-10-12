@@ -28,6 +28,9 @@ const Backoffice = lazy(() =>
   import('./pages/backoffice/Backoffice').then((module) => ({ default: module.Backoffice })),
 );
 const About = lazy(() => import('./pages/About').then((module) => ({ default: module.About })));
+const Recover = lazy(() =>
+  import('./pages/Recover').then((module) => ({ default: module.Recover })),
+);
 const Categories = lazy(() =>
   import('./pages/Categories').then((module) => ({ default: module.Categories })),
 );
@@ -48,8 +51,6 @@ function StoreRoutes() {
           <Route path="/catalogo" element={<Catalog />} />
           <Route path="/producto/:id" element={<ProductPage />} />
           <Route path="/carrito" element={<Cart />} />
-          <Route path="/ingresar" element={<Auth />} />
-          <Route path="/registro" element={<Auth register />} />
           <Route
             path="/checkout"
             element={
@@ -108,6 +109,10 @@ function App() {
                 </RequireAuth>
               }
             />
+            {/* Sign in, sign up and recovery use their own slim header and footer. */}
+            <Route path="/ingresar" element={<Auth />} />
+            <Route path="/registro" element={<Auth register />} />
+            <Route path="/recuperar" element={<Recover />} />
             <Route path="*" element={<StoreRoutes />} />
           </Routes>
         </Suspense>

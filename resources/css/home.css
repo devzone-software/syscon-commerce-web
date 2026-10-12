@@ -636,67 +636,7 @@ input:focus-visible {
 }
 
 /* Sign in and sign up */
-.signin {
-  min-height: 70vh;
-  padding: 0 16px 80px;
-  background: linear-gradient(180deg, var(--store-brand) 0, var(--store-brand) 300px, transparent 300px);
-}
 
-.signin-card {
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 36px 40px;
-  border: 1px solid var(--store-line);
-  border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 10px 30px #0c131f1a;
-}
-.signin-card form {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-.signin-card label {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 600;
-}
-.signin-card input {
-  padding: 13px 14px;
-  font-size: 15px;
-}
-.signin-card small {
-  margin-top: -8px;
-  font-size: 12px;
-  color: var(--store-muted);
-}
-.signin-switch {
-  margin: 22px 0 0;
-  font-size: 14px;
-  text-align: center;
-  color: var(--store-ink-soft);
-}
-.signin-switch a {
-  color: var(--store-brand);
-  font-weight: 700;
-}
-.signin-card.wide {
-  max-width: 640px;
-}
-.signin-card > .notice {
-  margin-bottom: 18px;
-}
-.signin-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-.signin-card select {
-  padding: 13px 14px;
-  font-size: 15px;
-}
 .signin-google {
   display: flex;
   justify-content: center;
@@ -707,52 +647,6 @@ input:focus-visible {
   font-size: 13px;
   text-align: center;
   color: var(--store-muted);
-}
-.signin-divider {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin: 22px 0;
-  font-size: 14px;
-  color: var(--store-muted);
-}
-.signin-divider::before,
-.signin-divider::after {
-  content: '';
-  flex: 1;
-  border-top: 1px solid var(--store-line);
-}
-.signin-done {
-  margin-top: 64px;
-  text-align: center;
-}
-.signin-done h1 {
-  margin: 14px 0 8px;
-  font-size: 26px;
-  letter-spacing: -0.03em;
-}
-.signin-done p {
-  margin: 0 0 24px;
-  color: var(--store-ink-soft);
-  overflow-wrap: anywhere;
-}
-.signin-check {
-  width: 72px;
-  height: 72px;
-  fill: none;
-  stroke: #16a34a;
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-@media (max-width: 700px) {
-  
-  .signin-card {
-    padding: 26px 20px;
-  }
-  .signin-row {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* Tablet */

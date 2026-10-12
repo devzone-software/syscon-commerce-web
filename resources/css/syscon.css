@@ -1,9 +1,3 @@
-/*
- * SYSCON design system (Figma "01 — Design System"): shared components for the store and the
- * backoffice. Imported last in app.css so these rules win over the legacy ones in each area.
- * Tokens are declared in home.css.
- */
-
 /* Typography · Inter: H1 32/40, H2 24/30, body 14/22, label 12/18 */
 body {
   font-size: 14px;
@@ -394,61 +388,6 @@ a.info-card:hover {
 }
 
 /* Sign in and sign up: form on a white section, aligned with the hero text */
-.signin {
-  min-height: 0;
-  padding: 0;
-  background: #fff;
-}
-.signin-card,
-.signin-card.wide {
-  max-width: none;
-  margin: 0 auto;
-  padding: 30px 0 40px;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-}
-.signin-card > * {
-  max-width: 608px;
-}
-.signin-card.wide > * {
-  max-width: 720px;
-}
-.signin-card h2 {
-  margin: 0 0 14px;
-  font-size: 22px;
-  line-height: 28px;
-  color: #111c2d;
-}
-.signin-card input,
-.signin-card select {
-  height: 48px;
-  padding: 0 14px;
-  border-color: #dbe3ed;
-  background: #fafbfc;
-  font-size: 13px;
-}
-.signin-card label {
-  font-size: 12px;
-  font-weight: 700;
-  color: #333b47;
-}
-.signin-submit {
-  align-self: flex-start;
-  width: 240px;
-  min-height: 48px;
-}
-.signin-switch {
-  text-align: left;
-  font-size: 12px;
-  color: #525966;
-}
-.signin-done {
-  text-align: center;
-}
-.signin-done > * {
-  margin-inline: auto;
-}
 
 @media (max-width: 700px) {
   .page-hero h1,
@@ -456,7 +395,5 @@ a.info-card:hover {
     font-size: 26px;
     line-height: 32px;
   }
-    .signin-submit {
-    width: 100%;
-  }
+    
 }
