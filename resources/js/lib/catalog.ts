@@ -34,14 +34,6 @@ export function pickFeatured(products: Product[], limit: number): Product[] {
   return [...firstOfCategory, ...rest].slice(0, limit);
 }
 
-/** The backend has no promotions, so "Ofertas" lists the cheapest products in stock. */
-export function lowestPriced(products: Product[], limit: number): Product[] {
-  return products
-    .filter((product) => product.stock > 0)
-    .sort((a, b) => Number(a.price) - Number(b.price))
-    .slice(0, limit);
-}
-
 export const productCount = (count: number) => `${count} ${count === 1 ? 'producto' : 'productos'}`;
 
 export type SortKey = 'relevancia' | 'precio-asc' | 'precio-desc' | 'nombre';

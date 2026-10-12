@@ -3,7 +3,6 @@ import type { Product } from '../types';
 import {
   filterProducts,
   groupProducts,
-  lowestPriced,
   pageNumbers,
   paginate,
   pickFeatured,
@@ -85,10 +84,6 @@ describe('catalog summary', () => {
       { name: 'Seguridad', count: 1 },
     ]);
     expect(pickFeatured(catalog, 8).map((p) => p.id)).toEqual(['1', '3']);
-  });
-  it('lists the cheapest products in stock for the offers page', () => {
-    expect(lowestPriced(catalog, 8).map((p) => p.id)).toEqual(['3', '1']);
-    expect(lowestPriced(catalog, 1).map((p) => p.id)).toEqual(['3']);
   });
 });
 
