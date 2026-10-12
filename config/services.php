@@ -7,6 +7,11 @@ return [
         'jwt_secret' => env('JWT_SECRET'),
     ],
 
+    // Public OAuth client id for Google Identity Services; empty hides the Google button.
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

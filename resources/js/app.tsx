@@ -28,6 +28,13 @@ const Backoffice = lazy(() =>
   import('./pages/backoffice/Backoffice').then((module) => ({ default: module.Backoffice })),
 );
 const About = lazy(() => import('./pages/About').then((module) => ({ default: module.About })));
+const Categories = lazy(() =>
+  import('./pages/Categories').then((module) => ({ default: module.Categories })),
+);
+const Offers = lazy(() => import('./pages/Offers').then((module) => ({ default: module.Offers })));
+const Contact = lazy(() =>
+  import('./pages/Contact').then((module) => ({ default: module.Contact })),
+);
 const NotFound = lazy(() =>
   import('./pages/NotFound').then((module) => ({ default: module.NotFound })),
 );
@@ -76,6 +83,9 @@ function StoreRoutes() {
             }
           />
           <Route path="/nosotros" element={<About />} />
+          <Route path="/categorias" element={<Categories />} />
+          <Route path="/ofertas" element={<Offers />} />
+          <Route path="/contacto" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

@@ -5,6 +5,7 @@ import type {
   Product,
   Supplier,
   SupplierHistory,
+  SignUp,
   SupplierJob,
   User,
 } from '../types';
@@ -58,8 +59,10 @@ export const api = {
   categories: () => request<string[]>('/catalog/categories'),
   brands: () => request<string[]>('/catalog/brands'),
   product: (id: string) => request<Product>(`/product/${encodeURIComponent(id)}`),
-  register: (email: string, password: string) =>
-    request<string>('/register', { method: 'POST', body: json({ email, password }) }),
+  register: (profile: SignUp) =>
+    request<string>('/register', { method: 'POST', body: json(profile) }),
+  googleLogin: (credential: string) =>
+    request<{ created: boolean }>('/login/google', { method: 'POST', body: json({ credential }) }),
   login: (email: string, password: string) =>
     request<unknown>('/login', { method: 'POST', body: json({ email, password }) }),
   logout: () => request<null>('/logout', { method: 'POST' }),

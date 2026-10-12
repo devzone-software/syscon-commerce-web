@@ -16,11 +16,11 @@ class GatewayTest extends TestCase
         Cache::flush();
     }
 
-    private function token(array $roles = ['ROLE_CUSTOMER']): string
+    private function token(array $roles = ['ROLE_CUSTOMER'], array $extra = []): string
     {
         $encode = fn ($value) => rtrim(strtr(base64_encode(json_encode($value)), '+/', '-_'), '=');
         $header = $encode(['alg' => 'HS256', 'typ' => 'JWT']);
-        $body = $encode(['iss' => 'syscon-auth', 'sub' => '00000000-0000-0000-0000-000000000001', 'exp' => time() + 900, 'authorities' => $roles]);
+        $body = $encode(['iss' => 'syscon-auth', 'sub' => '00000000-0000-0000-0000-000000000001', 'exp' => time() + 900, 'authorities' => $roles] + $extra);
         $signature = rtrim(strtr(base64_encode(hash_hmac('sha256', "$header.$body", str_repeat('a', 40), true)), '+/', '-_'), '=');
         return "$header.$body.$signature";
     }
@@ -44,6 +44,30 @@ class GatewayTest extends TestCase
         $response = $this->postJson('/web-api/login', ['email' => 'cliente@example.com', 'password' => 'very-long-password']);
         $response->assertOk()->assertHeader('X-CSRF-TOKEN')->assertDontSee('refresh-secret')->assertDontSee($token);
         $this->getJson('/web-api/me')->assertOk()->assertJsonPath('data.email', 'cliente@example.com')->assertJsonPath('data.roles.0', 'ROLE_CUSTOMER');
+    }
+
+    public function test_google_sign_in_opens_a_session_with_the_token_identity(): void
+    {
+        $token = $this->token(['ROLE_CUSTOMER'], ['email' => 'ana@gmail.com', 'given_name' => 'Ana', 'family_name' => 'Pérez']);
+        Http::fake([
+            'java.test/api/auth/google' => Http::response(['success' => true, 'data' => ['accessToken' => $token, 'refreshToken' => 'refresh-secret', 'created' => true]], 200),
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+        ]);
+        $this->postJson('/web-api/login/google', ['credential' => 'google-id-token'])
+            ->assertOk()->assertJsonPath('data.created', true)->assertDontSee('refresh-secret');
+        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/auth/google' && $request['credential'] === 'google-id-token');
+        $this->getJson('/web-api/me')->assertOk()->assertJsonPath('data.email', 'ana@gmail.com')->assertJsonPath('data.firstName', 'Ana');
+    }
+
+    public function test_register_requires_the_full_profile(): void
+    {
+        Http::fake(['java.test/api/auth/register' => Http::response(['success' => true, 'data' => 'id'], 201)]);
+        $profile = ['email' => 'ana@mail.com', 'password' => 'very-long-password', 'password_confirmation' => 'very-long-password', 'firstName' => 'Ana', 'lastName' => 'Pérez', 'documentType' => 'DNI', 'documentNumber' => '12345678', 'phone' => '987654321'];
+        $this->postJson('/web-api/register', ['email' => 'ana@mail.com', 'password' => 'very-long-password'])->assertUnprocessable();
+        $this->postJson('/web-api/register', ['phone' => '12345'] + $profile)->assertUnprocessable();
+        $this->postJson('/web-api/register', ['password_confirmation' => 'otra-cosa-distinta'] + $profile)->assertUnprocessable();
+        $this->postJson('/web-api/register', $profile)->assertStatus(201);
+        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/auth/register' && $request['documentNumber'] === '12345678' && ! isset($request['password_confirmation']));
     }
 
     public function test_me_separates_roles_from_permissions(): void

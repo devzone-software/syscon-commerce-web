@@ -1,22 +1,43 @@
-import { Link } from 'react-router-dom';
+import { PageHero, PageSection } from '../components/layout/PageHero';
+
+const values = [
+  { title: 'Confianza', text: 'Recomendaciones claras.' },
+  { title: 'Calidad', text: 'Selección con criterio técnico.' },
+  { title: 'Soporte', text: 'Acompañamiento continuo.' },
+];
 
 export function About() {
   return (
-    <div className="container page">
-      <div className="page-heading">
-        <span className="eyebrow accent">ACERCA DE SYSCON</span>
-        <h1>Tecnología para avanzar</h1>
-        <p>
-          SYSCON Commerce reúne productos y herramientas de compra para empresas y profesionales.
-        </p>
-      </div>
-      <div className="about-box">
-        <strong>Encuentra, compara y compra.</strong>
-        <p>Consulta productos disponibles, crea tu pedido y sigue su estado desde tu cuenta.</p>
-        <Link className="button button-primary" to="/catalogo">
-          Explorar catálogo →
-        </Link>
-      </div>
-    </div>
+    <>
+      <PageHero
+        eyebrow="NOSOTROS"
+        title="Tecnología confiable para crecer contigo"
+        text="Acompañamos a empresas y profesionales con soluciones de cómputo, redes y seguridad."
+      />
+      <PageSection title="Quiénes somos">
+        <div className="prose">
+          <p>
+            SYSCON integra productos, asesoría y soporte técnico para ayudar a implementar
+            soluciones tecnológicas de forma simple y confiable.
+          </p>
+          <p>
+            Nuestro enfoque combina atención cercana, selección de equipos y acompañamiento durante
+            la compra.
+          </p>
+        </div>
+      </PageSection>
+      <PageSection title="Lo que nos representa" soft>
+        <ul className="info-grid">
+          {values.map((value) => (
+            <li key={value.title}>
+              <div className="info-card is-plain">
+                <strong>{value.title}</strong>
+                <span>{value.text}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </PageSection>
+    </>
   );
 }

@@ -13,6 +13,7 @@ Route::prefix('web-api')->group(function () {
     Route::get('/product/{id}', [CatalogGatewayController::class, 'product'])->whereUuid('id');
     Route::post('/register', [AuthGatewayController::class, 'register']);
     Route::post('/login', [AuthGatewayController::class, 'login']);
+    Route::post('/login/google', [AuthGatewayController::class, 'google']);
     Route::post('/logout', [AuthGatewayController::class, 'logout']);
     Route::get('/me', [AuthGatewayController::class, 'me']);
     Route::match(['get', 'post'], '/orders', [OrderGatewayController::class, 'orders']);

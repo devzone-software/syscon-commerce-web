@@ -102,7 +102,7 @@ Java (`requirePermission`), sin depender del nombre del rol.
 | Ruta web | API Java | Acceso |
 | --- | --- | --- |
 | `GET catalog/{products,categories,brands}`, `GET product/{id}` | `/api/catalog/...` | Público (caché de 60 s) |
-| `POST register`, `login`, `logout`; `GET me` | `/api/auth/...` | `me` devuelve roles y permisos |
+| `POST register`, `login`, `login/google`, `logout`; `GET me` | `/api/auth/...` | `me` devuelve nombres, roles y permisos |
 | `GET/POST orders`, `GET orders/{id}` | `/api/orders` | Sesión |
 | `POST payments`, `GET payments/{id}` | `/api/payments` | Sesión; solo proveedor `MANUAL` |
 | `POST admin/products` | `POST /api/catalog/products` | `catalog:write` |
@@ -118,6 +118,12 @@ Java (`requirePermission`), sin depender del nombre del rol.
 - La facturación no está homologada: el XML no incluye IGV y se envía directo a SUNAT, no a un OSE.
 - El catálogo devuelve la lista completa; filtros y paginación se hacen en el navegador.
 - La carga masiva envía un upsert por fila porque no existe un endpoint masivo ni transaccional.
+
+## Ingreso con Google
+
+`/ingresar` y `/registro` muestran el botón oficial de Google cuando `GOOGLE_CLIENT_ID` está definido en `.env` (el mismo ID que usa el Auth Service). El botón entrega un ID token a `POST /web-api/login/google`, que lo reenvía a `/api/auth/google` y abre la sesión igual que el login por contraseña. El ID de cliente es público; no uses el secreto del cliente en la web. El origen desde el que se abre la web (por ejemplo `http://localhost:8081`) debe figurar en los orígenes autorizados del cliente en Google Cloud Console.
+
+El registro con correo pide nombres, apellidos, tipo y número de documento, celular, correo y contraseña con confirmación.
 
 ## Diagnóstico de sesión
 

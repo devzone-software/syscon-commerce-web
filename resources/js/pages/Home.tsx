@@ -1,14 +1,17 @@
 import { useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { ProductBrowser } from '../components/catalog/ProductBrowser';
+import {
+  B2BBanner,
+  CategoryShowcase,
+  FeaturedProducts,
+  HomeHero,
+  PromoBanner,
+  TrustStrip,
+} from '../components/home/HomeSections';
+import { groupProducts, pickFeatured } from '../lib/catalog';
 import { api } from '../services/api';
 import { useData, ErrorBox, Loading, Empty } from '../ui';
-import { BenefitsSection } from '../components/home/BenefitsSection';
-import { BrandSection } from '../components/home/BrandSection';
-import { CallToAction } from '../components/home/CallToAction';
-import { CategorySection } from '../components/home/CategorySection';
-import { FeaturedProducts } from '../components/home/FeaturedProducts';
-import { Hero } from '../components/home/Hero';
-import { groupProducts, pickFeatured } from '../lib/catalog';
 
 export function Home() {
   const { data, loading, error, reload } = useData(api.products);
@@ -16,55 +19,45 @@ export function Home() {
   const summary = useMemo(
     () =>
       data && {
-        categories: groupProducts(data, 'category'),
-        brands: groupProducts(data, 'brand'),
-        featured: pickFeatured(data, 8),
+        categories: groupProducts(data, 'category').slice(0, 8),
+        featured: pickFeatured(data, 4),
       },
     [data],
   );
 
-  // Links such as /#categorias point at sections that only exist once the catalog loads.
+  // Links such as /#productos point at sections that only exist once the catalog loads.
   useEffect(() => {
     if (hash && summary) document.getElementById(hash.slice(1))?.scrollIntoView();
   }, [hash, summary]);
 
   return (
-    <>
-      <Hero
-        stats={
-          data && summary
-            ? {
-                products: data.length,
-                categories: summary.categories.length,
-                brands: summary.brands.length,
-              }
-            : null
-        }
-      />
-      <BenefitsSection />
+    <div className="container home">
+      <TrustStrip />
+      <HomeHero />
       {loading ? (
-        <div className="container home-section">
-          <Loading />
-        </div>
+        <Loading />
       ) : error ? (
-        <div className="container home-section">
-          <ErrorBox message={error} retry={reload} />
-        </div>
+        <ErrorBox message={error} retry={reload} />
       ) : summary && data?.length ? (
         <>
-          <CategorySection categories={summary.categories} />
+          <CategoryShowcase categories={summary.categories} />
           <FeaturedProducts products={summary.featured} />
-          <BrandSection brands={summary.brands} />
+          <PromoBanner />
+          <div id="productos">
+            <ProductBrowser
+              products={data}
+              eyebrow="Catálogo oficial SYSCON"
+              title="Nuestros productos"
+            />
+          </div>
         </>
       ) : (
-        <div className="container home-section">
-          <Empty
-            title="Pronto habrá productos"
-            text="El catálogo estará disponible cuando se publiquen productos desde administración."
-          />
-        </div>
+        <Empty
+          title="Pronto habrá productos"
+          text="El catálogo estará disponible cuando se publiquen productos desde administración."
+        />
       )}
-      <CallToAction />
-    </>
+      <B2BBanner />
+    </div>
   );
 }

@@ -25,7 +25,25 @@ export type Payment = {
   paymentUrl?: string | null;
   externalReference?: string | null;
 };
-export type User = { id: string; email: string; roles: string[]; permissions?: string[] };
+export type User = {
+  id: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  roles: string[];
+  permissions?: string[];
+};
+export type DocumentType = 'DNI' | 'CE' | 'RUC' | 'PASAPORTE';
+export type SignUp = {
+  firstName: string;
+  lastName: string;
+  documentType: DocumentType;
+  documentNumber: string;
+  phone: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+};
 export type CartLine = { product: Product; quantity: number };
 
 /** Entities returned as-is by supplier-service. */

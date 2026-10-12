@@ -14,7 +14,9 @@ export function ActiveFilters({
     filters.query && { key: 'q', label: `Búsqueda: “${filters.query}”` },
     filters.category && { key: 'categoria', label: `Categoría: ${filters.category}` },
     filters.brand && { key: 'marca', label: `Marca: ${filters.brand}` },
-    filters.onlyAvailable && { key: 'disponible', label: 'Solo con stock' },
+    filters.onlyAvailable && { key: 'disponible', label: 'En stock inmediato' },
+    filters.minPrice !== null && { key: 'desde', label: `Desde S/ ${filters.minPrice}` },
+    filters.maxPrice !== null && { key: 'hasta', label: `Hasta S/ ${filters.maxPrice}` },
   ].filter((chip): chip is { key: string; label: string } => Boolean(chip));
   if (!chips.length) return null;
   return (

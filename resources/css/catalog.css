@@ -1,17 +1,5 @@
 /* Catalog page and shared pagination. Uses the tokens declared in home.css. */
-.catalog-layout {
-  display: grid;
-  grid-template-columns: 250px 1fr;
-  gap: 32px;
-  align-items: start;
-}
-.catalog-sidebar {
-  position: sticky;
-  top: 96px;
-}
-.catalog-filters-toggle {
-  display: none;
-}
+
 .catalog-filters {
   display: flex;
   flex-direction: column;
@@ -33,7 +21,7 @@
 }
 .facet legend {
   padding: 12px 0 8px;
-  font: 700 13px Manrope, sans-serif;
+  font: 700 13px Inter, sans-serif;
   color: var(--store-ink);
 }
 .facet-option {
@@ -129,7 +117,7 @@
   gap: 6px;
   min-height: 34px;
   padding: 0 10px 0 14px;
-  border: 1px solid #cfe3e8;
+  border: 1px solid #cfd7e8;
   border-radius: 999px;
   background: var(--store-soft);
   color: var(--store-brand-strong);
@@ -174,52 +162,11 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 1024px) {
-  .catalog-layout {
-    grid-template-columns: 220px 1fr;
-    gap: 22px;
-  }
-  .product-grid.catalog-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 @media (max-width: 700px) {
-  .catalog-layout {
-    grid-template-columns: 1fr;
-  }
-  .catalog-sidebar {
-    position: static;
-  }
-  .catalog-filters-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 44px;
-    border: 1px solid var(--store-line);
-    border-radius: 10px;
-    background: var(--store-surface);
-    color: var(--store-ink);
-    font-weight: 700;
-  }
-  #catalog-filters {
-    display: none;
-    margin-top: 10px;
-  }
-  #catalog-filters.is-open {
-    display: block;
-  }
-  .catalog-toolbar-row {
-    flex-wrap: wrap;
-  }
   .catalog-sort {
     width: 100%;
   }
   .catalog-sort select {
     flex: 1;
-  }
-  .product-grid.catalog-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 }

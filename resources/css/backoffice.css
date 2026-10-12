@@ -3,7 +3,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f4f7f9;
+  background: #f6faff;
 }
 .bo-topbar {
   position: sticky;
@@ -20,15 +20,10 @@
 .bo-topbar .brand {
   font-size: 19px;
 }
-.bo-topbar .brand-icon {
-  width: 34px;
-  height: 34px;
-  font-size: 21px;
-}
 .bo-topbar-tag {
   padding: 4px 10px;
   border-radius: 999px;
-  background: var(--store-navy);
+  background: var(--store-brand);
   color: #fff;
   font-size: 11px;
   font-weight: 700;
@@ -71,8 +66,8 @@
   height: calc(100vh - 64px);
   overflow-y: auto;
   padding: 20px 14px;
-  background: var(--store-surface);
-  border-right: 1px solid var(--store-line);
+  background: var(--store-navy);
+  border-right: 1px solid var(--store-navy);
 }
 .bo-nav-group {
   display: flex;
@@ -86,7 +81,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--store-muted);
+  color: #9fb7dd;
 }
 .bo-nav-group a {
   display: flex;
@@ -96,12 +91,15 @@
   border-radius: 9px;
   font-size: 14px;
   font-weight: 600;
-  color: var(--store-ink-soft);
+  color: #e6edf7;
 }
-.bo-nav-group a:hover,
+.bo-nav-group a:hover {
+  background: #ffffff14;
+  color: #fff;
+}
 .bo-nav-group a.active {
-  background: var(--store-soft);
-  color: var(--store-brand-strong);
+  background: var(--store-brand);
+  color: #fff;
 }
 .bo-main {
   min-width: 0;
@@ -175,7 +173,7 @@
   color: var(--store-muted);
 }
 .bo-stat strong {
-  font: 800 28px Manrope, sans-serif;
+  font: 800 28px Inter, sans-serif;
   letter-spacing: -0.04em;
   color: var(--store-ink);
 }
@@ -362,7 +360,7 @@
     max-height: calc(100vh - 64px);
     border-right: 0;
     border-bottom: 1px solid var(--store-line);
-    box-shadow: 0 16px 30px #0a33461a;
+    box-shadow: 0 16px 30px #0c131f1a;
   }
   .bo-sidebar.is-open {
     display: block;
