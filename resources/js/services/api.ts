@@ -7,6 +7,8 @@ import type {
   Delivery,
   DeliveryOptions,
   Invoice,
+  InvoiceCustomer,
+  InvoiceSeries,
   Order,
   Payment,
   Product,
@@ -135,16 +137,30 @@ export const api = {
   supplierJobs: () => request<SupplierJob[]>('/admin/supplier-jobs'),
   supplierHistory: (jobId: string) =>
     request<SupplierHistory[]>(`/admin/supplier-jobs/${encodeURIComponent(jobId)}/history`),
-  createInvoice: (invoice: {
-    orderId: string;
-    type: string;
-    serialNumber: string;
-    customerDocumentType: string;
-    customerDocumentNumber: string;
-    customerName: string;
-    referencedSerialNumber: string | null;
-  }) => request<Invoice>('/admin/invoices', { method: 'POST', body: json(invoice) }),
+  /** The platform assigns series and number; asking again for the order's document returns it. */
+  createInvoice: (
+    invoice: InvoiceCustomer & {
+      orderId: string;
+      type: string;
+      series: string | null;
+      referencedSerialNumber: string | null;
+    },
+  ) => request<Invoice>('/admin/invoices', { method: 'POST', body: json(invoice) }),
   invoice: (id: string) => request<Invoice>(`/admin/invoices/${encodeURIComponent(id)}`),
+  /** Draft only: fixes the customer before the document is sent. */
+  updateInvoice: (id: string, customer: InvoiceCustomer) =>
+    request<Invoice>(`/admin/invoices/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: json(customer),
+    }),
+  invoiceSeries: () => request<InvoiceSeries[]>('/admin/invoice-series'),
+  createInvoiceSeries: (series: { type: string; series: string; startAfter: number }) =>
+    request<InvoiceSeries>('/admin/invoice-series', { method: 'POST', body: json(series) }),
+  setInvoiceSeriesActive: (id: number, active: boolean) =>
+    request<InvoiceSeries>(`/admin/invoice-series/${id}`, {
+      method: 'PATCH',
+      body: json({ active }),
+    }),
   submitInvoice: (id: string) =>
     request<Invoice>(`/admin/invoices/${encodeURIComponent(id)}/submit`, { method: 'POST' }),
 };

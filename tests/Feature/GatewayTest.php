@@ -194,12 +194,34 @@ class GatewayTest extends TestCase
             'java.test/api/invoices' => Http::response(['success' => true, 'data' => ['id' => 'i1', 'status' => 'DRAFT']], 200),
         ]);
         $session = ['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'invoices:submit']), 'refresh' => 'r']];
-        $base = ['orderId' => '00000000-0000-0000-0000-0000000000aa', 'type' => '03', 'serialNumber' => 'B001-1', 'customerDocumentType' => '1', 'customerDocumentNumber' => '12345678', 'customerName' => 'Cliente'];
-        $this->withSession($session)->postJson('/web-api/admin/invoices', [...$base, 'serialNumber' => 'B001-0'])->assertUnprocessable();
+        $base = ['orderId' => '00000000-0000-0000-0000-0000000000aa', 'type' => '03', 'customerDocumentType' => '1', 'customerDocumentNumber' => '12345678', 'customerName' => 'Cliente'];
+        $this->withSession($session)->postJson('/web-api/admin/invoices', [...$base, 'series' => 'B001-1'])->assertUnprocessable();
         $this->withSession($session)->postJson('/web-api/admin/invoices', [...$base, 'type' => '07'])->assertUnprocessable();
-        $this->withSession($session)->postJson('/web-api/admin/invoices', $base)->assertOk()->assertJsonPath('data.status', 'DRAFT');
+        $this->withSession($session)->postJson('/web-api/admin/invoices', [...$base, 'series' => 'B002'])->assertOk()->assertJsonPath('data.status', 'DRAFT');
         // Customer data may be omitted: the platform takes it from the order billing.
         $this->withSession($session)->postJson('/web-api/admin/invoices', array_diff_key($base, array_flip(['customerDocumentType', 'customerDocumentNumber', 'customerName'])))->assertOk();
+        // The number is never sent: the platform assigns it.
+        Http::assertNotSent(fn ($request) => array_key_exists('serialNumber', $request->data()));
+    }
+
+    public function test_invoice_series_and_corrections_require_permission(): void
+    {
+        $id = '00000000-0000-0000-0000-0000000000aa';
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            'java.test/api/invoices/series*' => Http::response(['success' => true, 'data' => []], 200),
+            "java.test/api/invoices/$id" => Http::response(['success' => true, 'data' => ['id' => $id]], 200),
+        ]);
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'orders:manage']), 'refresh' => 'r']])
+            ->getJson('/web-api/admin/invoice-series')->assertForbidden();
+        $session = ['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'invoices:submit']), 'refresh' => 'r']];
+        $this->withSession($session)->getJson('/web-api/admin/invoice-series')->assertOk();
+        $this->withSession($session)->postJson('/web-api/admin/invoice-series', ['type' => '03', 'series' => 'b2'])->assertUnprocessable();
+        $this->withSession($session)->postJson('/web-api/admin/invoice-series', ['type' => '03', 'series' => 'B002', 'startAfter' => 120])->assertOk();
+        $this->withSession($session)->patchJson('/web-api/admin/invoice-series/3', ['active' => false])->assertOk();
+        Http::assertSent(fn ($request) => $request->method() === 'PATCH' && $request->url() === 'http://java.test/api/invoices/series/3' && $request['active'] === false);
+        $this->withSession($session)->patchJson("/web-api/admin/invoices/$id", ['customerDocumentType' => '1'])->assertUnprocessable();
+        $this->withSession($session)->patchJson("/web-api/admin/invoices/$id", ['customerDocumentType' => '1', 'customerDocumentNumber' => '87654321', 'customerName' => 'Ana'])->assertOk();
     }
 
     public function test_login_rejects_tokens_the_web_cannot_verify(): void

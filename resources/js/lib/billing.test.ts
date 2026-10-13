@@ -4,6 +4,8 @@ import {
   billingPayload,
   invoiceTypeLabel,
   isValidRuc,
+  seriesFor,
+  seriesPrefix,
   validateBilling,
   validateInvoice,
   type BillingForm,
@@ -13,7 +15,7 @@ import {
 const boleta: InvoiceInput = {
   orderId: '0b7f1c2e-8a4d-4f5e-9c1b-2d3e4f5a6b7c',
   type: '03',
-  serialNumber: 'b001-12',
+  series: '',
   customerDocumentType: '1',
   customerDocumentNumber: '12345678',
   customerName: 'Cliente',
@@ -21,15 +23,41 @@ const boleta: InvoiceInput = {
 };
 
 describe('invoice rules', () => {
-  it('accepts a valid boleta and normalizes the series case', () => {
+  it('accepts a boleta with the automatic or a chosen series', () => {
     expect(validateInvoice(boleta)).toEqual({});
+    expect(validateInvoice({ ...boleta, series: 'B002' })).toEqual({});
   });
   it('checks the series format and prefix per document type', () => {
-    expect(validateInvoice({ ...boleta, serialNumber: 'B001-0' }).serialNumber).toBeDefined();
-    expect(validateInvoice({ ...boleta, serialNumber: 'F001-1' }).serialNumber).toMatch(/boletas/);
+    expect(validateInvoice({ ...boleta, series: 'B001-1' }).series).toBeDefined();
+    expect(validateInvoice({ ...boleta, series: 'F001' }).series).toMatch(/B/);
+    expect(
+      validateInvoice({ ...boleta, type: '07', referencedSerialNumber: 'F001-3', series: 'BC01' })
+        .series,
+    ).toMatch(/F/);
+  });
+  it('lists the active series the platform would use', () => {
+    const row = (id: number, type: string, series: string, active = true) => ({
+      id,
+      type,
+      series,
+      active,
+      lastNumber: 0,
+      nextNumber: `${series}-1`,
+    });
+    const all = [
+      row(1, '03', 'B001'),
+      row(2, '03', 'B002', false),
+      row(3, '01', 'F001'),
+      row(4, '07', 'FC01'),
+      row(5, '07', 'BC01'),
+    ];
+    expect(seriesFor(all, '03').map((item) => item.series)).toEqual(['B001']);
+    expect(seriesFor(all, '07', 'b001-4').map((item) => item.series)).toEqual(['BC01']);
+    expect(seriesFor(all, '07').map((item) => item.series)).toEqual(['FC01', 'BC01']);
+    expect(seriesPrefix('07', 'nope')).toBeNull();
   });
   it('requires RUC for facturas and checks document lengths', () => {
-    const factura = { ...boleta, type: '01', serialNumber: 'F001-1' };
+    const factura = { ...boleta, type: '01' };
     expect(validateInvoice(factura).customerDocumentType).toMatch(/RUC/);
     expect(
       validateInvoice({ ...factura, customerDocumentType: '6', customerDocumentNumber: '123' })
@@ -69,7 +97,6 @@ describe('checkout billing', () => {
       validateInvoice({
         ...boleta,
         type: '01',
-        serialNumber: 'F001-1',
         customerDocumentType: '6',
         customerDocumentNumber: '20123456789',
       }).customerDocumentNumber,

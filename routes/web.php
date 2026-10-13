@@ -29,7 +29,10 @@ Route::prefix('web-api')->group(function () {
     Route::patch('/admin/orders/{id}/status', [OrderGatewayController::class, 'orderStatus'])->whereUuid('id');
     Route::post('/admin/payments/{id}/confirm', [PaymentGatewayController::class, 'confirmPayment'])->whereUuid('id');
     Route::post('/admin/invoices', [InvoiceGatewayController::class, 'create']);
+    Route::match(['get', 'post'], '/admin/invoice-series', [InvoiceGatewayController::class, 'series']);
+    Route::patch('/admin/invoice-series/{id}', [InvoiceGatewayController::class, 'updateSeries'])->whereNumber('id');
     Route::get('/admin/invoices/{id}', [InvoiceGatewayController::class, 'show'])->whereUuid('id');
+    Route::patch('/admin/invoices/{id}', [InvoiceGatewayController::class, 'update'])->whereUuid('id');
     Route::post('/admin/invoices/{id}/submit', [InvoiceGatewayController::class, 'submit'])->whereUuid('id');
     Route::match(['get', 'post'], '/admin/suppliers', [SupplierGatewayController::class, 'suppliers']);
     Route::post('/admin/suppliers/{id}/run', [SupplierGatewayController::class, 'run'])->whereUuid('id');

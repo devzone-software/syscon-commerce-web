@@ -110,7 +110,7 @@ Java (`requirePermission`), sin depender del nombre del rol.
 | `GET admin/payments` | `GET /api/admin/payments` | `payments:confirm` |
 | `PATCH admin/orders/{id}/status` | `PATCH /api/orders/{id}/status/{status}` | `orders:manage` |
 | `POST admin/payments/{id}/confirm` | `POST /api/payments/{id}/confirm` | `payments:confirm` |
-| `POST admin/invoices`, `GET admin/invoices/{id}`, `POST admin/invoices/{id}/submit` | `/api/invoices` | `invoices:submit` |
+| `POST admin/invoices` (sin correlativo), `GET|PATCH admin/invoices/{id}`, `POST admin/invoices/{id}/submit`, `GET|POST admin/invoice-series`, `PATCH admin/invoice-series/{id}` | `/api/invoices`, `/api/invoices/series` | `invoices:submit` |
 | `GET/POST admin/suppliers`, `POST admin/suppliers/{id}/run`, `GET admin/supplier-jobs[/{id}/history]` | `/api/suppliers` | `suppliers:manage` |
 
 ## Límites conocidos del backend

@@ -1,4 +1,4 @@
-import type { Billing, DocumentType, Profile } from '../types';
+import type { Billing, DocumentType, InvoiceSeries, Profile } from '../types';
 
 /** Document types accepted by invoice-service (SUNAT catalog 01). */
 export const invoiceTypes = [
@@ -29,7 +29,8 @@ export const invoiceTypeLabel = (type: string) =>
 export type InvoiceInput = {
   orderId: string;
   type: string;
-  serialNumber: string;
+  /** One of the configured series; '' lets the platform pick the first active one. */
+  series: string;
   customerDocumentType: string;
   customerDocumentNumber: string;
   customerName: string;
@@ -37,17 +38,32 @@ export type InvoiceInput = {
 };
 
 const SERIAL = /^[FB][A-Z0-9]{3}-[1-9][0-9]{0,7}$/;
+export const SERIES = /^[FB][A-Z0-9]{3}$/;
 
-/** Same checks as InvoiceService.create, plus the document length and factura/RUC rule. */
+/** First letter of the series: F for facturas, B for boletas; notes follow the document they modify. */
+export function seriesPrefix(type: string, referencedSerialNumber = ''): string | null {
+  if (type === '01') return 'F';
+  if (type === '03') return 'B';
+  const referenced = referencedSerialNumber.trim().toUpperCase();
+  return SERIAL.test(referenced) ? referenced[0] : null;
+}
+
+/** Active series the platform would accept for this document, in the order it picks them. */
+export function seriesFor(series: InvoiceSeries[], type: string, referencedSerialNumber = '') {
+  const prefix = seriesPrefix(type, referencedSerialNumber);
+  return series.filter(
+    (item) => item.active && item.type === type && (!prefix || item.series.startsWith(prefix)),
+  );
+}
+
+/** Same checks as InvoiceController::store, plus the document length and factura/RUC rule. */
 export function validateInvoice(input: InvoiceInput): Partial<Record<keyof InvoiceInput, string>> {
   const errors: Partial<Record<keyof InvoiceInput, string>> = {};
-  const serial = input.serialNumber.trim().toUpperCase();
-  if (!SERIAL.test(serial))
-    errors.serialNumber = 'Usa el formato serie-correlativo, por ejemplo B001-25 o F001-8.';
-  else if (input.type === '01' && !serial.startsWith('F'))
-    errors.serialNumber = 'Las facturas usan series que empiezan con F.';
-  else if (input.type === '03' && !serial.startsWith('B'))
-    errors.serialNumber = 'Las boletas usan series que empiezan con B.';
+  const prefix = seriesPrefix(input.type, input.referencedSerialNumber);
+  if (input.series && !SERIES.test(input.series))
+    errors.series = 'La serie tiene 4 caracteres y empieza con F o B.';
+  else if (input.series && prefix && !input.series.startsWith(prefix))
+    errors.series = `Este comprobante usa una serie que empieza con ${prefix}.`;
   if (
     ['07', '08'].includes(input.type) &&
     !SERIAL.test(input.referencedSerialNumber.trim().toUpperCase())

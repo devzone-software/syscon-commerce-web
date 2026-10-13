@@ -178,4 +178,24 @@ export type Invoice = {
   error: string | null;
   sunatCode: string | null;
   sunatDescription: string | null;
+  customerDocumentType?: string;
+  customerDocumentNumber?: string;
+  customerName?: string;
+  referencedSerialNumber?: string | null;
+  total?: string;
+  createdAt?: string | null;
+};
+/** Series configured on the platform; `nextNumber` is the serial the next document gets. */
+export type InvoiceSeries = {
+  id: number;
+  type: string;
+  series: string;
+  lastNumber: number;
+  nextNumber: string;
+  active: boolean;
+};
+export type InvoiceCustomer = {
+  customerDocumentType: string;
+  customerDocumentNumber: string;
+  customerName: string;
 };
