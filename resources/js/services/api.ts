@@ -1,4 +1,8 @@
 import type {
+  AdminOrder,
+  AdminOrderList,
+  AdminPage,
+  AdminPayment,
   Billing,
   Delivery,
   DeliveryOptions,
@@ -63,6 +67,23 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return result.data;
 }
 const json = (body: unknown) => JSON.stringify(body);
+/** Query string without empty filters. */
+const query = (filters: Record<string, string | number | undefined>) => {
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== '') params.set(key, String(value));
+  });
+  const text = params.toString();
+  return text ? `?${text}` : '';
+};
+export type OrderFilters = {
+  status?: string;
+  q?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+};
+export type PaymentFilters = { status?: string; q?: string; page?: number };
 export const api = {
   products: () => request<Product[]>('/catalog/products'),
   categories: () => request<string[]>('/catalog/categories'),
@@ -92,6 +113,10 @@ export const api = {
   payment: (id: string) => request<Payment>(`/payments/${encodeURIComponent(id)}`),
   saveProduct: (product: Omit<Product, 'id'>) =>
     request<Product>('/admin/products', { method: 'POST', body: json(product) }),
+  adminOrders: (filters: OrderFilters) => request<AdminOrderList>(`/admin/orders${query(filters)}`),
+  adminOrder: (id: string) => request<AdminOrder>(`/admin/orders/${encodeURIComponent(id)}`),
+  adminPayments: (filters: PaymentFilters) =>
+    request<AdminPage<AdminPayment>>(`/admin/payments${query(filters)}`),
   setOrderStatus: (id: string, status: string) =>
     request<Order>(`/admin/orders/${encodeURIComponent(id)}/status`, {
       method: 'PATCH',

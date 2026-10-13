@@ -45,6 +45,8 @@ export type Order = {
   /** Products only; `total` adds the delivery cost. */
   subtotal?: string;
   createdAt?: string | null;
+  /** While unpaid: when the stock reservation ends and the order expires (null = never). */
+  expiresAt?: string | null;
   details: { productId: string; sku: string; name: string; quantity: number; unitPrice: number }[];
 };
 export type Payment = {
@@ -55,6 +57,64 @@ export type Payment = {
   amount: number;
   paymentUrl?: string | null;
   externalReference?: string | null;
+  /** Configured manual payment instructions, only while the payment is pending. */
+  instructions?: string | null;
+  createdAt?: string | null;
+  confirmedAt?: string | null;
+  /** Backoffice only: e-mail of whoever confirmed it. */
+  confirmedBy?: string | null;
+};
+/** Row of the backoffice payments inbox (GET /admin/payments). */
+export type AdminPayment = Payment & {
+  customerEmail: string;
+  orderStatus: string;
+  orderExpiresAt: string | null;
+};
+export type AdminPage<T> = { items: T[]; page: number; perPage: number; total: number };
+/** Row of the backoffice orders inbox (GET /admin/orders). */
+export type AdminOrderSummary = {
+  id: string;
+  status: string;
+  total: string;
+  createdAt: string | null;
+  expiresAt: string | null;
+  customer: { id: string; email: string; name: string | null };
+  billing: { type: '01' | '03'; documentNumber: string; name: string } | null;
+  deliveryMethod: DeliveryMethod | null;
+  payment: { id: string; status: string } | null;
+  invoice: { id: string; serialNumber: string; status: string } | null;
+};
+export type AdminOrderList = AdminPage<AdminOrderSummary> & { counts: Record<string, number> };
+export type OrderEvent = {
+  type: string;
+  from: string | null;
+  to: string | null;
+  reference: string | null;
+  /** E-mail of the user who acted; null with `system` when the platform did it. */
+  actor: string | null;
+  system: boolean;
+  at: string | null;
+};
+/** GET /admin/orders/{id}: the order with everything related to it. */
+export type AdminOrder = Order & {
+  customer: {
+    id: string;
+    email: string;
+    name: string | null;
+    phone: string | null;
+    documentType: string | null;
+    documentNumber: string | null;
+  } | null;
+  payments: Payment[];
+  invoices: {
+    id: string;
+    type: string;
+    serialNumber: string;
+    status: string;
+    total: string;
+    createdAt: string | null;
+  }[];
+  events: OrderEvent[];
 };
 export type User = {
   id: string;

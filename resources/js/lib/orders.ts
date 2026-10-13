@@ -9,9 +9,22 @@ export const orderStatusLabels: Record<string, string> = {
   SHIPPED: 'Enviado',
   DELIVERED: 'Entregado',
   CANCELLED: 'Cancelado',
+  EXPIRED: 'Vencido',
 };
 
-/** Forward path of order-service (OrderService.transition); CANCELLED is only allowed before payment. */
+/** Tabs of the backoffice orders inbox, in working order; '' lists every state. */
+export const orderInboxTabs = [
+  '',
+  'PAYMENT_PENDING',
+  'PAID',
+  'PROCESSING',
+  'SHIPPED',
+  'DELIVERED',
+  'CANCELLED',
+  'EXPIRED',
+];
+
+/** Forward path of OrderService::transition; CANCELLED and EXPIRED only happen before payment. */
 export const orderFlow = ['PAYMENT_PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
 
 const nextStatus: Record<string, string> = {
@@ -30,6 +43,16 @@ export function allowedTransitions(status: string): string[] {
 export const paymentStatusLabels: Record<string, string> = {
   PENDING: 'Pendiente de confirmación',
   APPROVED: 'Aprobado',
+  CANCELLED: 'Anulado',
+};
+
+/** Entries of the order history (order_events). */
+export const orderEventLabels: Record<string, string> = {
+  CREATED: 'Pedido registrado',
+  PAYMENT_REQUESTED: 'Pago manual solicitado',
+  PAYMENT_CONFIRMED: 'Pago confirmado',
+  STATUS_CHANGED: 'Cambio de estado',
+  EXPIRED: 'Reserva vencida',
 };
 
 export const statusLabel = (labels: Record<string, string>, status: string) =>
@@ -37,7 +60,7 @@ export const statusLabel = (labels: Record<string, string>, status: string) =>
 
 export function statusTone(status: string): 'success' | 'warning' | 'danger' | 'info' {
   if (['PAID', 'DELIVERED', 'APPROVED', 'ACCEPTED', 'SUCCEEDED'].includes(status)) return 'success';
-  if (['CANCELLED', 'REJECTED', 'FAILED'].includes(status)) return 'danger';
+  if (['CANCELLED', 'EXPIRED', 'REJECTED', 'FAILED'].includes(status)) return 'danger';
   if (['PAYMENT_PENDING', 'PENDING', 'DRAFT', 'RUNNING'].includes(status)) return 'warning';
   return 'info';
 }
@@ -50,7 +73,7 @@ export const orderProgress = (status: string) => {
   return step < 0 ? 0 : Math.round((step / (orderFlow.length - 1)) * 100);
 };
 
-const closed = ['DELIVERED', 'CANCELLED'];
+const closed = ['DELIVERED', 'CANCELLED', 'EXPIRED'];
 /** Figures of the customer dashboard, computed from GET /orders (newest first). */
 export function accountSummary(orders: Order[]) {
   const active = orders.filter((order) => !closed.includes(order.status));
@@ -60,7 +83,9 @@ export function accountSummary(orders: Order[]) {
     pendingPayment: orders.filter((order) => order.status === 'PAYMENT_PENDING').length,
     // Only confirmed purchases count towards the spent amount.
     spent: orders
-      .filter((order) => !['CANCELLED', 'CREATED', 'PAYMENT_PENDING'].includes(order.status))
+      .filter(
+        (order) => !['CANCELLED', 'EXPIRED', 'CREATED', 'PAYMENT_PENDING'].includes(order.status),
+      )
       .reduce((sum, order) => sum + Number(order.total), 0),
     current: active[0] ?? null,
   };

@@ -15,6 +15,13 @@ describe('order states', () => {
     expect(allowedTransitions('SHIPPED')).toEqual(['DELIVERED']);
     expect(allowedTransitions('DELIVERED')).toEqual([]);
     expect(allowedTransitions('CANCELLED')).toEqual([]);
+    expect(allowedTransitions('EXPIRED')).toEqual([]);
+  });
+  it('treats expired orders as closed and unpaid', () => {
+    expect(statusLabel(orderStatusLabels, 'EXPIRED')).toBe('Vencido');
+    expect(statusTone('EXPIRED')).toBe('danger');
+    const summary = accountSummary([{ id: '1', status: 'EXPIRED', total: 80, details: [] }]);
+    expect(summary).toMatchObject({ active: 0, spent: 0, current: null });
   });
   it('labels known states and keeps unknown ones visible', () => {
     expect(statusLabel(orderStatusLabels, 'PAID')).toBe('Pagado');

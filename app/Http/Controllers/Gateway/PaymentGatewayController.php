@@ -20,6 +20,17 @@ class PaymentGatewayController extends GatewayController
         return $this->reply($this->api->authenticated('GET', "/api/payments/$id"));
     }
 
+    /** Backoffice inbox: pending manual payments by default, oldest first. */
+    public function adminPayments(Request $request): JsonResponse
+    {
+        if ($error = $this->requirePermission('payments:confirm')) return $error;
+        $data = $request->validate([
+            'status' => 'nullable|in:PENDING,APPROVED,CANCELLED', 'q' => 'nullable|string|max:120',
+            'page' => 'nullable|integer|min:1', 'perPage' => 'nullable|integer|min:1|max:100',
+        ]);
+        return $this->reply($this->api->authenticated('GET', '/api/admin/payments'.OrderGatewayController::query($data)));
+    }
+
     public function confirmPayment(string $id, Request $request): JsonResponse
     {
         if ($error = $this->requirePermission('payments:confirm')) return $error;

@@ -2,6 +2,12 @@ import { orderFlow, orderStatusLabels } from '../../lib/orders';
 
 export function OrderTimeline({ status }: { status: string }) {
   if (status === 'CANCELLED') return <p className="notice error">Este pedido fue cancelado.</p>;
+  if (status === 'EXPIRED')
+    return (
+      <p className="notice error">
+        Este pedido venció porque no se confirmó su pago a tiempo; su reserva de stock se liberó.
+      </p>
+    );
   const current = orderFlow.indexOf(status);
   return (
     <ol className="order-timeline" aria-label="Estado del pedido">

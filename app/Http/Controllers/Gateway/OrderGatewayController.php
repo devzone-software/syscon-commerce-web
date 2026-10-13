@@ -46,10 +46,36 @@ class OrderGatewayController extends GatewayController
         return $this->reply($this->api->authenticated('GET', "/api/orders/$id"));
     }
 
+    /** Backoffice inbox: every customer's orders, paginated and filtered by the platform. */
+    public function adminOrders(Request $request): JsonResponse
+    {
+        if ($error = $this->requirePermission('orders:manage')) return $error;
+        $data = $request->validate([
+            'status' => ['nullable', 'string', 'max:200', 'regex:/^[A-Z_]+(,[A-Z_]+)*$/'], 'q' => 'nullable|string|max:120',
+            'from' => 'nullable|date_format:Y-m-d', 'to' => 'nullable|date_format:Y-m-d|after_or_equal:from',
+            'page' => 'nullable|integer|min:1', 'perPage' => 'nullable|integer|min:1|max:100',
+        ]);
+        return $this->reply($this->api->authenticated('GET', '/api/admin/orders'.self::query($data)));
+    }
+
+    /** Order with its customer, payments, invoices and history. */
+    public function adminOrder(string $id): JsonResponse
+    {
+        if ($error = $this->requirePermission('orders:manage')) return $error;
+        return $this->reply($this->api->authenticated('GET', "/api/admin/orders/$id"));
+    }
+
     public function orderStatus(string $id, Request $request): JsonResponse
     {
         if ($error = $this->requirePermission('orders:manage')) return $error;
         $data = $request->validate(['status' => 'required|in:PROCESSING,SHIPPED,DELIVERED,CANCELLED']);
         return $this->reply($this->api->authenticated('PATCH', "/api/orders/$id/status/{$data['status']}"));
+    }
+
+    /** Query string with the filters that were actually sent. */
+    public static function query(array $filters): string
+    {
+        $filters = array_filter($filters, fn ($value) => $value !== null && $value !== '');
+        return $filters ? '?'.http_build_query($filters) : '';
     }
 }

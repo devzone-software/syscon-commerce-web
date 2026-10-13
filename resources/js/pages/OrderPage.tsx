@@ -8,7 +8,7 @@ import { PaymentDetails } from '../components/orders/PaymentDetails';
 import { StatusBadge } from '../components/shared/StatusBadge';
 import { billingRows } from '../lib/billing';
 import { deliveryRows } from '../lib/delivery';
-import { orderStatusLabels, shortId, statusLabel } from '../lib/orders';
+import { formatDateTime, orderStatusLabels, shortId, statusLabel } from '../lib/orders';
 import { api } from '../services/api';
 import { money } from '../state';
 import type { Payment } from '../types';
@@ -110,6 +110,8 @@ export function OrderPage() {
                   <p className="flow-note">
                     El método disponible es el pago manual. Un asesor confirmará el pago tras
                     verificarlo; conserva el identificador de la solicitud.
+                    {data.expiresAt &&
+                      ` Reservamos tu stock hasta el ${formatDateTime(data.expiresAt)}; si el pago no se confirma antes, el pedido vence.`}
                   </p>
                   {payError && <ErrorBox message={payError} />}
                   {!payment && (

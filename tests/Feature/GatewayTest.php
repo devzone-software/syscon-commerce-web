@@ -143,6 +143,25 @@ class GatewayTest extends TestCase
             ->postJson('/web-api/admin/payments/00000000-0000-0000-0000-0000000000aa/confirm', ['reference' => 'op-1'])->assertForbidden();
     }
 
+    public function test_admin_inboxes_forward_filters_and_require_permissions(): void
+    {
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            'java.test/api/admin/orders*' => Http::response(['success' => true, 'data' => ['items' => [], 'total' => 0]], 200),
+            'java.test/api/admin/payments*' => Http::response(['success' => true, 'data' => ['items' => [], 'total' => 0]], 200),
+        ]);
+        $orders = ['syscon' => ['access' => $this->token(['ROLE_OPERATOR', 'orders:manage']), 'refresh' => 'r']];
+        $this->withSession($orders)->getJson('/web-api/admin/orders?status=PAID,PROCESSING&q=ana&page=2&from=')->assertOk();
+        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/admin/orders?status=PAID%2CPROCESSING&q=ana&page=2');
+        $this->withSession($orders)->getJson('/web-api/admin/orders?status=paid;drop')->assertUnprocessable();
+        $this->withSession($orders)->getJson('/web-api/admin/payments')->assertForbidden();
+        $payments = ['syscon' => ['access' => $this->token(['ROLE_OPERATOR', 'payments:confirm']), 'refresh' => 'r']];
+        $this->withSession($payments)->getJson('/web-api/admin/orders')->assertForbidden();
+        $this->withSession($payments)->getJson('/web-api/admin/payments?status=PENDING')->assertOk();
+        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/admin/payments?status=PENDING');
+        $this->withSession($payments)->getJson('/web-api/admin/payments?status=REFUNDED')->assertUnprocessable();
+    }
+
     public function test_saving_a_product_clears_catalog_caches(): void
     {
         Cache::put('catalog.categories', ['status' => 200, 'body' => ['success' => true, 'data' => []]], 60);

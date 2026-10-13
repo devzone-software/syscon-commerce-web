@@ -258,6 +258,60 @@
 .bo-lookup .field-error {
   flex-basis: 100%;
 }
+.bo-filters-dates {
+  grid-template-columns: 2fr 1fr 1fr;
+}
+.bo-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.bo-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid var(--store-line);
+  border-radius: 999px;
+  background: var(--store-surface);
+  color: var(--store-ink-soft);
+  font: 600 13px Inter, sans-serif;
+  cursor: pointer;
+}
+.bo-tabs button:hover {
+  border-color: var(--store-brand);
+}
+.bo-tabs button[aria-pressed='true'] {
+  border-color: var(--store-brand);
+  background: var(--store-brand);
+  color: #fff;
+}
+.bo-tabs small {
+  font-size: 12px;
+  opacity: 0.8;
+}
+.bo-row-active td {
+  background: var(--store-soft);
+}
+.bo-history {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.bo-history li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 0 10px 16px;
+  border-left: 2px solid var(--store-line);
+  font-size: 14px;
+}
+.bo-history small {
+  font-size: 12px;
+  color: var(--store-muted);
+}
 .bo-detail-grid {
   display: grid;
   grid-template-columns: 1.6fr 1fr;

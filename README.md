@@ -20,8 +20,8 @@ Aplicación Laravel 12 + React 19 + TypeScript + Tailwind para el backend [SYSCO
 | Panel, reportes de catálogo e inventario | cualquier permiso de personal |
 | Productos, carga masiva CSV, categorías y marcas, existencias | `catalog:write` |
 | Proveedores (sincronización de feeds) | `suppliers:manage` |
-| Pedidos (consulta por ID y cambio de estado) | `orders:manage` |
-| Pagos (consulta por ID y confirmación manual) | `payments:confirm` |
+| Pedidos (bandeja filtrable, detalle con pagos, comprobantes e historial, cambio de estado) | `orders:manage` |
+| Pagos (bandeja de pagos por verificar y confirmación manual) | `payments:confirm` |
 | Comprobantes (emisión, consulta y envío) | `invoices:submit` |
 
 POS, caja, sucursales, almacenes, movimientos, kardex, clientes, listados globales y reportes de
@@ -106,6 +106,8 @@ Java (`requirePermission`), sin depender del nombre del rol.
 | `GET/POST orders`, `GET orders/{id}` | `/api/orders` | Sesión |
 | `POST payments`, `GET payments/{id}` | `/api/payments` | Sesión; solo proveedor `MANUAL` |
 | `POST admin/products` | `POST /api/catalog/products` | `catalog:write` |
+| `GET admin/orders`, `GET admin/orders/{id}` | `GET /api/admin/orders[/{id}]` | `orders:manage` |
+| `GET admin/payments` | `GET /api/admin/payments` | `payments:confirm` |
 | `PATCH admin/orders/{id}/status` | `PATCH /api/orders/{id}/status/{status}` | `orders:manage` |
 | `POST admin/payments/{id}/confirm` | `POST /api/payments/{id}/confirm` | `payments:confirm` |
 | `POST admin/invoices`, `GET admin/invoices/{id}`, `POST admin/invoices/{id}/submit` | `/api/invoices` | `invoices:submit` |
