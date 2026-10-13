@@ -388,3 +388,25 @@
     grid-template-columns: 1fr;
   }
 }
+.billing-option strong {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.billing-option-cost {
+  font-style: normal;
+  font-weight: 800;
+  color: #00265d;
+  white-space: nowrap;
+}
+.billing-option.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.billing-option.is-disabled:hover {
+  border-color: #dbe3ed;
+}
+.billing-option > span {
+  flex: 1;
+  min-width: 0;
+}

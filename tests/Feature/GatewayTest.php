@@ -92,10 +92,21 @@ class GatewayTest extends TestCase
         $session = ['syscon' => ['access' => $this->token(), 'refresh' => 'refresh-secret']];
         $items = [['productId' => '00000000-0000-0000-0000-0000000000aa', 'quantity' => 1]];
         $billing = ['type' => '03', 'documentType' => '1', 'documentNumber' => '12345678', 'name' => 'Ana Quispe', 'address' => null];
+        $delivery = ['method' => 'PICKUP', 'contactName' => 'Ana Quispe', 'contactPhone' => '987654321'];
+        $key = '7b0f2c9e-1d3a-4c5b-8e6f-0a1b2c3d4e5f';
+        $order = ['items' => $items, 'billing' => $billing, 'delivery' => $delivery, 'idempotencyKey' => $key];
         $this->withSession($session)->postJson('/web-api/orders', ['items' => $items])->assertUnprocessable();
-        $this->withSession($session)->postJson('/web-api/orders', ['items' => $items, 'billing' => ['type' => '07'] + $billing])->assertUnprocessable();
-        $this->withSession($session)->postJson('/web-api/orders', ['items' => $items, 'billing' => $billing])->assertOk()->assertJsonPath('data.id', 'o1');
-        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/orders' && $request['billing']['documentNumber'] === '12345678' && $request['billing']['type'] === '03');
+        $this->withSession($session)->postJson('/web-api/orders', ['billing' => ['type' => '07'] + $billing] + $order)->assertUnprocessable();
+        $this->withSession($session)->postJson('/web-api/orders', ['delivery' => ['method' => 'DELIVERY'] + $delivery] + $order)->assertUnprocessable();
+        $this->withSession($session)->postJson('/web-api/orders', array_diff_key($order, ['idempotencyKey' => 1]))->assertUnprocessable();
+        $this->withSession($session)->postJson('/web-api/orders', $order)->assertOk()->assertJsonPath('data.id', 'o1');
+        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/orders' && $request['billing']['documentNumber'] === '12345678' && $request['delivery']['method'] === 'PICKUP' && $request['idempotencyKey'] === $key);
+    }
+
+    public function test_delivery_options_are_public(): void
+    {
+        Http::fake(['java.test/api/orders/delivery-options' => Http::response(['success' => true, 'data' => ['delivery' => ['enabled' => true, 'cost' => '15.00']]], 200)]);
+        $this->getJson('/web-api/delivery-options')->assertOk()->assertJsonPath('data.delivery.cost', '15.00');
     }
 
     public function test_profile_requires_session_and_proxies_platform(): void

@@ -21,27 +21,41 @@ export function InfoRows({
   );
 }
 
-/** Totals shared by the cart and the checkout; the backend confirms the final amount. */
+/**
+ * Totals shared by the cart and the checkout; the backend confirms the final amount.
+ * `shipping`: omitted in the cart (chosen later), null while loading, otherwise the cost.
+ */
 export function OrderSummary({
   lines,
   totalLabel = 'Total',
+  shipping,
   children,
 }: {
   lines: CartLine[];
   totalLabel?: string;
+  shipping?: number | null;
   children?: ReactNode;
 }) {
   const units = cartUnits(lines);
-  const total = cartTotal(lines);
+  const subtotal = cartTotal(lines);
+  const total = subtotal + (shipping ?? 0);
+  const shippingLabel =
+    shipping === undefined
+      ? 'Se elige en el checkout'
+      : shipping === null
+        ? '…'
+        : shipping === 0
+          ? 'Gratis'
+          : money(shipping);
   return (
     <div className="order-summary">
       <InfoRows
         rows={[
           {
             label: `Subtotal (${units} ${units === 1 ? 'unidad' : 'unidades'})`,
-            value: money(total),
+            value: money(subtotal),
           },
-          { label: 'Envío', value: 'Coordinado' },
+          { label: 'Envío', value: shippingLabel },
           { label: totalLabel, value: money(total), tone: 'total' },
         ]}
       />

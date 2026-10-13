@@ -1,5 +1,7 @@
 import type {
   Billing,
+  Delivery,
+  DeliveryOptions,
   Invoice,
   Order,
   Payment,
@@ -77,8 +79,14 @@ export const api = {
   orders: () => request<Order[]>('/orders'),
   order: (id: string) => request<Order>(`/orders/${encodeURIComponent(id)}`),
   profile: () => request<Profile>('/profile'),
-  createOrder: (items: { productId: string; quantity: number }[], billing: Billing) =>
-    request<Order>('/orders', { method: 'POST', body: json({ items, billing }) }),
+  deliveryOptions: () => request<DeliveryOptions>('/delivery-options'),
+  /** Retrying with the same idempotencyKey returns the order already created. */
+  createOrder: (order: {
+    items: { productId: string; quantity: number }[];
+    billing: Billing;
+    delivery: Delivery;
+    idempotencyKey: string;
+  }) => request<Order>('/orders', { method: 'POST', body: json(order) }),
   createPayment: (orderId: string) =>
     request<Payment>('/payments', { method: 'POST', body: json({ orderId, provider: 'MANUAL' }) }),
   payment: (id: string) => request<Payment>(`/payments/${encodeURIComponent(id)}`),

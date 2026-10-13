@@ -20,8 +20,23 @@ class OrderGatewayController extends GatewayController
             'billing.documentNumber' => 'required|string|max:15',
             'billing.name' => 'required|string|max:255',
             'billing.address' => 'nullable|string|max:255',
+            'delivery' => 'required|array',
+            'delivery.method' => 'required|in:PICKUP,DELIVERY',
+            'delivery.contactName' => 'required|string|max:120',
+            'delivery.contactPhone' => 'required|string|max:11',
+            'delivery.address' => 'nullable|required_if:delivery.method,DELIVERY|string|max:255',
+            'delivery.district' => 'nullable|required_if:delivery.method,DELIVERY|string|max:80',
+            'delivery.reference' => 'nullable|string|max:255',
+            // Same key on a retry: the platform returns the order already created.
+            'idempotencyKey' => 'required|uuid',
         ]);
         return $this->reply($this->api->authenticated('POST', '/api/orders', $data));
+    }
+
+    /** Public: pickup and home delivery options with the cost the platform will charge. */
+    public function deliveryOptions(): JsonResponse
+    {
+        return $this->reply($this->api->request('GET', '/api/orders/delivery-options'));
     }
 
     /** Owners and users with orders:manage can read an order; Java enforces it. */

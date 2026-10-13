@@ -1,20 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { InfoRows, OrderSummary } from '../components/cart/OrderSummary';
+import { BillingFields } from '../components/checkout/BillingFields';
+import { DeliveryFields } from '../components/checkout/DeliveryFields';
 import { PageHero, PageSection } from '../components/layout/PageHero';
 import { useCartReview } from '../hooks/useCartReview';
 import { displayName } from '../lib/auth';
 import {
   billingFromProfile,
   billingPayload,
-  boletaDocuments,
   validateBilling,
   type BillingForm,
 } from '../lib/billing';
 import { issueMessages } from '../lib/cart';
+import {
+  checkoutAttemptKey,
+  deliveryCost,
+  deliveryFromProfile,
+  deliveryPayload,
+  forgetCheckoutAttempt,
+  validateDelivery,
+  type DeliveryForm,
+} from '../lib/delivery';
 import { api } from '../services/api';
 import { money, useShop } from '../state';
-import type { Payment, Profile } from '../types';
+import type { DeliveryOptions, Payment, Profile } from '../types';
 import { ErrorBox } from '../ui';
 
 export function Checkout() {
@@ -25,6 +35,11 @@ export function Checkout() {
   const [error, setError] = useState('');
   const [forms, setForms] = useState(() => initialForms(user));
   const [type, setType] = useState<BillingForm['type']>('03');
+  const [delivery, setDelivery] = useState<DeliveryForm>(() =>
+    deliveryFromProfile({ firstName: user?.firstName ?? null, lastName: user?.lastName ?? null }),
+  );
+  const [options, setOptions] = useState<DeliveryOptions | null>(null);
+  const [optionsError, setOptionsError] = useState('');
   const edited = useRef(false);
   const [showErrors, setShowErrors] = useState(false);
 
@@ -37,8 +52,13 @@ export function Checkout() {
         if (!active || edited.current) return;
         setForms(initialForms(user, profile));
         setType(billingFromProfile(profile).type);
+        setDelivery(deliveryFromProfile(profile));
       })
       .catch(() => undefined);
+    api
+      .deliveryOptions()
+      .then((value) => active && setOptions(value))
+      .catch((e) => active && setOptionsError((e as Error).message));
     return () => {
       active = false;
     };
@@ -47,24 +67,38 @@ export function Checkout() {
   }, []);
 
   const billing = forms[type];
-  const errors = validateBilling(billing);
-  const update = (patch: Partial<BillingForm>) => {
+  const billingErrors = validateBilling(billing);
+  const deliveryErrors = validateDelivery(delivery, options);
+  const invalid = Object.keys(billingErrors).length + Object.keys(deliveryErrors).length > 0;
+  const shipping = deliveryCost(delivery.method, options);
+  const updateBilling = (patch: Partial<BillingForm>) => {
     edited.current = true;
     setForms((current) => ({ ...current, [type]: { ...current[type], ...patch } }));
   };
+  const updateDelivery = (patch: Partial<DeliveryForm>) => {
+    edited.current = true;
+    setDelivery((current) => ({ ...current, ...patch }));
+  };
 
   const submit = async () => {
-    if (Object.keys(errors).length) {
+    if (invalid) {
       setShowErrors(true);
       return;
     }
     setBusy(true);
     setError('');
+    const payload = {
+      items: cart.map((line) => ({ productId: line.product.id, quantity: line.quantity })),
+      billing: billingPayload(billing),
+      delivery: deliveryPayload(delivery),
+    };
     try {
-      const order = await api.createOrder(
-        cart.map((line) => ({ productId: line.product.id, quantity: line.quantity })),
-        billingPayload(billing),
-      );
+      // A retry of this same purchase reuses the key, so it cannot create a second order.
+      const order = await api.createOrder({
+        ...payload,
+        idempotencyKey: checkoutAttemptKey(payload),
+      });
+      forgetCheckoutAttempt();
       clear();
       // The manual payment request is idempotent; if it fails the order page offers a retry.
       let payment: Payment | null = null;
@@ -81,40 +115,50 @@ export function Checkout() {
   };
 
   if (!cart.length && !busy) return <Navigate to="/carrito" replace />;
-  const blocked = checking || issues.size > 0;
+  const blocked = checking || issues.size > 0 || !options;
 
   return (
     <>
       <PageHero
         eyebrow="CHECKOUT SEGURO"
         title="Finaliza tu compra"
-        text="Revisa tus datos, los productos y el método de pago antes de confirmar."
+        text="Elige la entrega y el comprobante, revisa los productos y confirma tu pedido."
       />
       <PageSection title="Datos de compra">
         <InfoRows
           rows={[
             { label: 'Cliente', value: user ? displayName(user) : '—' },
             { label: 'Correo electrónico', value: user?.email ?? '—' },
-            { label: 'Entrega', value: 'Coordinación con un asesor de SYSCON' },
           ]}
         />
         <p className="flow-note">
           El pedido quedará vinculado a tu cuenta y podrás seguirlo desde “Mis pedidos”.
         </p>
+        <h3 className="flow-subtitle">Entrega</h3>
+        {optionsError ? (
+          <ErrorBox message={`No pudimos cargar las opciones de entrega. ${optionsError}`} />
+        ) : (
+          <DeliveryFields
+            form={delivery}
+            options={options}
+            errors={showErrors ? deliveryErrors : {}}
+            onChange={updateDelivery}
+          />
+        )}
         <h3 className="flow-subtitle">Comprobante de pago</h3>
         <BillingFields
           type={type}
           form={billing}
-          errors={showErrors ? errors : {}}
+          errors={showErrors ? billingErrors : {}}
           onType={(value) => {
             edited.current = true;
             setType(value);
           }}
-          onChange={update}
+          onChange={updateBilling}
         />
-        {showErrors && Object.keys(errors).length > 0 && (
+        {showErrors && invalid && (
           <p className="notice error" role="alert">
-            Revisa los datos del comprobante antes de confirmar.
+            Revisa los datos de entrega y del comprobante antes de confirmar.
           </p>
         )}
         <h3 className="flow-subtitle">Productos</h3>
@@ -147,7 +191,7 @@ export function Checkout() {
         {error && <ErrorBox message={error} />}
       </PageSection>
       <PageSection title="Resumen del pedido" soft>
-        <OrderSummary lines={cart} totalLabel="Total a pagar">
+        <OrderSummary lines={cart} totalLabel="Total a pagar" shipping={shipping}>
           {issues.size > 0 && (
             <p className="notice error" role="alert">
               Hay productos que requieren atención. <Link to="/carrito">Revisar carrito</Link>
@@ -156,7 +200,7 @@ export function Checkout() {
           <button type="button" className="flow-button" disabled={busy || blocked} onClick={submit}>
             {busy
               ? 'Creando pedido…'
-              : checking
+              : checking || !options
                 ? 'Verificando disponibilidad…'
                 : 'Confirmar compra'}
           </button>
@@ -178,140 +222,4 @@ function initialForms(user: Identity, profile?: Profile): Forms {
   return base.type === '01'
     ? { '01': base, '03': { ...empty, type: '03', documentType: '1' } }
     : { '03': base, '01': { ...empty, type: '01', documentType: '6' } };
-}
-
-const billingOptions = [
-  ['03', 'Boleta de venta', 'Persona natural · DNI, carné de extranjería o pasaporte'],
-  ['01', 'Factura', 'Empresa o persona con negocio · RUC'],
-] as const;
-
-function BillingFields({
-  type,
-  form,
-  errors,
-  onType,
-  onChange,
-}: {
-  type: BillingForm['type'];
-  form: BillingForm;
-  errors: Partial<Record<keyof BillingForm, string>>;
-  onType: (type: BillingForm['type']) => void;
-  onChange: (patch: Partial<BillingForm>) => void;
-}) {
-  const factura = type === '01';
-  const fieldProps = (key: keyof BillingForm) => ({
-    'aria-invalid': errors[key] ? true : undefined,
-    'aria-describedby': errors[key] ? `billing-${key}-error` : undefined,
-  });
-  const fieldError = (key: keyof BillingForm) =>
-    errors[key] && (
-      <p className="field-error" id={`billing-${key}-error`}>
-        {errors[key]}
-      </p>
-    );
-
-  return (
-    <fieldset className="billing-fields">
-      <legend>Tipo de comprobante</legend>
-      <div className="billing-choice">
-        {billingOptions.map(([value, title, text]) => (
-          <label key={value} className={`billing-option${type === value ? ' is-active' : ''}`}>
-            <input
-              type="radio"
-              name="billing-type"
-              value={value}
-              checked={type === value}
-              onChange={() => onType(value)}
-            />
-            <span>
-              <strong>{title}</strong>
-              {text}
-            </span>
-          </label>
-        ))}
-      </div>
-      <div className="field-row">
-        {factura ? (
-          <label className="field">
-            RUC
-            <input
-              value={form.documentNumber}
-              onChange={(event) => onChange({ documentNumber: event.target.value })}
-              inputMode="numeric"
-              maxLength={13}
-              placeholder="20XXXXXXXXX"
-              autoComplete="off"
-              {...fieldProps('documentNumber')}
-            />
-            {fieldError('documentNumber')}
-          </label>
-        ) : (
-          <>
-            <label className="field">
-              Tipo de documento
-              <select
-                value={form.documentType}
-                onChange={(event) =>
-                  onChange({ documentType: event.target.value as BillingForm['documentType'] })
-                }
-                {...fieldProps('documentType')}
-              >
-                {boletaDocuments.map((item) => (
-                  <option key={item.value} value={item.value}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-              {fieldError('documentType')}
-            </label>
-            <label className="field">
-              Número de documento
-              <input
-                value={form.documentNumber}
-                onChange={(event) => onChange({ documentNumber: event.target.value })}
-                inputMode={form.documentType === '1' ? 'numeric' : 'text'}
-                maxLength={15}
-                placeholder={form.documentType === '1' ? '8 dígitos' : '6 a 12 letras o números'}
-                autoComplete="off"
-                {...fieldProps('documentNumber')}
-              />
-              {fieldError('documentNumber')}
-            </label>
-          </>
-        )}
-      </div>
-      <label className="field">
-        {factura ? 'Razón social' : 'Nombre completo'}
-        <input
-          value={form.name}
-          onChange={(event) => onChange({ name: event.target.value })}
-          maxLength={255}
-          autoComplete={factura ? 'organization' : 'name'}
-          placeholder={factura ? 'Ej. Comercial Andina S.A.C.' : 'Nombres y apellidos'}
-          {...fieldProps('name')}
-        />
-        {fieldError('name')}
-      </label>
-      {factura && (
-        <label className="field">
-          <span>
-            Dirección fiscal <small>(opcional)</small>
-          </span>
-          <input
-            value={form.address}
-            onChange={(event) => onChange({ address: event.target.value })}
-            maxLength={255}
-            autoComplete="street-address"
-            placeholder="Av., calle, número, distrito"
-            {...fieldProps('address')}
-          />
-          {fieldError('address')}
-        </label>
-      )}
-      <p className="flow-note">
-        Estos datos se guardan con tu pedido para emitir el comprobante. Si luego cambias tu perfil,
-        el pedido conserva los datos con los que compraste.
-      </p>
-    </fieldset>
-  );
 }

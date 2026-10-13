@@ -17,6 +17,22 @@ export type Billing = {
   name: string;
   address?: string | null;
 };
+export type DeliveryMethod = 'PICKUP' | 'DELIVERY';
+/** Delivery chosen at checkout; the cost is always set by the platform. */
+export type Delivery = {
+  method: DeliveryMethod;
+  cost?: string;
+  contactName: string;
+  contactPhone: string;
+  address?: string | null;
+  district?: string | null;
+  reference?: string | null;
+};
+/** GET /orders/delivery-options: what the checkout can offer and what each option costs. */
+export type DeliveryOptions = {
+  pickup: { enabled: boolean; cost: string; address: string | null; hours: string | null };
+  delivery: { enabled: boolean; cost: string | null; areas: string | null };
+};
 export type Order = {
   id: string;
   status: string;
@@ -24,6 +40,10 @@ export type Order = {
   customerId?: string;
   /** Null for orders created before billing data was captured. */
   billing?: Billing | null;
+  /** Null for orders created before the delivery method was captured. */
+  delivery?: Delivery | null;
+  /** Products only; `total` adds the delivery cost. */
+  subtotal?: string;
   createdAt?: string | null;
   details: { productId: string; sku: string; name: string; quantity: number; unitPrice: number }[];
 };

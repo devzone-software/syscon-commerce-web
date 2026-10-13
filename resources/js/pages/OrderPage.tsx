@@ -7,6 +7,7 @@ import { OrderTimeline } from '../components/orders/OrderTimeline';
 import { PaymentDetails } from '../components/orders/PaymentDetails';
 import { StatusBadge } from '../components/shared/StatusBadge';
 import { billingRows } from '../lib/billing';
+import { deliveryRows } from '../lib/delivery';
 import { orderStatusLabels, shortId, statusLabel } from '../lib/orders';
 import { api } from '../services/api';
 import { money } from '../state';
@@ -84,7 +85,7 @@ export function OrderPage() {
                     value: <StatusBadge status={data.status} labels={orderStatusLabels} />,
                   },
                   { label: 'Total', value: money(Number(data.total)) },
-                  { label: 'Entrega', value: 'Coordinación con asesor' },
+                  ...deliveryRows(data.delivery),
                   ...billingRows(data.billing),
                 ]}
               />

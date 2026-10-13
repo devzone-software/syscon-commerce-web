@@ -162,8 +162,8 @@ function AddToCartDialog({ request, onClose }: { request: Request; onClose: () =
             <ShieldIcon size={14} /> Producto original con garantía del fabricante
           </li>
           <li>
-            <TruckIcon size={14} /> Entrega coordinada · el precio y el stock se confirman al crear
-            el pedido
+            <TruckIcon size={14} /> Retiro en tienda o envío a domicilio · el precio y el stock se
+            confirman al crear el pedido
           </li>
         </ul>
 

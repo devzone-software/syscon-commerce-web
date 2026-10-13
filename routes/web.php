@@ -17,6 +17,7 @@ Route::prefix('web-api')->group(function () {
     Route::post('/logout', [AuthGatewayController::class, 'logout']);
     Route::get('/me', [AuthGatewayController::class, 'me']);
     Route::get('/profile', [AuthGatewayController::class, 'profile']);
+    Route::get('/delivery-options', [OrderGatewayController::class, 'deliveryOptions']);
     Route::match(['get', 'post'], '/orders', [OrderGatewayController::class, 'orders']);
     Route::get('/orders/{id}', [OrderGatewayController::class, 'order'])->whereUuid('id');
     Route::post('/payments', [PaymentGatewayController::class, 'pay']);

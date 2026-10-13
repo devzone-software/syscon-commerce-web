@@ -19,6 +19,7 @@ import { OrdersTable } from '../components/orders/OrdersTable';
 import { StatusBadge } from '../components/shared/StatusBadge';
 import { displayName, roleLabel } from '../lib/auth';
 import { accountSummary, orderProgress, orderStatusLabels, shortId } from '../lib/orders';
+import { deliveryMethodLabels } from '../lib/delivery';
 import { api } from '../services/api';
 import { money, useShop } from '../state';
 import type { Order } from '../types';
@@ -142,7 +143,12 @@ export function Account() {
               <div className="portal-card-head">
                 <div>
                   <h2 id="portal-current-title">Tu pedido más reciente en curso</h2>
-                  <p>Pedido #{shortId(current.id)} • Entrega coordinada con un asesor SYSCON</p>
+                  <p>
+                    Pedido #{shortId(current.id)} •{' '}
+                    {current.delivery
+                      ? deliveryMethodLabels[current.delivery.method]
+                      : 'Entrega coordinada con un asesor SYSCON'}
+                  </p>
                 </div>
                 <StatusBadge status={current.status} labels={orderStatusLabels} />
               </div>
