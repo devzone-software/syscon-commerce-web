@@ -25,6 +25,12 @@ export function setCartQuantity(lines: CartLine[], id: string, quantity: number)
   );
 }
 
+/** Units of a product already in the cart and how many more can still be added. */
+export function cartAvailability(lines: CartLine[], product: Product) {
+  const inCart = lines.find((line) => line.product.id === product.id)?.quantity ?? 0;
+  return { inCart, remaining: Math.max(0, product.stock - inCart) };
+}
+
 export const cartUnits = (lines: CartLine[]) => lines.reduce((n, line) => n + line.quantity, 0);
 export const cartTotal = (lines: CartLine[]) =>
   lines.reduce((sum, line) => sum + Number(line.product.price) * line.quantity, 0);

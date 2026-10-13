@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { money, useShop } from './state';
+import { useConfirmAdd } from './components/cart/AddToCartDialog';
 import type { Product } from './types';
 import cartAddIcon from '../images/home/cart-add.svg';
 import { ProductImage } from './components/ProductImage';
@@ -74,7 +75,7 @@ export function Empty({
  * "Ver producto" / "Agregar" actions. `compact` is the smaller variant of the catalog grid.
  */
 export function ProductCard({ product, compact = false }: { product: Product; compact?: boolean }) {
-  const { add } = useShop();
+  const add = useConfirmAdd();
   const available = product.stock > 0;
   const details = [product.brand, `SKU ${product.sku}`].filter(Boolean).join(' · ');
   const url = `/producto/${product.id}`;

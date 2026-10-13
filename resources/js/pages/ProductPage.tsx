@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { money, useShop } from '../state';
+import { useConfirmAdd } from '../components/cart/AddToCartDialog';
 import { ProductImage } from '../components/ProductImage';
 import { InfoRows } from '../components/cart/OrderSummary';
 import { PageSection } from '../components/layout/PageHero';
@@ -14,13 +15,12 @@ export function ProductPage() {
   const { id = '' } = useParams();
   const { data, loading, error, reload } = useData(() => api.product(id), [id]);
   const catalog = useData(api.products);
-  const { add, cart } = useShop();
+  const { cart } = useShop();
+  const confirmAdd = useConfirmAdd();
   const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(0);
 
   useEffect(() => {
     setQuantity(1);
-    setAdded(0);
   }, [id]);
 
   const related = useMemo(
@@ -58,8 +58,7 @@ export function ProductPage() {
   const remaining = Math.max(0, data.stock - inCart);
   const units = Math.min(quantity, Math.max(1, remaining));
   const addToCart = () => {
-    add(data, units);
-    setAdded(units);
+    confirmAdd(data, units);
     setQuantity(1);
   };
 
@@ -126,12 +125,6 @@ export function ProductPage() {
                 <p className="product-in-cart">
                   Tienes {inCart} {inCart === 1 ? 'unidad' : 'unidades'} en tu carrito.
                 </p>
-              )}
-              {added > 0 && (
-                <div className="notice success" role="status">
-                  {added === 1 ? 'Se agregó 1 unidad' : `Se agregaron ${added} unidades`} al
-                  carrito. <Link to="/carrito">Ver carrito</Link>
-                </div>
               )}
             </div>
           </div>

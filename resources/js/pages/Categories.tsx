@@ -13,7 +13,8 @@ import { company } from '../components/layout/Header';
 import { ArrowRightIcon, CartIcon, HeadsetIcon, SearchIcon, ShieldIcon } from '../components/icons';
 import { catalogParams, groupProducts, productCount } from '../lib/catalog';
 import { api } from '../services/api';
-import { money, useShop } from '../state';
+import { money } from '../state';
+import { useConfirmAdd } from '../components/cart/AddToCartDialog';
 import type { Product } from '../types';
 import { useData, ErrorBox, Loading, Empty } from '../ui';
 
@@ -48,7 +49,7 @@ const campaignTags = ['MÁS SOLICITADO', 'ESTABILIDAD EMPRESARIAL', 'DISPONIBLE 
 
 /** Compact product card of the category rows (SKU, availability, price and actions). */
 function ShowcaseCard({ product }: { product: Product }) {
-  const { add } = useShop();
+  const add = useConfirmAdd();
   const url = `/producto/${product.id}`;
   const available = product.stock > 0;
   return (

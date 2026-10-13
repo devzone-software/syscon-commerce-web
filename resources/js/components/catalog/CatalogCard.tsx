@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import cartIcon from '../../../images/catalog/cart.svg';
-import { money, useShop } from '../../state';
+import { money } from '../../state';
+import { useConfirmAdd } from '../cart/AddToCartDialog';
 import type { Product } from '../../types';
 import { ProductImage } from '../ProductImage';
 
@@ -9,7 +10,7 @@ export const LOW_STOCK = 5;
 
 /** Product card of Figma "Client / Productos" (3-column catalog grid). */
 export function CatalogCard({ product }: { product: Product }) {
-  const { add } = useShop();
+  const add = useConfirmAdd();
   const url = `/producto/${product.id}`;
   const out = product.stock < 1;
   const low = !out && product.stock <= LOW_STOCK;

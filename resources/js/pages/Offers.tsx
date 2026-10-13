@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import homeIcon from '../../images/catalog/home.svg';
 import b2bIcon from '../../images/home/b2b-building.svg';
 import promoImage from '../../images/home/promo-security.jpg';
@@ -21,7 +21,8 @@ import {
 } from '../components/icons';
 import { groupProducts, pageNumbers, paginate } from '../lib/catalog';
 import { api } from '../services/api';
-import { money, useShop } from '../state';
+import { money } from '../state';
+import { useConfirmAdd } from '../components/cart/AddToCartDialog';
 import type { Product } from '../types';
 import { useData, ErrorBox, Loading, Empty } from '../ui';
 
@@ -69,7 +70,7 @@ function stockNote(product: Product) {
 
 /** Offer card of the "Ofertas Destacadas del Mes" row and the paged grid. */
 function OfferCard({ product, tag }: { product: Product; tag?: string }) {
-  const { add } = useShop();
+  const add = useConfirmAdd();
   const url = `/producto/${product.id}`;
   const note = stockNote(product);
   return (
@@ -108,8 +109,7 @@ function OfferCard({ product, tag }: { product: Product; tag?: string }) {
 /** Figma "Client / Ofertas": the cheapest products in stock, as the backend has no promotions. */
 export function Offers() {
   const { data, loading, error, reload } = useData(api.products);
-  const { add } = useShop();
-  const navigate = useNavigate();
+  const add = useConfirmAdd();
   const [category, setCategory] = useState('');
   const [brand, setBrand] = useState('');
   const [range, setRange] = useState('');
@@ -247,13 +247,7 @@ export function Offers() {
                       <Link to={`/producto/${spotlight.id}`} className="is-soft">
                         <ReceiptIcon size={16} /> Ver Ficha Técnica
                       </Link>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          add(spotlight);
-                          navigate('/carrito');
-                        }}
-                      >
+                      <button type="button" onClick={() => add(spotlight)}>
                         <CartIcon size={16} /> Comprar Ahora
                       </button>
                     </div>
