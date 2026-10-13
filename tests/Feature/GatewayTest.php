@@ -86,6 +86,26 @@ class GatewayTest extends TestCase
             ->postJson('/web-api/orders', ['items' => [['productId' => 'bad', 'quantity' => 0]]])->assertUnprocessable();
     }
 
+    public function test_order_forwards_billing_and_requires_it(): void
+    {
+        Http::fake(['java.test/api/orders' => Http::response(['success' => true, 'data' => ['id' => 'o1', 'billing' => ['type' => '03']]], 200)]);
+        $session = ['syscon' => ['access' => $this->token(), 'refresh' => 'refresh-secret']];
+        $items = [['productId' => '00000000-0000-0000-0000-0000000000aa', 'quantity' => 1]];
+        $billing = ['type' => '03', 'documentType' => '1', 'documentNumber' => '12345678', 'name' => 'Ana Quispe', 'address' => null];
+        $this->withSession($session)->postJson('/web-api/orders', ['items' => $items])->assertUnprocessable();
+        $this->withSession($session)->postJson('/web-api/orders', ['items' => $items, 'billing' => ['type' => '07'] + $billing])->assertUnprocessable();
+        $this->withSession($session)->postJson('/web-api/orders', ['items' => $items, 'billing' => $billing])->assertOk()->assertJsonPath('data.id', 'o1');
+        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/orders' && $request['billing']['documentNumber'] === '12345678' && $request['billing']['type'] === '03');
+    }
+
+    public function test_profile_requires_session_and_proxies_platform(): void
+    {
+        Http::fake(['java.test/api/auth/profile' => Http::response(['success' => true, 'data' => ['documentType' => 'DNI', 'documentNumber' => '12345678']], 200)]);
+        $this->getJson('/web-api/profile')->assertUnauthorized();
+        $this->withSession(['syscon' => ['access' => $this->token(), 'refresh' => 'refresh-secret']])
+            ->getJson('/web-api/profile')->assertOk()->assertJsonPath('data.documentNumber', '12345678');
+    }
+
     public function test_customer_cannot_write_catalog(): void
     {
         Http::fake(['java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200)]);
@@ -148,6 +168,8 @@ class GatewayTest extends TestCase
         $this->withSession($session)->postJson('/web-api/admin/invoices', [...$base, 'serialNumber' => 'B001-0'])->assertUnprocessable();
         $this->withSession($session)->postJson('/web-api/admin/invoices', [...$base, 'type' => '07'])->assertUnprocessable();
         $this->withSession($session)->postJson('/web-api/admin/invoices', $base)->assertOk()->assertJsonPath('data.status', 'DRAFT');
+        // Customer data may be omitted: the platform takes it from the order billing.
+        $this->withSession($session)->postJson('/web-api/admin/invoices', array_diff_key($base, array_flip(['customerDocumentType', 'customerDocumentNumber', 'customerName'])))->assertOk();
     }
 
     public function test_login_rejects_tokens_the_web_cannot_verify(): void

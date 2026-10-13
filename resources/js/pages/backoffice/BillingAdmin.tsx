@@ -5,6 +5,7 @@ import { PageHeader } from '../../components/backoffice/PageHeader';
 import { StatusBadge } from '../../components/shared/StatusBadge';
 import { can, permissions } from '../../lib/auth';
 import {
+  documentLabel,
   documentTypes,
   invoiceStatusLabels,
   invoiceTypeLabel,
@@ -34,6 +35,35 @@ function InvoiceForm({ orderId, onCreated }: { orderId: string; onCreated: (id: 
   const [error, setError] = useState('');
   const set = (patch: Partial<InvoiceInput>) => setForm((current) => ({ ...current, ...patch }));
   const isNote = form.type === '07' || form.type === '08';
+  const [prefill, setPrefill] = useState('');
+
+  // The order keeps the billing data chosen at checkout; it is copied here so it can be reviewed.
+  const loadFromOrder = async () => {
+    if (!isUuid(form.orderId)) {
+      setErrors({ orderId: 'Ingresa el ID (UUID) de un pedido pagado.' });
+      return;
+    }
+    setPrefill('');
+    try {
+      const order = await api.order(form.orderId.trim().toLowerCase());
+      if (!order.billing) {
+        setPrefill('Este pedido no tiene datos de facturación registrados; complétalos a mano.');
+        return;
+      }
+      const { type, documentType, documentNumber, name } = order.billing;
+      set({
+        type,
+        customerDocumentType: documentType,
+        customerDocumentNumber: documentNumber,
+        customerName: name,
+      });
+      setPrefill(
+        `Datos tomados del pedido: ${invoiceTypeLabel(type)} · ${documentLabel(documentType)} ${documentNumber}. Revísalos antes de generar.`,
+      );
+    } catch (e) {
+      setPrefill((e as Error).message);
+    }
+  };
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -95,6 +125,9 @@ function InvoiceForm({ orderId, onCreated }: { orderId: string; onCreated: (id: 
             {...invalid('orderId')}
           />
           {fieldError('orderId')}
+          <button type="button" className="link-button" onClick={loadFromOrder}>
+            Usar datos de facturación del pedido
+          </button>
         </label>
         <label className="field">
           Tipo de comprobante
@@ -117,6 +150,11 @@ function InvoiceForm({ orderId, onCreated }: { orderId: string; onCreated: (id: 
           {fieldError('serialNumber')}
         </label>
       </div>
+      {prefill && (
+        <p className="notice" role="status">
+          {prefill}
+        </p>
+      )}
       {isNote && (
         <label className="field">
           Comprobante que se modifica

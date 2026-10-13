@@ -1,8 +1,10 @@
 import type {
+  Billing,
   Invoice,
   Order,
   Payment,
   Product,
+  Profile,
   Supplier,
   SupplierHistory,
   SignUp,
@@ -42,8 +44,13 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const csrfMeta = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
   if (nextCsrf && csrfMeta) csrfMeta.content = nextCsrf;
   if (!response.ok || !result?.success) {
-    const validation = (result as (Envelope<T> & { errors?: Record<string, string[]> }) | null)
-      ?.errors;
+    // BFF validation answers `errors`; the platform's 422 envelope carries them in `data`.
+    const data = result?.data as unknown;
+    const validation =
+      (result as (Envelope<T> & { errors?: Record<string, string[]> }) | null)?.errors ??
+      (response.status === 422 && data && typeof data === 'object' && !Array.isArray(data)
+        ? (data as Record<string, string[]>)
+        : undefined);
     throw new ApiError(
       validation
         ? Object.values(validation).flat().join(' ')
@@ -69,8 +76,9 @@ export const api = {
   me: () => request<User>('/me'),
   orders: () => request<Order[]>('/orders'),
   order: (id: string) => request<Order>(`/orders/${encodeURIComponent(id)}`),
-  createOrder: (items: { productId: string; quantity: number }[]) =>
-    request<Order>('/orders', { method: 'POST', body: json({ items }) }),
+  profile: () => request<Profile>('/profile'),
+  createOrder: (items: { productId: string; quantity: number }[], billing: Billing) =>
+    request<Order>('/orders', { method: 'POST', body: json({ items, billing }) }),
   createPayment: (orderId: string) =>
     request<Payment>('/payments', { method: 'POST', body: json({ orderId, provider: 'MANUAL' }) }),
   payment: (id: string) => request<Payment>(`/payments/${encodeURIComponent(id)}`),

@@ -11,7 +11,16 @@ class OrderGatewayController extends GatewayController
     {
         if ($error = $this->requireLogin()) return $error;
         if ($request->isMethod('GET')) return $this->reply($this->api->authenticated('GET', '/api/orders'));
-        $data = $request->validate(['items' => 'required|array|min:1|max:100', 'items.*.productId' => 'required|uuid|distinct', 'items.*.quantity' => 'required|integer|min:1|max:999']);
+        // Shape only: the platform owns the document rules (DNI, RUC check digit, factura needs RUC).
+        $data = $request->validate([
+            'items' => 'required|array|min:1|max:100', 'items.*.productId' => 'required|uuid|distinct', 'items.*.quantity' => 'required|integer|min:1|max:999',
+            'billing' => 'required|array',
+            'billing.type' => 'required|in:01,03',
+            'billing.documentType' => 'required|in:1,4,6,7',
+            'billing.documentNumber' => 'required|string|max:15',
+            'billing.name' => 'required|string|max:255',
+            'billing.address' => 'nullable|string|max:255',
+        ]);
         return $this->reply($this->api->authenticated('POST', '/api/orders', $data));
     }
 

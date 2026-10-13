@@ -9,11 +9,22 @@ export type Product = {
   brand: string | null;
   active: boolean;
 };
+/** Billing data chosen at checkout; the order keeps it as a copy (SUNAT catalogs 01 and 06). */
+export type Billing = {
+  type: '01' | '03';
+  documentType: '1' | '4' | '6' | '7';
+  documentNumber: string;
+  name: string;
+  address?: string | null;
+};
 export type Order = {
   id: string;
   status: string;
   total: number;
   customerId?: string;
+  /** Null for orders created before billing data was captured. */
+  billing?: Billing | null;
+  createdAt?: string | null;
   details: { productId: string; sku: string; name: string; quantity: number; unitPrice: number }[];
 };
 export type Payment = {
@@ -34,6 +45,14 @@ export type User = {
   permissions?: string[];
 };
 export type DocumentType = 'DNI' | 'CE' | 'RUC' | 'PASAPORTE';
+export type Profile = {
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  documentType: DocumentType | null;
+  documentNumber: string | null;
+  phone: string | null;
+};
 export type SignUp = {
   firstName: string;
   lastName: string;

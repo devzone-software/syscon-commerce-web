@@ -328,3 +328,63 @@
     line-height: 32px;
   }
 }
+
+/* Checkout · comprobante (boleta / factura) */
+.billing-fields {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.billing-fields legend {
+  margin-bottom: 10px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #59616e;
+}
+.billing-choice {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.billing-option {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #dbe3ed;
+  border-radius: 10px;
+  background: #fbfcfe;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #59616e;
+  cursor: pointer;
+}
+.billing-option:hover {
+  border-color: #9fb3d6;
+}
+.billing-option.is-active {
+  border-color: #00265d;
+  background: #f0f3ff;
+  box-shadow: inset 0 0 0 1px #00265d;
+}
+.billing-option input {
+  margin-top: 3px;
+  accent-color: #00265d;
+}
+.billing-option strong {
+  display: block;
+  font-size: 14px;
+  color: #111c2d;
+}
+.billing-fields .field input,
+.billing-fields .field select {
+  width: 100%;
+}
+@media (max-width: 560px) {
+  .billing-choice {
+    grid-template-columns: 1fr;
+  }
+}

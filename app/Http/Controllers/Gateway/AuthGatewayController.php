@@ -64,6 +64,13 @@ class AuthGatewayController extends GatewayController
         return response()->json(['success' => true, 'message' => 'Sesión cerrada.'])->header('X-CSRF-TOKEN', csrf_token());
     }
 
+    /** Stored profile (document, phone) used to prefill the checkout billing form. */
+    public function profile(): JsonResponse
+    {
+        if ($error = $this->requireLogin()) return $error;
+        return $this->reply($this->api->authenticated('GET', '/api/auth/profile'));
+    }
+
     public function me(): JsonResponse
     {
         if ($error = $this->requireIdentityConfig()) return $error;
