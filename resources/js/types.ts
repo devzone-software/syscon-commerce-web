@@ -127,6 +127,23 @@ export type AdminOrder = Order & {
     createdAt: string | null;
   }[];
   events: OrderEvent[];
+  /** Customer emails of the order (outbox), oldest first. */
+  notifications?: OrderNotification[];
+};
+export type OrderNotification = {
+  id: string;
+  /** ORDER_CREATED, PAYMENT_CONFIRMED or INVOICE_AVAILABLE. */
+  type: string;
+  reference: string | null;
+  recipient: string;
+  /** PENDING, SENDING, SENT or FAILED. */
+  status: string;
+  attempts: number;
+  lastError: string | null;
+  /** Next automatic retry; null after the last one (manual resend only). */
+  nextAttemptAt: string | null;
+  sentAt: string | null;
+  createdAt: string | null;
 };
 export type User = {
   id: string;

@@ -14,6 +14,8 @@ import {
   formatDateTime,
   orderEventLabels,
   orderInboxTabs,
+  notificationLabels,
+  notificationStatusLabels,
   orderStatusLabels,
   paymentStatusLabels,
   shortId,
@@ -21,11 +23,81 @@ import {
 } from '../../lib/orders';
 import { api } from '../../services/api';
 import { money, useShop } from '../../state';
-import type { AdminOrder, OrderEvent } from '../../types';
+import type { AdminOrder, OrderEvent, OrderNotification } from '../../types';
 import { useData, Empty, ErrorBox, Loading } from '../../ui';
 
 /** Main documents (factura, boleta); notes reference them. */
 const MAIN_INVOICES = ['01', '03'];
+
+/** Customer emails with their delivery state; resending never repeats the order operation. */
+function NotificationList({
+  notifications,
+  canResend,
+  onResent,
+}: {
+  notifications: OrderNotification[];
+  canResend: boolean;
+  onResent: () => void;
+}) {
+  const [busy, setBusy] = useState('');
+  const [error, setError] = useState('');
+  const resend = async (id: string) => {
+    setBusy(id);
+    setError('');
+    try {
+      await api.resendNotification(id);
+      onResent();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy('');
+    }
+  };
+  return (
+    <>
+      <h3 className="flow-subtitle">Correos al cliente</h3>
+      {notifications.length ? (
+        <ul className="bo-simple-list">
+          {notifications.map((item) => (
+            <li key={item.id}>
+              <span>
+                <strong>{statusLabel(notificationLabels, item.type)}</strong>
+                <small>
+                  {item.recipient} · {statusLabel(notificationStatusLabels, item.status)}
+                  {item.sentAt && ` el ${formatDateTime(item.sentAt)}`}
+                  {item.status === 'FAILED' &&
+                    (item.nextAttemptAt
+                      ? ` · reintento automático ${formatDateTime(item.nextAttemptAt)}`
+                      : ` · sin más reintentos (${item.attempts})`)}
+                </small>
+                {item.status === 'FAILED' && item.lastError && (
+                  <small className="field-error">{item.lastError}</small>
+                )}
+              </span>
+              {canResend && item.status !== 'SENDING' && (
+                <button
+                  type="button"
+                  className="link-button"
+                  disabled={Boolean(busy)}
+                  onClick={() => resend(item.id)}
+                >
+                  {busy === item.id ? 'Enviando…' : 'Reenviar'}
+                  <span className="visually-hidden">
+                    {' '}
+                    {statusLabel(notificationLabels, item.type)}
+                  </span>
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="muted">Sin correos registrados.</p>
+      )}
+      {error && <ErrorBox message={error} />}
+    </>
+  );
+}
 
 function eventText(event: OrderEvent) {
   const label = statusLabel(orderEventLabels, event.type);
@@ -198,6 +270,14 @@ function OrderDetail({ id, onChanged }: { id: string; onChanged: () => void }) {
           >
             Emitir comprobante
           </Link>
+        )}
+
+        {data.notifications && (
+          <NotificationList
+            notifications={data.notifications}
+            canResend={can(user, permissions.ordersManage)}
+            onResent={reload}
+          />
         )}
 
         <h3 className="flow-subtitle">Estado</h3>

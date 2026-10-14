@@ -53,6 +53,24 @@ export const orderEventLabels: Record<string, string> = {
   PAYMENT_CONFIRMED: 'Pago confirmado',
   STATUS_CHANGED: 'Cambio de estado',
   EXPIRED: 'Reserva vencida',
+  INVOICE_ACCEPTED: 'Comprobante aceptado por SUNAT',
+  CREDIT_NOTE_ACCEPTED: 'Nota de crédito aceptada',
+  DEBIT_NOTE_ACCEPTED: 'Nota de débito aceptada',
+  NOTIFICATION_RESENT: 'Correo reenviado',
+};
+
+/** Customer emails sent for an order. */
+export const notificationLabels: Record<string, string> = {
+  ORDER_CREATED: 'Pedido recibido',
+  PAYMENT_CONFIRMED: 'Pago confirmado',
+  INVOICE_AVAILABLE: 'Comprobante disponible',
+};
+
+export const notificationStatusLabels: Record<string, string> = {
+  PENDING: 'Pendiente',
+  SENDING: 'Enviando',
+  SENT: 'Enviado',
+  FAILED: 'Falló',
 };
 
 export const statusLabel = (labels: Record<string, string>, status: string) =>

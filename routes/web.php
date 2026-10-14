@@ -29,6 +29,7 @@ Route::prefix('web-api')->group(function () {
     Route::get('/admin/orders/{id}', [OrderGatewayController::class, 'adminOrder'])->whereUuid('id');
     Route::get('/admin/payments', [PaymentGatewayController::class, 'adminPayments']);
     Route::patch('/admin/orders/{id}/status', [OrderGatewayController::class, 'orderStatus'])->whereUuid('id');
+    Route::post('/admin/notifications/{id}/resend', [OrderGatewayController::class, 'resendNotification'])->whereUuid('id');
     Route::post('/admin/payments/{id}/confirm', [PaymentGatewayController::class, 'confirmPayment'])->whereUuid('id');
     Route::post('/admin/invoices', [InvoiceGatewayController::class, 'create']);
     Route::match(['get', 'post'], '/admin/invoice-series', [InvoiceGatewayController::class, 'series']);

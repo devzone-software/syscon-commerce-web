@@ -239,6 +239,20 @@ class GatewayTest extends TestCase
         $this->withSession($admin)->get("/web-api/admin/invoices/$invoice/xml")->assertOk()->assertHeader('Content-Disposition', 'attachment; filename="x.xml"');
     }
 
+    public function test_notification_resend_requires_order_management(): void
+    {
+        $id = '00000000-0000-0000-0000-0000000000cc';
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            "java.test/api/admin/notifications/$id/resend" => Http::response(['success' => true, 'data' => ['id' => $id, 'status' => 'SENT']], 200),
+        ]);
+        $this->withSession(['syscon' => ['access' => $this->token(), 'refresh' => 'r']])
+            ->postJson("/web-api/admin/notifications/$id/resend")->assertForbidden();
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'orders:manage']), 'refresh' => 'r']])
+            ->postJson("/web-api/admin/notifications/$id/resend")->assertOk()->assertJsonPath('data.status', 'SENT');
+        Http::assertSent(fn ($request) => $request->method() === 'POST' && $request->url() === "http://java.test/api/admin/notifications/$id/resend");
+    }
+
     public function test_invoice_series_and_corrections_require_permission(): void
     {
         $id = '00000000-0000-0000-0000-0000000000aa';

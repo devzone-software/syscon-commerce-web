@@ -11,6 +11,7 @@ import type {
   InvoiceSeries,
   Order,
   OrderInvoice,
+  OrderNotification,
   Payment,
   Product,
   Profile,
@@ -123,6 +124,10 @@ export const api = {
   adminOrder: (id: string) => request<AdminOrder>(`/admin/orders/${encodeURIComponent(id)}`),
   adminPayments: (filters: PaymentFilters) =>
     request<AdminPage<AdminPayment>>(`/admin/payments${query(filters)}`),
+  resendNotification: (id: string) =>
+    request<OrderNotification>(`/admin/notifications/${encodeURIComponent(id)}/resend`, {
+      method: 'POST',
+    }),
   setOrderStatus: (id: string, status: string) =>
     request<Order>(`/admin/orders/${encodeURIComponent(id)}/status`, {
       method: 'PATCH',

@@ -86,6 +86,13 @@ class OrderGatewayController extends GatewayController
         return $this->reply($this->api->authenticated('PATCH', "/api/orders/$id/status/{$data['status']}"));
     }
 
+    /** Sends a customer email again; the platform never repeats the order operation. */
+    public function resendNotification(string $id): JsonResponse
+    {
+        if ($error = $this->requirePermission('orders:manage')) return $error;
+        return $this->reply($this->api->authenticated('POST', "/api/admin/notifications/$id/resend"));
+    }
+
     /** Query string with the filters that were actually sent. */
     public static function query(array $filters): string
     {
