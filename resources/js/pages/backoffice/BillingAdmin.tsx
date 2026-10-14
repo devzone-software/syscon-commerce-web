@@ -10,9 +10,13 @@ import {
   invoiceStatusLabels,
   invoiceTypeLabel,
   invoiceTypes,
+  noteReasonFor,
+  noteReasons,
+  notePayload,
   SERIES,
   seriesFor,
   seriesPrefix,
+  taxPercent,
   validateInvoice,
   type InvoiceInput,
 } from '../../lib/billing';
@@ -20,7 +24,7 @@ import { formatDateTime, shortId } from '../../lib/orders';
 import { isUuid } from '../../lib/validation';
 import { api } from '../../services/api';
 import { money, useShop } from '../../state';
-import type { Invoice, InvoiceCustomer, InvoiceSeries } from '../../types';
+import type { Invoice, InvoiceCustomer, InvoiceSeries, Order } from '../../types';
 import { useData, ErrorBox, Loading } from '../../ui';
 
 type CustomerErrors = Partial<Record<keyof InvoiceCustomer, string>>;
@@ -115,8 +119,10 @@ function InvoiceForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [prefill, setPrefill] = useState('');
+  const [products, setProducts] = useState<Order['details'] | null>(null);
   const set = (patch: Partial<InvoiceInput>) => setForm((current) => ({ ...current, ...patch }));
   const isNote = form.type === '07' || form.type === '08';
+  const reason = noteReasonFor(form.type, form.noteCode);
   const available = seriesFor(series, form.type, form.referencedSerialNumber);
   const chosen = available.find((item) => item.series === form.series) ?? available[0];
 
@@ -129,18 +135,21 @@ function InvoiceForm({
     setPrefill('');
     try {
       const order = await api.order(id.trim().toLowerCase());
+      setProducts(order.details);
       if (!order.billing) {
         setPrefill('Este pedido no tiene datos de facturación registrados; complétalos a mano.');
         return;
       }
       const { type, documentType, documentNumber, name } = order.billing;
-      set({
-        type,
+      // A note keeps its type; the order only provides the customer.
+      setForm((current) => ({
+        ...current,
+        type: current.type === '07' || current.type === '08' ? current.type : type,
         series: '',
         customerDocumentType: documentType,
         customerDocumentNumber: documentNumber,
         customerName: name,
-      });
+      }));
       setPrefill(
         `Datos tomados del pedido: ${invoiceTypeLabel(type)} · ${documentLabel(documentType)} ${documentNumber}. Revísalos antes de generar.`,
       );
@@ -158,6 +167,8 @@ function InvoiceForm({
     event.preventDefault();
     const found = validateInvoice(form);
     if (!isUuid(form.orderId)) found.orderId = 'Ingresa el ID (UUID) de un pedido pagado.';
+    if (reason?.mode === 'items' && !products)
+      found.items = 'Carga el pedido para elegir los productos devueltos.';
     if (!isNote && !chosen)
       found.series = 'No hay una serie activa para este comprobante; regístrala abajo.';
     setErrors(found);
@@ -172,6 +183,7 @@ function InvoiceForm({
         series: form.series || null,
         ...customerOf(form),
         referencedSerialNumber: isNote ? form.referencedSerialNumber.trim().toUpperCase() : null,
+        ...(isNote ? notePayload(form) : {}),
       });
       onCreated(invoice);
     } catch (e) {
@@ -201,9 +213,10 @@ function InvoiceForm({
     >
       <h2 id="invoice-form-title">Emitir comprobante</h2>
       <p className="notice">
-        El comprobante se genera sobre un pedido <strong>pagado</strong> y toma sus líneas y total.
-        La serie y el correlativo los asigna el sistema al generarlo; si repites la emisión de un
-        pedido, recuperas el comprobante que ya tiene.
+        El comprobante se genera sobre un pedido <strong>pagado</strong> y toma sus líneas y total,
+        con el IGV incluido en los precios separado por línea. Las notas parten de un comprobante
+        aceptado y nunca acreditan más que su total. La serie y el correlativo los asigna el sistema
+        al generarlo; si repites la emisión de un pedido, recuperas el comprobante que ya tiene.
       </p>
       <div className="field-row">
         <label className="field">
@@ -221,7 +234,12 @@ function InvoiceForm({
         </label>
         <label className="field">
           Tipo de comprobante
-          <select value={form.type} onChange={(e) => set({ type: e.target.value, series: '' })}>
+          <select
+            value={form.type}
+            onChange={(e) =>
+              set({ type: e.target.value, series: '', noteCode: '', noteReason: '' })
+            }
+          >
             {invoiceTypes.map((type) => (
               <option key={type.value} value={type.value}>
                 {type.label}
@@ -273,6 +291,116 @@ function InvoiceForm({
           <small>Debe estar aceptado y pertenecer al mismo pedido.</small>
         </label>
       )}
+      {(form.type === '07' || form.type === '08') && (
+        <>
+          <div className="field-row">
+            <label className="field">
+              Motivo
+              <select
+                value={form.noteCode ?? ''}
+                onChange={(e) => {
+                  const next = noteReasonFor(form.type, e.target.value);
+                  // The explanation starts as the reason's name unless it was already written.
+                  const keep = form.noteReason && form.noteReason !== reason?.label;
+                  set({
+                    noteCode: e.target.value,
+                    noteReason: keep ? form.noteReason : next?.label,
+                  });
+                }}
+                {...invalid('noteCode')}
+              >
+                <option value="">Selecciona…</option>
+                {noteReasons[form.type].map((item) => (
+                  <option key={item.value} value={item.value}>
+                    {item.value} · {item.label}
+                  </option>
+                ))}
+              </select>
+              {fieldError('noteCode')}
+              {reason && <small>{reason.help}</small>}
+            </label>
+            <label className="field">
+              Sustento
+              <input
+                value={form.noteReason ?? ''}
+                onChange={(e) => set({ noteReason: e.target.value })}
+                maxLength={250}
+                {...invalid('noteReason')}
+              />
+              {fieldError('noteReason')}
+              <small>Figura en el XML y en el documento impreso.</small>
+            </label>
+            {reason?.mode === 'amount' && (
+              <label className="field">
+                Importe con IGV (S/)
+                <input
+                  value={form.amount ?? ''}
+                  onChange={(e) => set({ amount: e.target.value })}
+                  inputMode="decimal"
+                  placeholder="0.00"
+                  {...invalid('amount')}
+                />
+                {fieldError('amount')}
+              </label>
+            )}
+          </div>
+          {reason?.mode === 'items' && (
+            <fieldset
+              className="field"
+              aria-describedby={errors.items ? 'invoice-items-error' : undefined}
+            >
+              <legend>Unidades devueltas</legend>
+              {products ? (
+                <div className="table-wrap">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Producto</th>
+                        <th scope="col" className="num">
+                          Vendidas
+                        </th>
+                        <th scope="col" className="num">
+                          Precio
+                        </th>
+                        <th scope="col" className="num">
+                          Devueltas
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products.map((item) => (
+                        <tr key={item.productId}>
+                          <td>
+                            <strong>{item.name}</strong>
+                            <small>SKU {item.sku}</small>
+                          </td>
+                          <td className="num">{item.quantity}</td>
+                          <td className="num">{money(Number(item.unitPrice))}</td>
+                          <td className="num">
+                            <input
+                              aria-label={`Unidades devueltas de ${item.name}`}
+                              value={form.items?.[item.productId] ?? ''}
+                              onChange={(e) =>
+                                set({ items: { ...form.items, [item.productId]: e.target.value } })
+                              }
+                              inputMode="numeric"
+                              placeholder="0"
+                              size={4}
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="muted">Carga el pedido para elegir los productos devueltos.</p>
+              )}
+              {fieldError('items')}
+            </fieldset>
+          )}
+        </>
+      )}
       <CustomerFields
         idPrefix="invoice"
         value={form}
@@ -286,6 +414,74 @@ function InvoiceForm({
         </button>
       </div>
     </form>
+  );
+}
+
+/** Lines as stored with the document: the same amounts the XML carries. */
+function InvoiceLines({ invoice }: { invoice: Invoice }) {
+  return (
+    <div className="table-wrap">
+      <table className="data-table">
+        <caption className="visually-hidden">Detalle del comprobante</caption>
+        <thead>
+          <tr>
+            <th scope="col">Descripción</th>
+            <th scope="col" className="num">
+              Cantidad
+            </th>
+            <th scope="col" className="num">
+              Precio con IGV
+            </th>
+            <th scope="col" className="num">
+              Valor sin IGV
+            </th>
+            <th scope="col" className="num">
+              IGV
+            </th>
+            <th scope="col" className="num">
+              Importe
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {(invoice.lines ?? []).map((line) => (
+            <tr key={line.lineNumber}>
+              <td>
+                <strong>{line.description}</strong>
+                {line.sku && <small>SKU {line.sku}</small>}
+              </td>
+              <td className="num">{line.quantity}</td>
+              <td className="num">{money(Number(line.unitPrice))}</td>
+              <td className="num">{money(Number(line.taxableAmount))}</td>
+              <td className="num">{money(Number(line.taxAmount))}</td>
+              <td className="num">{money(Number(line.lineTotal))}</td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th scope="row" colSpan={5}>
+              Op. gravada
+            </th>
+            <td className="num">{money(Number(invoice.taxableAmount))}</td>
+          </tr>
+          <tr>
+            <th scope="row" colSpan={5}>
+              IGV {taxPercent(invoice.taxRate ?? '0.18')}
+            </th>
+            <td className="num">{money(Number(invoice.taxAmount))}</td>
+          </tr>
+          <tr>
+            <th scope="row" colSpan={5}>
+              Total
+            </th>
+            <td className="num">
+              <strong>{money(Number(invoice.total))}</strong>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
   );
 }
 
@@ -428,7 +624,16 @@ function InvoiceDetail({ id, notice }: { id: string; notice: string }) {
             <dd>{data.referencedSerialNumber}</dd>
           </div>
         )}
-        {data.total && (
+        {data.noteCode && (
+          <div>
+            <dt>Motivo</dt>
+            <dd>
+              {data.noteCode} · {noteReasonFor(data.type, data.noteCode)?.label ?? 'Otro'}
+              {data.noteReason && <small> — {data.noteReason}</small>}
+            </dd>
+          </div>
+        )}
+        {data.total && !data.lines?.length && (
           <div>
             <dt>Total</dt>
             <dd>{money(Number(data.total))}</dd>
@@ -453,6 +658,7 @@ function InvoiceDetail({ id, notice }: { id: string; notice: string }) {
           </div>
         )}
       </dl>
+      {data.lines && data.lines.length > 0 && <InvoiceLines invoice={data} />}
       {data.error && (
         <p className="notice error">
           Último error de envío: {data.error}. El reintento usa el mismo número {data.serialNumber}.
@@ -662,9 +868,9 @@ export function BillingAdmin() {
         description="Boletas, facturas y notas con serie y correlativo asignados por el sistema. Abre un comprobante desde su pedido o por su ID."
       />
       <p className="notice error" role="note">
-        La integración del backend no está homologada: el XML UBL todavía no incluye el detalle de
-        impuestos (IGV) y el envío se dirige a SUNAT, no a un OSE. No la uses para emisión real
-        hasta completar esos cambios en la plataforma.
+        La integración del backend no está homologada: el XML UBL ya separa base e IGV, pero no se
+        ha validado contra el servicio de pruebas de SUNAT ni contra un OSE. No la uses para emisión
+        real hasta completar esa validación.
       </p>
       <div className="bo-card">
         <IdLookup

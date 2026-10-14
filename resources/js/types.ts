@@ -44,11 +44,23 @@ export type Order = {
   delivery?: Delivery | null;
   /** Products only; `total` adds the delivery cost. */
   subtotal?: string;
+  /** Prices include IGV: base and tax split from `total` (null rate on very old payloads). */
+  taxes?: TaxSummary;
   createdAt?: string | null;
   /** While unpaid: when the stock reservation ends and the order expires (null = never). */
   expiresAt?: string | null;
-  details: { productId: string; sku: string; name: string; quantity: number; unitPrice: number }[];
+  details: {
+    productId: string;
+    sku: string;
+    name: string;
+    quantity: number;
+    unitPrice: number;
+    lineTotal?: string;
+    taxableAmount?: string;
+    taxAmount?: string;
+  }[];
 };
+export type TaxSummary = { rate: string; taxableAmount: string; taxAmount: string };
 export type Payment = {
   id: string;
   orderId: string;
@@ -182,8 +194,29 @@ export type Invoice = {
   customerDocumentNumber?: string;
   customerName?: string;
   referencedSerialNumber?: string | null;
+  /** Reason of a credit (catalog 09) or debit (catalog 10) note. */
+  noteCode?: string | null;
+  noteReason?: string | null;
+  taxRate?: string;
+  taxableAmount?: string;
+  taxAmount?: string;
   total?: string;
   createdAt?: string | null;
+  lines?: InvoiceLine[];
+};
+/** Line stored with the document; XML and printed copy read these amounts. */
+export type InvoiceLine = {
+  lineNumber: number;
+  productId: string | null;
+  sku: string | null;
+  description: string;
+  /** NIU goods, ZZ services (delivery, interest, adjustments). */
+  unitCode: string;
+  quantity: number;
+  unitPrice: string;
+  lineTotal: string;
+  taxableAmount: string;
+  taxAmount: string;
 };
 /** Series configured on the platform; `nextNumber` is the serial the next document gets. */
 export type InvoiceSeries = {

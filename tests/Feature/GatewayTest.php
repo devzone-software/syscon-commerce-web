@@ -197,6 +197,14 @@ class GatewayTest extends TestCase
         $base = ['orderId' => '00000000-0000-0000-0000-0000000000aa', 'type' => '03', 'customerDocumentType' => '1', 'customerDocumentNumber' => '12345678', 'customerName' => 'Cliente'];
         $this->withSession($session)->postJson('/web-api/admin/invoices', [...$base, 'series' => 'B001-1'])->assertUnprocessable();
         $this->withSession($session)->postJson('/web-api/admin/invoices', [...$base, 'type' => '07'])->assertUnprocessable();
+        // Notes need their reason; returned items and amounts are forwarded as sent.
+        $note = [...$base, 'type' => '07', 'referencedSerialNumber' => 'B001-1'];
+        $this->withSession($session)->postJson('/web-api/admin/invoices', $note)->assertUnprocessable();
+        $this->withSession($session)->postJson('/web-api/admin/invoices', [...$note, 'noteCode' => '07', 'noteReason' => 'Devolución', 'items' => [['productId' => 'x', 'quantity' => 1]]])->assertUnprocessable();
+        $this->withSession($session)->postJson('/web-api/admin/invoices', [...$note, 'noteCode' => '09', 'noteReason' => 'Descuento', 'amount' => '1.234'])->assertUnprocessable();
+        $items = [['productId' => '00000000-0000-0000-0000-0000000000bb', 'quantity' => 2]];
+        $this->withSession($session)->postJson('/web-api/admin/invoices', [...$note, 'noteCode' => '07', 'noteReason' => 'Devolución', 'items' => $items])->assertOk();
+        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/invoices' && ($request->data()['items'] ?? null) === $items && $request->data()['noteCode'] === '07');
         $this->withSession($session)->postJson('/web-api/admin/invoices', [...$base, 'series' => 'B002'])->assertOk()->assertJsonPath('data.status', 'DRAFT');
         // Customer data may be omitted: the platform takes it from the order billing.
         $this->withSession($session)->postJson('/web-api/admin/invoices', array_diff_key($base, array_flip(['customerDocumentType', 'customerDocumentNumber', 'customerName'])))->assertOk();

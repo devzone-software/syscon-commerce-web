@@ -24,6 +24,15 @@ class InvoiceGatewayController extends GatewayController
             'customerDocumentNumber' => 'nullable|string|max:15',
             'customerName' => 'nullable|string|max:255',
             'referencedSerialNumber' => ['nullable', 'required_if:type,07,08', 'string', 'regex:/^[FB][A-Z0-9]{3}-[1-9][0-9]{0,7}$/'],
+            // Notes: reason code (catalog 09 credit / 10 debit) and its explanation; the platform
+            // checks which codes apply to each type and that credits never exceed the original.
+            'noteCode' => 'nullable|required_if:type,07,08|in:01,02,03,06,07,09',
+            'noteReason' => 'nullable|required_if:type,07,08|string|max:250',
+            // Return by item (credit 07) or amount with IGV (credit 09 and debit notes).
+            'items' => 'nullable|array|max:100',
+            'items.*.productId' => 'required|uuid|distinct',
+            'items.*.quantity' => 'required|integer|min:1|max:100000',
+            'amount' => 'nullable|decimal:0,2|gt:0|max:999999999999.99',
         ]);
         return $this->reply($this->api->authenticated('POST', '/api/invoices', $data));
     }

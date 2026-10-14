@@ -4,8 +4,10 @@ import {
   billingPayload,
   invoiceTypeLabel,
   isValidRuc,
+  notePayload,
   seriesFor,
   seriesPrefix,
+  taxPercent,
   validateBilling,
   validateInvoice,
   type BillingForm,
@@ -73,10 +75,49 @@ describe('invoice rules', () => {
   });
   it('requires the referenced document for credit and debit notes', () => {
     expect(validateInvoice({ ...boleta, type: '07' }).referencedSerialNumber).toBeDefined();
-    expect(validateInvoice({ ...boleta, type: '07', referencedSerialNumber: 'B001-3' })).toEqual(
-      {},
-    );
+    const credit = {
+      ...boleta,
+      type: '07',
+      referencedSerialNumber: 'B001-3',
+      noteCode: '01',
+      noteReason: 'Anulación de la operación',
+    };
+    expect(validateInvoice(credit)).toEqual({});
     expect(invoiceTypeLabel('07')).toBe('Nota de crédito');
+  });
+  it('requires a supported reason and the data each reason uses', () => {
+    const credit = { ...boleta, type: '07', referencedSerialNumber: 'B001-3' };
+    expect(validateInvoice(credit).noteCode).toBeDefined();
+    expect(validateInvoice({ ...credit, noteCode: '03', noteReason: 'x' }).noteCode).toBeDefined();
+    expect(
+      validateInvoice({ ...credit, noteCode: '01', noteReason: ' ' }).noteReason,
+    ).toBeDefined();
+    const decrease = { ...credit, noteCode: '09', noteReason: 'Descuento' };
+    expect(validateInvoice(decrease).amount).toBeDefined();
+    expect(validateInvoice({ ...decrease, amount: '1.234' }).amount).toBeDefined();
+    expect(validateInvoice({ ...decrease, amount: '0' }).amount).toBeDefined();
+    expect(validateInvoice({ ...decrease, amount: '10.15' })).toEqual({});
+    const items = { ...credit, noteCode: '07', noteReason: 'Devolución' };
+    expect(validateInvoice({ ...items, items: { a: '' } }).items).toBeDefined();
+    expect(validateInvoice({ ...items, items: { a: '1.5' } }).items).toBeDefined();
+    expect(validateInvoice({ ...items, items: { a: '0', b: '2' } })).toEqual({});
+    // Debit notes use catalog 10, where 03 exists and 06 does not.
+    const debit = { ...boleta, type: '08', referencedSerialNumber: 'B001-3', noteReason: 'Mora' };
+    expect(validateInvoice({ ...debit, noteCode: '03', amount: '5.90' })).toEqual({});
+    expect(validateInvoice({ ...debit, noteCode: '06', amount: '5.90' }).noteCode).toBeDefined();
+  });
+  it('sends only the fields the reason uses', () => {
+    const base = { ...boleta, type: '07', referencedSerialNumber: 'B001-3', noteReason: ' Dev ' };
+    expect(
+      notePayload({ ...base, noteCode: '07', amount: '3', items: { a: '0', b: '2' } }),
+    ).toEqual({ noteCode: '07', noteReason: 'Dev', items: [{ productId: 'b', quantity: 2 }] });
+    expect(notePayload({ ...base, noteCode: '09', amount: ' 3.50 ', items: { b: '2' } })).toEqual({
+      noteCode: '09',
+      noteReason: 'Dev',
+      amount: '3.50',
+    });
+    expect(notePayload(boleta)).toEqual({});
+    expect(taxPercent('0.1800')).toBe('(18%)');
   });
 });
 

@@ -1,3 +1,4 @@
+import { taxPercent } from '../../lib/billing';
 import { money } from '../../state';
 import type { Order } from '../../types';
 
@@ -47,6 +48,22 @@ export function OrderLines({ order }: { order: Order }) {
                   Envío a domicilio
                 </th>
                 <td className="num">{money(Number(order.delivery.cost))}</td>
+              </tr>
+            </>
+          )}
+          {order.taxes && (
+            <>
+              <tr>
+                <th scope="row" colSpan={3}>
+                  Op. gravada (sin IGV)
+                </th>
+                <td className="num">{money(Number(order.taxes.taxableAmount))}</td>
+              </tr>
+              <tr>
+                <th scope="row" colSpan={3}>
+                  IGV {taxPercent(order.taxes.rate)}
+                </th>
+                <td className="num">{money(Number(order.taxes.taxAmount))}</td>
               </tr>
             </>
           )}

@@ -144,6 +144,11 @@ export const api = {
       type: string;
       series: string | null;
       referencedSerialNumber: string | null;
+      /** Notes: reason (catalog 09/10), explanation and, depending on it, items or amount. */
+      noteCode?: string;
+      noteReason?: string;
+      amount?: string;
+      items?: { productId: string; quantity: number }[];
     },
   ) => request<Invoice>('/admin/invoices', { method: 'POST', body: json(invoice) }),
   invoice: (id: string) => request<Invoice>(`/admin/invoices/${encodeURIComponent(id)}`),

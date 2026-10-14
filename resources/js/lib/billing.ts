@@ -26,6 +26,76 @@ export const invoiceStatusLabels: Record<string, string> = {
 export const invoiceTypeLabel = (type: string) =>
   invoiceTypes.find((item) => item.value === type)?.label ?? type;
 
+/** How a note gets its lines: the whole document, returned products or a single amount. */
+export type NoteMode = 'full' | 'items' | 'amount';
+
+/** Reasons the platform supports: catalog 09 for credit notes, catalog 10 for debit notes. */
+export const noteReasons: Record<
+  '07' | '08',
+  { value: string; label: string; mode: NoteMode; help: string }[]
+> = {
+  '07': [
+    {
+      value: '01',
+      label: 'Anulación de la operación',
+      mode: 'full',
+      help: 'Revierte todo el comprobante. Al ser aceptada, el pedido puede volver a facturarse.',
+    },
+    {
+      value: '02',
+      label: 'Anulación por error en el RUC',
+      mode: 'full',
+      help: 'Revierte todo el comprobante para emitir otro con el documento correcto.',
+    },
+    {
+      value: '06',
+      label: 'Devolución total',
+      mode: 'full',
+      help: 'El cliente devolvió todos los productos. El reingreso al stock lo registra inventario.',
+    },
+    {
+      value: '07',
+      label: 'Devolución por ítem',
+      mode: 'items',
+      help: 'Acredita solo las unidades devueltas, al precio facturado.',
+    },
+    {
+      value: '09',
+      label: 'Disminución en el valor',
+      mode: 'amount',
+      help: 'Descuento posterior a la venta, por un importe con IGV.',
+    },
+  ],
+  '08': [
+    {
+      value: '01',
+      label: 'Intereses por mora',
+      mode: 'amount',
+      help: 'Importe con IGV que se cobra adicionalmente.',
+    },
+    {
+      value: '02',
+      label: 'Aumento en el valor',
+      mode: 'amount',
+      help: 'Importe con IGV que se cobra adicionalmente.',
+    },
+    {
+      value: '03',
+      label: 'Penalidades / otros conceptos',
+      mode: 'amount',
+      help: 'Importe con IGV que se cobra adicionalmente.',
+    },
+  ],
+};
+
+export const noteReasonFor = (type: string, code: string | null | undefined) =>
+  type === '07' || type === '08'
+    ? noteReasons[type].find((item) => item.value === code)
+    : undefined;
+
+/** "(18%)" from the stored rate "0.1800". */
+export const taxPercent = (rate: string) => `(${Number((Number(rate) * 100).toFixed(2))}%)`;
+
 export type InvoiceInput = {
   orderId: string;
   type: string;
@@ -35,6 +105,13 @@ export type InvoiceInput = {
   customerDocumentNumber: string;
   customerName: string;
   referencedSerialNumber: string;
+  /** Notes only. */
+  noteCode?: string;
+  noteReason?: string;
+  /** Amount with IGV, for notes in 'amount' mode. */
+  amount?: string;
+  /** Returned quantity per product id, for 'items' mode. */
+  items?: Record<string, string>;
 };
 
 const SERIAL = /^[FB][A-Z0-9]{3}-[1-9][0-9]{0,7}$/;
@@ -69,6 +146,22 @@ export function validateInvoice(input: InvoiceInput): Partial<Record<keyof Invoi
     !SERIAL.test(input.referencedSerialNumber.trim().toUpperCase())
   )
     errors.referencedSerialNumber = 'Indica el comprobante que se modifica (serie-correlativo).';
+  if (input.type === '07' || input.type === '08') {
+    const reason = noteReasonFor(input.type, input.noteCode);
+    if (!reason) errors.noteCode = 'Selecciona el motivo de la nota.';
+    if (!input.noteReason?.trim()) errors.noteReason = 'Describe el sustento de la nota.';
+    else if (input.noteReason.trim().length > 250)
+      errors.noteReason = 'El sustento admite hasta 250 caracteres.';
+    if (reason?.mode === 'amount' && !/^\d{1,12}(\.\d{1,2})?$/.test(input.amount?.trim() ?? ''))
+      errors.amount = 'Ingresa un importe con hasta 2 decimales.';
+    else if (reason?.mode === 'amount' && Number(input.amount) <= 0)
+      errors.amount = 'El importe debe ser mayor que cero.';
+    const quantities = Object.values(input.items ?? {}).filter((value) => value.trim() !== '');
+    if (reason?.mode === 'items' && quantities.some((value) => !/^\d+$/.test(value.trim())))
+      errors.items = 'Las cantidades devueltas son números enteros.';
+    else if (reason?.mode === 'items' && !quantities.some((value) => Number(value) > 0))
+      errors.items = 'Indica al menos una unidad devuelta.';
+  }
   const document = documentTypes.find((item) => item.value === input.customerDocumentType);
   const number = input.customerDocumentNumber.trim();
   if (!document) errors.customerDocumentType = 'Selecciona el tipo de documento.';
@@ -81,6 +174,24 @@ export function validateInvoice(input: InvoiceInput): Partial<Record<keyof Invoi
     errors.customerDocumentType = 'La factura requiere el RUC del cliente.';
   if (!input.customerName.trim()) errors.customerName = 'Ingresa el nombre o la razón social.';
   return errors;
+}
+
+/** Note fields sent to the platform: only what the chosen reason uses. */
+export function notePayload(input: InvoiceInput) {
+  const reason = noteReasonFor(input.type, input.noteCode);
+  if (!reason) return {};
+  return {
+    noteCode: reason.value,
+    noteReason: input.noteReason?.trim() ?? '',
+    ...(reason.mode === 'amount' ? { amount: input.amount?.trim() } : {}),
+    ...(reason.mode === 'items'
+      ? {
+          items: Object.entries(input.items ?? {})
+            .filter(([, quantity]) => Number(quantity) > 0)
+            .map(([productId, quantity]) => ({ productId, quantity: Number(quantity) })),
+        }
+      : {}),
+  };
 }
 
 /** RUC: 11 digits, prefix 10/15/17/20 and SUNAT modulo-11 check digit (same rule as the platform). */
