@@ -487,6 +487,89 @@ function InvoiceLines({ invoice }: { invoice: Invoice }) {
   );
 }
 
+/** Voids an accepted document without a credit note, within SUNAT's deadline. */
+function VoidForm({
+  series,
+  onVoid,
+  busy,
+}: {
+  series: string;
+  onVoid: (reason: string) => void;
+  busy: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState('');
+  const [error, setError] = useState('');
+  const kind = series.startsWith('F') ? 'comunicación de baja' : 'resumen diario';
+  const article = series.startsWith('F') ? 'una' : 'un';
+  if (!open)
+    return (
+      <button type="button" className="link-button" onClick={() => setOpen(true)}>
+        Anular comprobante ({kind})
+      </button>
+    );
+  return (
+    <form
+      className="form-stack"
+      noValidate
+      aria-label="Anular comprobante"
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (reason.trim().length < 3) return setError('Indica el motivo de la anulación.');
+        setError('');
+        onVoid(reason.trim());
+      }}
+    >
+      <p className="notice">
+        Se enviará a SUNAT {article} {kind}. Solo procede dentro de los 7 días de emitido y sin
+        notas vigentes; después usa una nota de crédito. Aceptada la anulación, el pedido puede
+        facturarse de nuevo.
+      </p>
+      <label className="field">
+        Motivo de la anulación
+        <input value={reason} onChange={(e) => setReason(e.target.value)} maxLength={100} />
+        {error && <small className="field-error">{error}</small>}
+      </label>
+      <div className="form-actions">
+        <button type="button" className="link-button" onClick={() => setOpen(false)}>
+          Cancelar
+        </button>
+        <button type="submit" className="button button-primary" disabled={busy}>
+          {busy ? 'Enviando…' : 'Enviar anulación'}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function VoidHistory({ voids }: { voids: NonNullable<Invoice['voids']> }) {
+  const labels = {
+    SENT: 'En proceso',
+    ACCEPTED: 'Aceptada',
+    REJECTED: 'Rechazada',
+    FAILED: 'No enviada',
+  };
+  return (
+    <ul className="bo-simple-list" aria-label="Anulaciones">
+      {voids.map((item) => (
+        <li key={item.id}>
+          <span>
+            <strong>
+              {item.identifier} · {labels[item.status]}
+            </strong>
+            <small>
+              {item.reason}
+              {item.ticket && ` · ticket ${item.ticket}`}
+              {item.description &&
+                ` · ${item.responseCode ? `${item.responseCode} ` : ''}${item.description}`}
+            </small>
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /** Evidence of every submission and reconciliation with SUNAT. */
 function AttemptHistory({ attempts }: { attempts: NonNullable<Invoice['attempts']> }) {
   return (
@@ -621,6 +704,20 @@ function InvoiceDetail({ id, notice }: { id: string; notice: string }) {
   if (error || !data)
     return <ErrorBox message={error || 'Comprobante no encontrado.'} retry={reload} />;
   const canSubmit = data.status === 'DRAFT' || data.status === 'FAILED';
+  const runAction = async (action: () => Promise<Invoice>, done: string) => {
+    setBusy(true);
+    setMessage('');
+    setSubmitError('');
+    try {
+      const result = await action();
+      setMessage(`${done}. Estado: ${invoiceStatusLabels[result.status] ?? result.status}.`);
+      reload();
+    } catch (e) {
+      setSubmitError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
   const reconcile = async () => {
     setBusy(true);
     setMessage('');
@@ -773,6 +870,26 @@ function InvoiceDetail({ id, notice }: { id: string; notice: string }) {
             {busy ? 'Consultando…' : 'Consultar estado en SUNAT'}
           </button>
         </div>
+      )}
+      {data.voids && data.voids.length > 0 && <VoidHistory voids={data.voids} />}
+      {data.status === 'VOIDING' && (
+        <div className="form-actions">
+          <button
+            type="button"
+            className="button button-secondary"
+            disabled={busy}
+            onClick={() => runAction(() => api.checkInvoiceVoid(id), 'Anulación consultada')}
+          >
+            Consultar anulación en SUNAT
+          </button>
+        </div>
+      )}
+      {data.status === 'ACCEPTED' && (
+        <VoidForm
+          series={data.serialNumber}
+          onVoid={(reason) => runAction(() => api.voidInvoice(id, reason), 'Anulación procesada')}
+          busy={busy}
+        />
       )}
       {data.attempts && data.attempts.length > 0 && <AttemptHistory attempts={data.attempts} />}
       {canSubmit && !correcting && (

@@ -56,6 +56,20 @@ class InvoiceGatewayController extends GatewayController
         return $this->reply($this->api->authenticated('PATCH', "/api/invoices/$id", $data));
     }
 
+    /** Voids an accepted document: voided notice (series F) or daily summary (series B). */
+    public function void(string $id, Request $request): JsonResponse
+    {
+        if ($error = $this->requirePermission('invoices:submit')) return $error;
+        $data = $request->validate(['reason' => 'required|string|min:3|max:100']);
+        return $this->reply($this->api->authenticated('POST', "/api/invoices/$id/void", $data));
+    }
+
+    public function checkVoid(string $id): JsonResponse
+    {
+        if ($error = $this->requirePermission('invoices:submit')) return $error;
+        return $this->reply($this->api->authenticated('POST', "/api/invoices/$id/void/check"));
+    }
+
     /** No answer from SUNAT: queries the CDR or resends the same signed XML (never a new document). */
     public function reconcile(string $id): JsonResponse
     {

@@ -207,6 +207,13 @@ export const api = {
       method: 'PATCH',
       body: json({ active }),
     }),
+  voidInvoice: (id: string, reason: string) =>
+    request<Invoice>(`/admin/invoices/${encodeURIComponent(id)}/void`, {
+      method: 'POST',
+      body: json({ reason }),
+    }),
+  checkInvoiceVoid: (id: string) =>
+    request<Invoice>(`/admin/invoices/${encodeURIComponent(id)}/void/check`, { method: 'POST' }),
   reconcileInvoice: (id: string) =>
     request<Invoice>(`/admin/invoices/${encodeURIComponent(id)}/reconcile`, { method: 'POST' }),
   submitInvoice: (id: string) =>

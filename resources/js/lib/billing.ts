@@ -22,6 +22,8 @@ export const invoiceStatusLabels: Record<string, string> = {
   REJECTED: 'Rechazado',
   FAILED: 'Error de envío',
   PENDING_CHECK: 'Pendiente de conciliación',
+  VOIDING: 'En anulación',
+  VOIDED: 'Anulado',
 };
 
 export const invoiceTypeLabel = (type: string) =>
@@ -109,6 +111,8 @@ export function invoiceValidity(status: string, test: boolean | undefined) {
       ? 'Documento de prueba: aceptado por el servicio de pruebas de SUNAT, sin valor tributario.'
       : 'Comprobante aceptado por SUNAT.';
   if (status === 'REJECTED') return 'Rechazado por SUNAT: el PDF no tiene valor tributario.';
+  if (status === 'VOIDED') return 'Anulado ante SUNAT: no tiene valor tributario.';
+  if (status === 'VOIDING') return 'SUNAT está procesando la anulación.';
   if (status === 'PENDING_CHECK')
     return 'Sin respuesta de SUNAT: puede haber llegado. Concilia antes de emitir otro comprobante.';
   return 'Borrador sin enviar: el PDF es solo una vista previa sin valor tributario.';

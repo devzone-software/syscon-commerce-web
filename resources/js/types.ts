@@ -312,6 +312,18 @@ export type Invoice = {
   /** The endpoint is SUNAT's test service: accepted documents are tests. */
   test?: boolean;
   hasCdr?: boolean;
+  /** Voiding requests: RA (voided notice) or RC (daily summary), processed by ticket. */
+  voids?: {
+    id: string;
+    kind: 'RA' | 'RC';
+    identifier: string;
+    reason: string;
+    ticket: string | null;
+    status: 'SENT' | 'ACCEPTED' | 'REJECTED' | 'FAILED';
+    responseCode: string | null;
+    description: string | null;
+    createdAt: string | null;
+  }[];
   /** Every submission or reconciliation with SUNAT, oldest first. */
   attempts?: {
     action: 'SUBMIT' | 'RECONCILE';
