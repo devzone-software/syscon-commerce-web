@@ -1,4 +1,5 @@
 import { formatDateTime, paymentStatusLabels } from '../../lib/orders';
+import { paymentMethodLabel } from '../../lib/sales';
 import { money } from '../../state';
 import type { Payment } from '../../types';
 import { StatusBadge } from '../shared/StatusBadge';
@@ -15,7 +16,7 @@ export function PaymentDetails({ payment }: { payment: Payment }) {
         </div>
         <div>
           <dt>Método</dt>
-          <dd>{payment.provider === 'MANUAL' ? 'Pago manual' : payment.provider}</dd>
+          <dd>{paymentMethodLabel(payment.provider)}</dd>
         </div>
         <div>
           <dt>Estado</dt>

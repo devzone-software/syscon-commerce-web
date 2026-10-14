@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { billingForCustomer, cashChange, paymentError, paymentMethodLabel } from './sales';
+import {
+  billingForCustomer,
+  cashChange,
+  gatewayReturnNotice,
+  paymentError,
+  paymentMethodLabel,
+} from './sales';
 
 describe('direct sale payment', () => {
   it('requires the operation number except for cash', () => {
@@ -39,5 +45,14 @@ describe('direct sale payment', () => {
       documentType: '6',
       name: '',
     });
+  });
+});
+
+describe('gateway return', () => {
+  it('only confirms when the backend reports the order as paid', () => {
+    expect(gatewayReturnNotice('PAID').tone).toBe('success');
+    expect(gatewayReturnNotice('PAYMENT_PENDING').tone).toBe('info');
+    expect(gatewayReturnNotice(null).text).toMatch(/intentar de nuevo/);
+    expect(paymentMethodLabel('SANDBOX')).toMatch(/prueba/);
   });
 });

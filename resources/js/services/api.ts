@@ -122,8 +122,10 @@ export const api = {
     delivery: Delivery;
     idempotencyKey: string;
   }) => request<Order>('/orders', { method: 'POST', body: json(order) }),
-  createPayment: (orderId: string) =>
-    request<Payment>('/payments', { method: 'POST', body: json({ orderId, provider: 'MANUAL' }) }),
+  /** MANUAL returns the order's existing request; a gateway opens a new attempt when the last was rejected. */
+  createPayment: (orderId: string, provider: 'MANUAL' | 'SANDBOX' = 'MANUAL') =>
+    request<Payment>('/payments', { method: 'POST', body: json({ orderId, provider }) }),
+  paymentMethods: () => request<{ manual: boolean; gateways: string[] }>('/payment-methods'),
   payment: (id: string) => request<Payment>(`/payments/${encodeURIComponent(id)}`),
   saveProduct: (product: Omit<Product, 'id'>) =>
     request<Product>('/admin/products', { method: 'POST', body: json(product) }),

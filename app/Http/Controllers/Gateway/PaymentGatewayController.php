@@ -10,8 +10,15 @@ class PaymentGatewayController extends GatewayController
     public function pay(Request $request): JsonResponse
     {
         if ($error = $this->requireLogin()) return $error;
-        $data = $request->validate(['orderId' => 'required|uuid', 'provider' => 'required|in:MANUAL']);
+        // SANDBOX is the simulated online gateway; the platform rejects it unless it is enabled.
+        $data = $request->validate(['orderId' => 'required|uuid', 'provider' => 'required|in:MANUAL,SANDBOX']);
         return $this->reply($this->api->authenticated('POST', '/api/payments', $data));
+    }
+
+    /** Payment methods the checkout can offer (manual and enabled online gateways). */
+    public function methods(): JsonResponse
+    {
+        return $this->reply($this->api->request('GET', '/api/payments/methods'));
     }
 
     public function payment(string $id): JsonResponse
@@ -25,7 +32,7 @@ class PaymentGatewayController extends GatewayController
     {
         if ($error = $this->requirePermission('payments:confirm')) return $error;
         $data = $request->validate([
-            'status' => 'nullable|in:PENDING,APPROVED,CANCELLED', 'q' => 'nullable|string|max:120',
+            'status' => 'nullable|in:PENDING,APPROVED,CANCELLED,REJECTED,REFUND_REQUIRED', 'q' => 'nullable|string|max:120',
             'page' => 'nullable|integer|min:1', 'perPage' => 'nullable|integer|min:1|max:100',
         ]);
         return $this->reply($this->api->authenticated('GET', '/api/admin/payments'.OrderGatewayController::query($data)));

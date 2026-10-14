@@ -11,7 +11,23 @@ export type PaymentMethod = (typeof paymentMethods)[number]['value'];
 
 export const paymentMethodLabel = (method: string) =>
   paymentMethods.find((item) => item.value === method)?.label ??
-  (method === 'MANUAL' ? 'Pago manual (web)' : method);
+  (
+    { MANUAL: 'Pago manual (web)', SANDBOX: 'Pasarela en línea (prueba)' } as Record<string, string>
+  )[method] ??
+  method;
+
+/** Message after returning from the gateway, decided by the order state the backend reports. */
+export function gatewayReturnNotice(orderStatus: string | null): {
+  tone: 'success' | 'info';
+  text: string;
+} {
+  if (orderStatus && orderStatus !== 'PAYMENT_PENDING')
+    return { tone: 'success', text: 'Pago confirmado. Ya estamos preparando tu pedido.' };
+  return {
+    tone: 'info',
+    text: 'Aún no tenemos la confirmación del pago. Si la pasarela lo rechazó, puedes intentar de nuevo; si lo aprobó, se reflejará en unos instantes.',
+  };
+}
 
 export type SalePayment = { method: PaymentMethod; reference: string; received: string };
 

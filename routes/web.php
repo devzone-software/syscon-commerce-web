@@ -26,6 +26,7 @@ Route::prefix('web-api')->group(function () {
     Route::get('/orders/{id}', [OrderGatewayController::class, 'order'])->whereUuid('id');
     Route::get('/orders/{id}/invoices', [OrderGatewayController::class, 'invoices'])->whereUuid('id');
     Route::get('/orders/{id}/invoices/{invoice}/{format}', [OrderGatewayController::class, 'invoiceFile'])->whereUuid(['id', 'invoice'])->whereIn('format', ['pdf', 'xml', 'cdr']);
+    Route::get('/payment-methods', [PaymentGatewayController::class, 'methods']);
     Route::post('/payments', [PaymentGatewayController::class, 'pay']);
     Route::get('/payments/{id}', [PaymentGatewayController::class, 'payment'])->whereUuid('id');
     Route::post('/admin/products', [CatalogGatewayController::class, 'saveProduct']);

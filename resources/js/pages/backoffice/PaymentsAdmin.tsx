@@ -17,7 +17,7 @@ import { money, useShop } from '../../state';
 import type { Payment } from '../../types';
 import { useData, Empty, ErrorBox, Loading } from '../../ui';
 
-const paymentTabs = ['PENDING', 'APPROVED', 'CANCELLED'];
+const paymentTabs = ['PENDING', 'APPROVED', 'REJECTED', 'REFUND_REQUIRED', 'CANCELLED'];
 
 function PaymentDetail({ id, onChanged }: { id: string; onChanged: () => void }) {
   const { user } = useShop();

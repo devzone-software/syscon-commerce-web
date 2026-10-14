@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { InfoRows } from '../components/cart/OrderSummary';
 import { PageHero, PageSection } from '../components/layout/PageHero';
@@ -11,6 +11,7 @@ import { billingRows } from '../lib/billing';
 import { deliveryRows } from '../lib/delivery';
 import { formatDateTime, orderStatusLabels, shortId, statusLabel } from '../lib/orders';
 import { api } from '../services/api';
+import { gatewayReturnNotice } from '../lib/sales';
 import { money } from '../state';
 import type { Payment } from '../types';
 import { useData, ErrorBox, Loading } from '../ui';
@@ -29,12 +30,49 @@ export function OrderPage() {
   const [params] = useSearchParams();
   const location = useLocation();
   const isNew = params.get('nuevo') === '1';
+  const fromGateway = params.get('pago') === 'retorno';
   const { data, error, loading, reload } = useData(() => api.order(id), [id]);
   const [payment, setPayment] = useState<Payment | null>(
     (location.state as { payment?: Payment | null } | null)?.payment ?? null,
   );
   const [payError, setPayError] = useState('');
   const [busy, setBusy] = useState(false);
+  const methods = useData(api.paymentMethods);
+  const [returned, setReturned] = useState<ReturnType<typeof gatewayReturnNotice> | null>(null);
+
+  // Back from the gateway: success is shown only once the backend reports the order as paid.
+  useEffect(() => {
+    if (!fromGateway) return;
+    let live = true;
+    (async () => {
+      let status: string | null = null;
+      for (let i = 0; i < 6 && live; i++) {
+        status = (await api.order(id).catch(() => null))?.status ?? null;
+        if (status && status !== 'PAYMENT_PENDING') break;
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
+      if (live) {
+        setReturned(gatewayReturnNotice(status));
+        reload();
+      }
+    })();
+    return () => {
+      live = false;
+    };
+  }, [fromGateway, id]);
+
+  const payOnline = async () => {
+    setBusy(true);
+    setPayError('');
+    try {
+      const attempt = await api.createPayment(id, 'SANDBOX');
+      if (!attempt.paymentUrl) throw new Error('La pasarela no devolvió la página de pago.');
+      window.location.assign(attempt.paymentUrl);
+    } catch (e) {
+      setPayError((e as Error).message);
+      setBusy(false);
+    }
+  };
 
   // POST /payments returns the existing MANUAL request for the order when there is one.
   const requestPayment = async () => {
@@ -110,6 +148,15 @@ export function OrderPage() {
                   ))}
                 </ol>
               )}
+              {returned && (
+                <p
+                  className={`notice ${returned.tone === 'success' ? 'success' : ''}`}
+                  role="status"
+                >
+                  {returned.text}
+                </p>
+              )}
+              {fromGateway && !returned && <p className="flow-note">Confirmando tu pago…</p>}
               {payment && <PaymentDetails payment={payment} />}
               {data.status === 'PAYMENT_PENDING' ? (
                 <>
@@ -120,6 +167,16 @@ export function OrderPage() {
                       ` Reservamos tu stock hasta el ${formatDateTime(data.expiresAt)}; si el pago no se confirma antes, el pedido vence.`}
                   </p>
                   {payError && <ErrorBox message={payError} />}
+                  {methods.data?.gateways.includes('SANDBOX') && (
+                    <button
+                      type="button"
+                      className="flow-button"
+                      disabled={busy}
+                      onClick={payOnline}
+                    >
+                      {busy ? 'Redirigiendo…' : 'Pagar en línea (pasarela de prueba)'}
+                    </button>
+                  )}
                   {!payment && (
                     <button
                       type="button"

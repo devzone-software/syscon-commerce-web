@@ -44,6 +44,8 @@ export const paymentStatusLabels: Record<string, string> = {
   PENDING: 'Pendiente de confirmación',
   APPROVED: 'Aprobado',
   CANCELLED: 'Anulado',
+  REJECTED: 'Rechazado',
+  REFUND_REQUIRED: 'Devolución pendiente',
 };
 
 /** Entries of the order history (order_events). */
@@ -58,6 +60,9 @@ export const orderEventLabels: Record<string, string> = {
   CREDIT_NOTE_ACCEPTED: 'Nota de crédito aceptada',
   DEBIT_NOTE_ACCEPTED: 'Nota de débito aceptada',
   NOTIFICATION_RESENT: 'Correo reenviado',
+  PAYMENT_REJECTED: 'Pago en línea rechazado',
+  PAYMENT_REFUND_REQUIRED: 'Pago recibido tras cancelar: requiere devolución',
+  INVOICE_VOIDED: 'Comprobante anulado',
 };
 
 /** Customer emails sent for an order. */
