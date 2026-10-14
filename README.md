@@ -16,15 +16,16 @@ Aplicación Laravel 12 + React 19 + TypeScript + Tailwind para el backend [SYSCO
 
 **Backoffice** (`/admin`, layout propio, secciones visibles según permisos)
 
-| Sección                                                                                                        | Permiso                       |
-| -------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| Panel, reportes de catálogo e inventario                                                                       | cualquier permiso de personal |
-| Reportes de ventas y conciliación (CSV)                                                                        | `reports:view`                |
-| Productos, carga masiva CSV, categorías y marcas, existencias                                                  | `catalog:write`               |
-| Proveedores (sincronización de feeds)                                                                          | `suppliers:manage`            |
-| Pedidos (bandeja filtrable, detalle con pagos, comprobantes, correos al cliente e historial, cambio de estado) | `orders:manage`               |
-| Pagos (bandeja de pagos por verificar y confirmación manual)                                                   | `payments:confirm`            |
-| Comprobantes (emisión con serie automática, notas de crédito/débito, PDF/XML/CDR y envío)                      | `invoices:submit`             |
+| Sección                                                                                                           | Permiso                       |
+| ----------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| Panel, reportes de catálogo e inventario                                                                          | cualquier permiso de personal |
+| Reportes de ventas y conciliación (CSV)                                                                           | `reports:view`                |
+| Productos, carga masiva CSV, categorías y marcas, existencias                                                     | `catalog:write`               |
+| Proveedores (sincronización de feeds)                                                                             | `suppliers:manage`            |
+| Pedidos (bandeja filtrable, detalle con pagos, comprobantes, correos al cliente e historial, cambio de estado)    | `orders:manage`               |
+| Venta directa en tienda (cobro en efectivo, tarjeta, Yape, Plin o transferencia, entrega inmediata y comprobante) | `sales:create`                |
+| Pagos (bandeja de pagos por verificar y confirmación manual)                                                      | `payments:confirm`            |
+| Comprobantes (emisión con serie automática, notas de crédito/débito, PDF/XML/CDR y envío)                         | `invoices:submit`             |
 
 POS, caja, sucursales, almacenes, movimientos, kardex, clientes y administración de usuarios
 dependen de APIs que el backend aún no ofrece. Están detalladas en
@@ -117,6 +118,7 @@ Laravel valida la entrada, conserva el JWT en la sesión y aplica el mismo permi
 | `POST admin/notifications/{id}/resend`                                                                | `POST /api/admin/notifications/{id}/resend`                                                                  | `orders:manage`                                               |
 | `POST admin/payments/{id}/confirm`                                                                    | `POST /api/payments/{id}/confirm`                                                                            | `payments:confirm`                                            |
 | `POST admin/invoices` (sin correlativo), `GET                                                         | PATCH admin/invoices/{id}`, `POST admin/invoices/{id}/submit`, `GET admin/invoices/{id}/{pdf,xml,cdr}`, `GET | POST admin/invoice-series`, `PATCH admin/invoice-series/{id}` | `/api/invoices`, `/api/invoices/series` | `invoices:submit` |
+| `POST admin/sales`, `GET admin/customers`                                                             | `/api/admin/sales`, `/api/admin/customers`                                                                   | `sales:create`                                                |
 | `GET admin/reports/summary`, `GET admin/reports/sales` (`format=csv`)                                 | `/api/admin/reports/...`                                                                                     | `reports:view`                                                |
 | `GET/POST admin/suppliers`, `POST admin/suppliers/{id}/run`, `GET admin/supplier-jobs[/{id}/history]` | `/api/suppliers`                                                                                             | `suppliers:manage`                                            |
 
@@ -144,7 +146,7 @@ login responde 502 y no guarda la sesión. Tras cambiar `.env`, recrea el conten
 
 - `app/Services/JavaApi.php`: cliente HTTP de la plataforma (nombre heredado del backend Java), descargas de archivos y rotación de refresh token.
 - `app/Services/Identity.php`: validación de firma, emisor y vencimiento del JWT.
-- `app/Http/Controllers/Gateway/`: un controlador por módulo (`Auth`, `Catalog`, `Order`, `Payment`, `Invoice`, `Report`, `Supplier`) sobre una base común con `requirePermission`.
+- `app/Http/Controllers/Gateway/`: un controlador por módulo (`Auth`, `Catalog`, `Order`, `Payment`, `Invoice`, `Report`, `Sale`, `Supplier`) sobre una base común con `requirePermission`.
 - `resources/js/services/api.ts`: cliente del navegador para `/web-api`.
 - `resources/js/state.tsx`: sesión visible y carrito local; las operaciones del carrito están en `lib/cart.ts`.
 - `resources/js/lib/`: reglas sin interfaz y con pruebas (catálogo, carrito, pedidos, permisos, facturación, inventario, validaciones).
