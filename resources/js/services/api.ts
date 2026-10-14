@@ -194,6 +194,8 @@ export const api = {
       method: 'PATCH',
       body: json({ active }),
     }),
+  reconcileInvoice: (id: string) =>
+    request<Invoice>(`/admin/invoices/${encodeURIComponent(id)}/reconcile`, { method: 'POST' }),
   submitInvoice: (id: string) =>
     request<Invoice>(`/admin/invoices/${encodeURIComponent(id)}/submit`, { method: 'POST' }),
 };

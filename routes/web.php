@@ -39,6 +39,7 @@ Route::prefix('web-api')->group(function () {
     Route::get('/admin/invoices/{id}', [InvoiceGatewayController::class, 'show'])->whereUuid('id');
     Route::patch('/admin/invoices/{id}', [InvoiceGatewayController::class, 'update'])->whereUuid('id');
     Route::post('/admin/invoices/{id}/submit', [InvoiceGatewayController::class, 'submit'])->whereUuid('id');
+    Route::post('/admin/invoices/{id}/reconcile', [InvoiceGatewayController::class, 'reconcile'])->whereUuid('id');
     Route::get('/admin/invoices/{id}/{format}', [InvoiceGatewayController::class, 'file'])->whereUuid('id')->whereIn('format', ['pdf', 'xml', 'cdr']);
     Route::post('/admin/sales', [SaleGatewayController::class, 'store']);
     Route::get('/admin/customers', [SaleGatewayController::class, 'customers']);

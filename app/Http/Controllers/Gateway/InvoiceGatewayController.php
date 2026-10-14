@@ -56,6 +56,13 @@ class InvoiceGatewayController extends GatewayController
         return $this->reply($this->api->authenticated('PATCH', "/api/invoices/$id", $data));
     }
 
+    /** No answer from SUNAT: queries the CDR or resends the same signed XML (never a new document). */
+    public function reconcile(string $id): JsonResponse
+    {
+        if ($error = $this->requirePermission('invoices:submit')) return $error;
+        return $this->reply($this->api->authenticated('POST', "/api/invoices/$id/reconcile"));
+    }
+
     /** PDF (with its draft/test warning), XML or CDR of any document, for billing staff. */
     public function file(string $id, string $format): Response
     {

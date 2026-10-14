@@ -288,6 +288,15 @@ export type Invoice = {
   /** The endpoint is SUNAT's test service: accepted documents are tests. */
   test?: boolean;
   hasCdr?: boolean;
+  /** Every submission or reconciliation with SUNAT, oldest first. */
+  attempts?: {
+    action: 'SUBMIT' | 'RECONCILE';
+    result: string;
+    sunatCode: string | null;
+    message: string | null;
+    actor: string | null;
+    at: string | null;
+  }[];
 };
 /** GET /orders/{id}/invoices: what the customer can download. */
 export type OrderInvoice = {

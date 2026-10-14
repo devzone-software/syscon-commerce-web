@@ -487,6 +487,43 @@ function InvoiceLines({ invoice }: { invoice: Invoice }) {
   );
 }
 
+/** Evidence of every submission and reconciliation with SUNAT. */
+function AttemptHistory({ attempts }: { attempts: NonNullable<Invoice['attempts']> }) {
+  return (
+    <details className="form-stack">
+      <summary>Historial de envíos a SUNAT ({attempts.length})</summary>
+      <div className="table-wrap">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Fecha</th>
+              <th scope="col">Acción</th>
+              <th scope="col">Resultado</th>
+              <th scope="col">Respuesta</th>
+            </tr>
+          </thead>
+          <tbody>
+            {attempts.map((attempt, index) => (
+              <tr key={index}>
+                <td>
+                  {formatDateTime(attempt.at)}
+                  <small>{attempt.actor ?? 'Sistema'}</small>
+                </td>
+                <td>{attempt.action === 'RECONCILE' ? 'Conciliación' : 'Envío'}</td>
+                <td>{invoiceStatusLabels[attempt.result] ?? attempt.result}</td>
+                <td>
+                  {attempt.sunatCode && <strong>{attempt.sunatCode} </strong>}
+                  {attempt.message}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </details>
+  );
+}
+
 /** Draft only: a document that went through submission may have reached SUNAT. */
 function CorrectionForm({
   invoice,
@@ -584,6 +621,22 @@ function InvoiceDetail({ id, notice }: { id: string; notice: string }) {
   if (error || !data)
     return <ErrorBox message={error || 'Comprobante no encontrado.'} retry={reload} />;
   const canSubmit = data.status === 'DRAFT' || data.status === 'FAILED';
+  const reconcile = async () => {
+    setBusy(true);
+    setMessage('');
+    setSubmitError('');
+    try {
+      const result = await api.reconcileInvoice(id);
+      setMessage(
+        `Conciliación procesada. Estado: ${invoiceStatusLabels[result.status] ?? result.status}.`,
+      );
+      reload();
+    } catch (e) {
+      setSubmitError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
     <section className="bo-card" aria-labelledby="invoice-detail-title">
       <div className="order-top">
@@ -709,6 +762,19 @@ function InvoiceDetail({ id, notice }: { id: string; notice: string }) {
             Corregir datos del cliente
           </button>
         ))}
+      {data.status === 'PENDING_CHECK' && (
+        <div className="form-actions">
+          <button
+            type="button"
+            className="button button-primary"
+            disabled={busy}
+            onClick={reconcile}
+          >
+            {busy ? 'Consultando…' : 'Consultar estado en SUNAT'}
+          </button>
+        </div>
+      )}
+      {data.attempts && data.attempts.length > 0 && <AttemptHistory attempts={data.attempts} />}
       {canSubmit && !correcting && (
         <div className="form-stack">
           <p className="muted">

@@ -216,3 +216,9 @@ describe('invoice files', () => {
     expect(invoiceValidity('ACCEPTED', false)).toBe('Comprobante aceptado por SUNAT.');
   });
 });
+
+describe('pending reconciliation', () => {
+  it('warns not to issue another document while SUNAT has not answered', () => {
+    expect(invoiceValidity('PENDING_CHECK', true)).toMatch(/Concilia/);
+  });
+});
