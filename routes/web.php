@@ -20,6 +20,8 @@ Route::prefix('web-api')->group(function () {
     Route::get('/delivery-options', [OrderGatewayController::class, 'deliveryOptions']);
     Route::match(['get', 'post'], '/orders', [OrderGatewayController::class, 'orders']);
     Route::get('/orders/{id}', [OrderGatewayController::class, 'order'])->whereUuid('id');
+    Route::get('/orders/{id}/invoices', [OrderGatewayController::class, 'invoices'])->whereUuid('id');
+    Route::get('/orders/{id}/invoices/{invoice}/{format}', [OrderGatewayController::class, 'invoiceFile'])->whereUuid(['id', 'invoice'])->whereIn('format', ['pdf', 'xml', 'cdr']);
     Route::post('/payments', [PaymentGatewayController::class, 'pay']);
     Route::get('/payments/{id}', [PaymentGatewayController::class, 'payment'])->whereUuid('id');
     Route::post('/admin/products', [CatalogGatewayController::class, 'saveProduct']);
@@ -34,6 +36,7 @@ Route::prefix('web-api')->group(function () {
     Route::get('/admin/invoices/{id}', [InvoiceGatewayController::class, 'show'])->whereUuid('id');
     Route::patch('/admin/invoices/{id}', [InvoiceGatewayController::class, 'update'])->whereUuid('id');
     Route::post('/admin/invoices/{id}/submit', [InvoiceGatewayController::class, 'submit'])->whereUuid('id');
+    Route::get('/admin/invoices/{id}/{format}', [InvoiceGatewayController::class, 'file'])->whereUuid('id')->whereIn('format', ['pdf', 'xml', 'cdr']);
     Route::match(['get', 'post'], '/admin/suppliers', [SupplierGatewayController::class, 'suppliers']);
     Route::post('/admin/suppliers/{id}/run', [SupplierGatewayController::class, 'run'])->whereUuid('id');
     Route::get('/admin/supplier-jobs', [SupplierGatewayController::class, 'jobs']);

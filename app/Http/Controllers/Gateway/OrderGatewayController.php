@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Gateway;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class OrderGatewayController extends GatewayController
 {
@@ -44,6 +45,19 @@ class OrderGatewayController extends GatewayController
     {
         if ($error = $this->requireLogin()) return $error;
         return $this->reply($this->api->authenticated('GET', "/api/orders/$id"));
+    }
+
+    /** The customer's documents for one order: the platform lists only accepted ones they own. */
+    public function invoices(string $id): JsonResponse
+    {
+        if ($error = $this->requireLogin()) return $error;
+        return $this->reply($this->api->authenticated('GET', "/api/orders/$id/invoices"));
+    }
+
+    public function invoiceFile(string $id, string $invoice, string $format): Response
+    {
+        if ($error = $this->requireLogin()) return $error;
+        return $this->sendFile($this->api->download("/api/orders/$id/invoices/$invoice/$format"));
     }
 
     /** Backoffice inbox: every customer's orders, paginated and filtered by the platform. */

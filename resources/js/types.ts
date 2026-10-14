@@ -203,6 +203,22 @@ export type Invoice = {
   total?: string;
   createdAt?: string | null;
   lines?: InvoiceLine[];
+  /** The endpoint is SUNAT's test service: accepted documents are tests. */
+  test?: boolean;
+  hasCdr?: boolean;
+};
+/** GET /orders/{id}/invoices: what the customer can download. */
+export type OrderInvoice = {
+  id: string;
+  type: string;
+  serialNumber: string;
+  status: string;
+  referencedSerialNumber: string | null;
+  total: string;
+  createdAt: string | null;
+  /** Accepted by SUNAT's test service: printed as a test document without tax value. */
+  test: boolean;
+  hasCdr: boolean;
 };
 /** Line stored with the document; XML and printed copy read these amounts. */
 export type InvoiceLine = {

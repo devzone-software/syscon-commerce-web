@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Gateway;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /** Proxies the platform invoices module (/api/invoices), which requires invoices:submit. */
 class InvoiceGatewayController extends GatewayController
@@ -53,6 +54,13 @@ class InvoiceGatewayController extends GatewayController
             'customerName' => 'required|string|max:255',
         ]);
         return $this->reply($this->api->authenticated('PATCH', "/api/invoices/$id", $data));
+    }
+
+    /** PDF (with its draft/test warning), XML or CDR of any document, for billing staff. */
+    public function file(string $id, string $format): Response
+    {
+        if ($error = $this->requirePermission('invoices:submit')) return $error;
+        return $this->sendFile($this->api->download("/api/invoices/$id/$format"));
     }
 
     public function submit(string $id): JsonResponse

@@ -10,6 +10,8 @@ import {
   invoiceStatusLabels,
   invoiceTypeLabel,
   invoiceTypes,
+  invoiceFileUrl,
+  invoiceValidity,
   noteReasonFor,
   noteReasons,
   notePayload,
@@ -659,6 +661,27 @@ function InvoiceDetail({ id, notice }: { id: string; notice: string }) {
         )}
       </dl>
       {data.lines && data.lines.length > 0 && <InvoiceLines invoice={data} />}
+      <p className={data.status === 'ACCEPTED' && !data.test ? 'notice success' : 'notice'}>
+        {invoiceValidity(data.status, data.test)}
+      </p>
+      <div className="form-actions">
+        <a
+          className="button button-secondary"
+          href={invoiceFileUrl(data.id, 'pdf')}
+          target="_blank"
+          rel="noopener"
+        >
+          {data.status === 'ACCEPTED' ? 'Ver / imprimir PDF' : 'Vista previa PDF'}
+        </a>
+        <a className="link-button" href={invoiceFileUrl(data.id, 'xml')} download>
+          Descargar XML
+        </a>
+        {data.hasCdr && (
+          <a className="link-button" href={invoiceFileUrl(data.id, 'cdr')} download>
+            Descargar CDR
+          </a>
+        )}
+      </div>
       {data.error && (
         <p className="notice error">
           Último error de envío: {data.error}. El reintento usa el mismo número {data.serialNumber}.

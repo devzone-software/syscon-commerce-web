@@ -93,6 +93,24 @@ export const noteReasonFor = (type: string, code: string | null | undefined) =>
     ? noteReasons[type].find((item) => item.value === code)
     : undefined;
 
+export type InvoiceFormat = 'pdf' | 'xml' | 'cdr';
+
+/** Download URLs served by the BFF; customers go through their order, staff by document id. */
+export const invoiceFileUrl = (invoiceId: string, format: InvoiceFormat, orderId?: string) =>
+  orderId
+    ? `/web-api/orders/${encodeURIComponent(orderId)}/invoices/${encodeURIComponent(invoiceId)}/${format}`
+    : `/web-api/admin/invoices/${encodeURIComponent(invoiceId)}/${format}`;
+
+/** What a printed copy is worth, so drafts and tests are never mistaken for valid documents. */
+export function invoiceValidity(status: string, test: boolean | undefined) {
+  if (status === 'ACCEPTED')
+    return test
+      ? 'Documento de prueba: aceptado por el servicio de pruebas de SUNAT, sin valor tributario.'
+      : 'Comprobante aceptado por SUNAT.';
+  if (status === 'REJECTED') return 'Rechazado por SUNAT: el PDF no tiene valor tributario.';
+  return 'Borrador sin enviar: el PDF es solo una vista previa sin valor tributario.';
+}
+
 /** "(18%)" from the stored rate "0.1800". */
 export const taxPercent = (rate: string) => `(${Number((Number(rate) * 100).toFixed(2))}%)`;
 

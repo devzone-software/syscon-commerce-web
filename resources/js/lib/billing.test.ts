@@ -3,6 +3,8 @@ import {
   billingFromProfile,
   billingPayload,
   invoiceTypeLabel,
+  invoiceFileUrl,
+  invoiceValidity,
   isValidRuc,
   notePayload,
   seriesFor,
@@ -198,5 +200,19 @@ describe('checkout billing', () => {
       documentType: '1',
       documentNumber: '',
     });
+  });
+});
+
+describe('invoice files', () => {
+  it('builds the customer and staff download URLs', () => {
+    expect(invoiceFileUrl('i1', 'pdf', 'o1')).toBe('/web-api/orders/o1/invoices/i1/pdf');
+    expect(invoiceFileUrl('i1', 'cdr')).toBe('/web-api/admin/invoices/i1/cdr');
+  });
+  it('never presents drafts, rejections or tests as valid documents', () => {
+    expect(invoiceValidity('DRAFT', true)).toMatch(/Borrador/);
+    expect(invoiceValidity('FAILED', false)).toMatch(/sin valor/);
+    expect(invoiceValidity('REJECTED', false)).toMatch(/Rechazado/);
+    expect(invoiceValidity('ACCEPTED', true)).toMatch(/prueba/);
+    expect(invoiceValidity('ACCEPTED', false)).toBe('Comprobante aceptado por SUNAT.');
   });
 });

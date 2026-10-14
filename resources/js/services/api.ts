@@ -10,6 +10,7 @@ import type {
   InvoiceCustomer,
   InvoiceSeries,
   Order,
+  OrderInvoice,
   Payment,
   Product,
   Profile,
@@ -101,6 +102,9 @@ export const api = {
   me: () => request<User>('/me'),
   orders: () => request<Order[]>('/orders'),
   order: (id: string) => request<Order>(`/orders/${encodeURIComponent(id)}`),
+  /** Documents of the customer's order that SUNAT accepted (drafts are never listed). */
+  orderInvoices: (id: string) =>
+    request<OrderInvoice[]>(`/orders/${encodeURIComponent(id)}/invoices`),
   profile: () => request<Profile>('/profile'),
   deliveryOptions: () => request<DeliveryOptions>('/delivery-options'),
   /** Retrying with the same idempotencyKey returns the order already created. */

@@ -212,6 +212,33 @@ class GatewayTest extends TestCase
         Http::assertNotSent(fn ($request) => array_key_exists('serialNumber', $request->data()));
     }
 
+    public function test_invoice_files_are_streamed_with_their_type_and_name(): void
+    {
+        $order = '00000000-0000-0000-0000-0000000000aa';
+        $invoice = '00000000-0000-0000-0000-0000000000bb';
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            "java.test/api/orders/$order/invoices/$invoice/pdf" => Http::response('%PDF-1.7 bytes', 200, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'inline; filename="20999999995-03-B001-1.pdf"']),
+            "java.test/api/orders/$order/invoices/$invoice/xml" => Http::response(['success' => false, 'message' => 'Comprobante no disponible'], 404),
+            "java.test/api/orders/$order/invoices" => Http::response(['success' => true, 'data' => []], 200),
+            "java.test/api/invoices/$invoice/xml" => Http::response('<Invoice/>', 200, ['Content-Type' => 'application/xml', 'Content-Disposition' => 'attachment; filename="x.xml"']),
+        ]);
+        $this->get("/web-api/orders/$order/invoices/$invoice/pdf")->assertUnauthorized();
+        $customer = ['syscon' => ['access' => $this->token(), 'refresh' => 'r']];
+        $pdf = $this->withSession($customer)->get("/web-api/orders/$order/invoices/$invoice/pdf")->assertOk()
+            ->assertHeader('Content-Type', 'application/pdf')->assertHeader('Content-Disposition', 'inline; filename="20999999995-03-B001-1.pdf"');
+        $this->assertSame('%PDF-1.7 bytes', $pdf->getContent());
+        $this->assertStringContainsString('no-store', $pdf->headers->get('Cache-Control'));
+        // Platform errors keep the JSON envelope.
+        $this->withSession($customer)->get("/web-api/orders/$order/invoices/$invoice/xml")->assertNotFound()->assertJsonPath('message', 'Comprobante no disponible');
+        $this->withSession($customer)->get("/web-api/orders/$order/invoices/$invoice/txt")->assertNotFound();
+        $this->withSession($customer)->getJson("/web-api/orders/$order/invoices")->assertOk();
+        // Staff downloads need invoices:submit.
+        $this->withSession($customer)->get("/web-api/admin/invoices/$invoice/xml")->assertForbidden();
+        $admin = ['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'invoices:submit']), 'refresh' => 'r']];
+        $this->withSession($admin)->get("/web-api/admin/invoices/$invoice/xml")->assertOk()->assertHeader('Content-Disposition', 'attachment; filename="x.xml"');
+    }
+
     public function test_invoice_series_and_corrections_require_permission(): void
     {
         $id = '00000000-0000-0000-0000-0000000000aa';

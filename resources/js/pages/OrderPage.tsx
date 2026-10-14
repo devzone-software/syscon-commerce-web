@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { InfoRows } from '../components/cart/OrderSummary';
 import { PageHero, PageSection } from '../components/layout/PageHero';
+import { BILLABLE, OrderDocuments } from '../components/orders/OrderDocuments';
 import { OrderLines } from '../components/orders/OrderLines';
 import { OrderTimeline } from '../components/orders/OrderTimeline';
 import { PaymentDetails } from '../components/orders/PaymentDetails';
@@ -93,6 +94,11 @@ export function OrderPage() {
               <h3 className="flow-subtitle">Productos</h3>
               <OrderLines order={data} />
             </PageSection>
+            {BILLABLE.includes(data.status) && (
+              <PageSection title="Comprobantes">
+                <OrderDocuments orderId={data.id} />
+              </PageSection>
+            )}
             <PageSection title={isNew ? '¿Qué sigue ahora?' : 'Pago'} soft>
               {isNew && (
                 <ol className="flow-steps">
