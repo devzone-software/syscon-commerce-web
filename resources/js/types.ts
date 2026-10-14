@@ -186,6 +186,30 @@ export type AdminOrder = Order & {
 };
 /** Order returned by POST /admin/sales, with the approved counter payment. */
 export type StoreSale = Order & { payment: Payment | null };
+/** Cash register of the staff member (GET /admin/cash/current and history). */
+export type CashSession = {
+  id: string;
+  status: 'OPEN' | 'CLOSED';
+  cashier: string | null;
+  openingAmount: string;
+  openedAt: string | null;
+  closedAt: string | null;
+  byMethod: { method: string; payments: number; total: string }[];
+  /** Opening + cash sales + cash in − cash out. */
+  expectedCash: string;
+  countedCash: string | null;
+  /** Counted − expected; negative means missing cash. */
+  difference: string | null;
+  notes: string | null;
+  movements?: { type: 'IN' | 'OUT'; amount: string; reason: string; at: string | null }[];
+  sales?: {
+    orderId: string;
+    method: string;
+    amount: string;
+    reference: string | null;
+    at: string | null;
+  }[];
+};
 /** Registered customer found by GET /admin/customers. */
 export type CustomerMatch = {
   id: string;

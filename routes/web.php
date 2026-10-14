@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Gateway\AuthGatewayController;
+use App\Http\Controllers\Gateway\CashGatewayController;
 use App\Http\Controllers\Gateway\CatalogGatewayController;
 use App\Http\Controllers\Gateway\InvoiceGatewayController;
 use App\Http\Controllers\Gateway\OrderGatewayController;
@@ -42,6 +43,11 @@ Route::prefix('web-api')->group(function () {
     Route::post('/admin/invoices/{id}/reconcile', [InvoiceGatewayController::class, 'reconcile'])->whereUuid('id');
     Route::get('/admin/invoices/{id}/{format}', [InvoiceGatewayController::class, 'file'])->whereUuid('id')->whereIn('format', ['pdf', 'xml', 'cdr']);
     Route::post('/admin/sales', [SaleGatewayController::class, 'store']);
+    Route::get('/admin/cash/current', [CashGatewayController::class, 'current']);
+    Route::post('/admin/cash/open', [CashGatewayController::class, 'open']);
+    Route::post('/admin/cash/movements', [CashGatewayController::class, 'movement']);
+    Route::post('/admin/cash/close', [CashGatewayController::class, 'close']);
+    Route::get('/admin/cash/sessions', [CashGatewayController::class, 'sessions']);
     Route::get('/admin/customers', [SaleGatewayController::class, 'customers']);
     Route::get('/admin/reports/summary', [ReportGatewayController::class, 'summary']);
     Route::get('/admin/reports/sales', [ReportGatewayController::class, 'sales']);

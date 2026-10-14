@@ -24,6 +24,7 @@ Aplicación Laravel 12 + React 19 + TypeScript + Tailwind para el backend [SYSCO
 | Proveedores (sincronización de feeds)                                                                             | `suppliers:manage`            |
 | Pedidos (bandeja filtrable, detalle con pagos, comprobantes, correos al cliente e historial, cambio de estado)    | `orders:manage`               |
 | Venta directa en tienda (cobro en efectivo, tarjeta, Yape, Plin o transferencia, entrega inmediata y comprobante) | `sales:create`                |
+| Caja (apertura, ingresos y egresos, cierre con arqueo e historial)                                                | `sales:create`                |
 | Pagos (bandeja de pagos por verificar y confirmación manual)                                                      | `payments:confirm`            |
 | Comprobantes (emisión con serie automática, notas de crédito/débito, PDF/XML/CDR y envío)                         | `invoices:submit`             |
 
@@ -119,6 +120,7 @@ Laravel valida la entrada, conserva el JWT en la sesión y aplica el mismo permi
 | `POST admin/payments/{id}/confirm`                                                                    | `POST /api/payments/{id}/confirm`                                                                            | `payments:confirm`                                            |
 | `POST admin/invoices` (sin correlativo), `GET                                                         | PATCH admin/invoices/{id}`, `POST admin/invoices/{id}/submit`, `GET admin/invoices/{id}/{pdf,xml,cdr}`, `GET | POST admin/invoice-series`, `PATCH admin/invoice-series/{id}` | `/api/invoices`, `/api/invoices/series` | `invoices:submit` |
 | `POST admin/sales`, `GET admin/customers`                                                             | `/api/admin/sales`, `/api/admin/customers`                                                                   | `sales:create`                                                |
+| `GET admin/cash/current`, `POST admin/cash/{open,movements,close}`, `GET admin/cash/sessions`         | `/api/admin/cash/...`                                                                                        | `sales:create`                                                |
 | `GET admin/reports/summary`, `GET admin/reports/sales` (`format=csv`)                                 | `/api/admin/reports/...`                                                                                     | `reports:view`                                                |
 | `GET/POST admin/suppliers`, `POST admin/suppliers/{id}/run`, `GET admin/supplier-jobs[/{id}/history]` | `/api/suppliers`                                                                                             | `suppliers:manage`                                            |
 

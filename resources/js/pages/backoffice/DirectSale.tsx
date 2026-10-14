@@ -179,6 +179,7 @@ function SaleResult({
 
 export function DirectSale() {
   const catalog = useData(api.products);
+  const cash = useData(api.cashCurrent);
   const [query, setQuery] = useState('');
   const [lines, setLines] = useState<CartLine[]>([]);
   const [customer, setCustomer] = useState<CustomerMatch | null>(null);
@@ -284,6 +285,11 @@ export function DirectSale() {
         title="Venta directa"
         description="Venta en tienda: el precio, el stock y el IGV los valida el sistema; el pago queda aprobado y el pedido entregado al registrar."
       />
+      {cash.data === null && !cash.loading && (
+        <p className="notice error" role="alert">
+          No tienes una caja abierta: ábrela en <Link to="/admin/caja">Caja</Link> antes de cobrar.
+        </p>
+      )}
       <form onSubmit={submit} noValidate className="bo-detail-grid">
         <section className="bo-card form-stack" aria-labelledby="sale-products-title">
           <h2 id="sale-products-title">Productos</h2>

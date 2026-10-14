@@ -15,6 +15,7 @@ import type {
   Payment,
   Product,
   StoreSale,
+  CashSession,
   CustomerMatch,
   SaleRow,
   SalesSummary,
@@ -135,6 +136,18 @@ export const api = {
     payment: { method: string; reference: string | null };
     idempotencyKey: string;
   }) => request<StoreSale>('/admin/sales', { method: 'POST', body: json(sale) }),
+  cashCurrent: () => request<CashSession | null>('/admin/cash/current'),
+  openCash: (openingAmount: string) =>
+    request<CashSession>('/admin/cash/open', { method: 'POST', body: json({ openingAmount }) }),
+  cashMovement: (movement: { type: 'IN' | 'OUT'; amount: string; reason: string }) =>
+    request<CashSession>('/admin/cash/movements', { method: 'POST', body: json(movement) }),
+  closeCash: (countedCash: string, notes: string) =>
+    request<CashSession>('/admin/cash/close', {
+      method: 'POST',
+      body: json({ countedCash, notes: notes || null }),
+    }),
+  cashSessions: (page: number) =>
+    request<AdminPage<CashSession>>(`/admin/cash/sessions${query({ page })}`),
   searchCustomers: (q: string) => request<CustomerMatch[]>(`/admin/customers${query({ q })}`),
   salesSummary: (period: { from: string; to: string }) =>
     request<SalesSummary>(`/admin/reports/summary${query(period)}`),

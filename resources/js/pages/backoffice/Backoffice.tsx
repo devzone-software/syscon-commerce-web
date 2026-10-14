@@ -6,6 +6,7 @@ import { can, canUseBackoffice, permissions, type Permission } from '../../lib/a
 import { useShop } from '../../state';
 import { Empty } from '../../ui';
 import { BillingAdmin } from './BillingAdmin';
+import { CashRegister } from './CashRegister';
 import { Dashboard } from './Dashboard';
 import { DirectSale } from './DirectSale';
 import { InventoryAdmin } from './InventoryAdmin';
@@ -77,6 +78,13 @@ const sections: Section[] = [
     group: 'Ventas',
     permission: permissions.salesCreate,
     element: <DirectSale />,
+  },
+  {
+    path: 'caja',
+    label: 'Caja',
+    group: 'Ventas',
+    permission: permissions.salesCreate,
+    element: <CashRegister />,
   },
   {
     path: 'pagos',

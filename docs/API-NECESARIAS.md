@@ -17,7 +17,7 @@ Revisado el 14 de octubre de 2026.
 - Serie y correlativo asignados por el backend; XML UBL con IGV por línea y documento; notas con motivo.
 - PDF, XML y CDR descargables; el cliente ve los comprobantes aceptados de sus pedidos.
 - Reportes de ventas, pendientes, comprobantes y conciliación (`/api/admin/reports/*`).
-- Venta directa del personal con cobro y entrega inmediatos (`/api/admin/sales`); falta caja con apertura y cierre.
+- Venta directa del personal con cobro y entrega inmediatos (`/api/admin/sales`); caja con apertura, movimientos y cierre con arqueo (`/api/admin/cash`).
 
 ## Hallazgos pendientes
 
