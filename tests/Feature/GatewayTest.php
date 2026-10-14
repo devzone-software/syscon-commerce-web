@@ -257,6 +257,29 @@ class GatewayTest extends TestCase
         $this->assertStringContainsString('a;20.30', $csv->getContent());
     }
 
+    public function test_direct_sales_require_permission_and_payment_reference(): void
+    {
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            'java.test/api/admin/sales' => Http::response(['success' => true, 'data' => ['id' => 's1', 'status' => 'DELIVERED']], 200),
+            'java.test/api/admin/customers*' => Http::response(['success' => true, 'data' => []], 200),
+        ]);
+        $sale = [
+            'items' => [['productId' => '00000000-0000-0000-0000-0000000000dd', 'quantity' => 1]],
+            'billing' => ['type' => '03', 'documentType' => '1', 'documentNumber' => '12345678', 'name' => 'Ana'],
+            'payment' => ['method' => 'CASH'], 'idempotencyKey' => '00000000-0000-0000-0000-0000000000ee',
+        ];
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'orders:manage']), 'refresh' => 'r']])
+            ->postJson('/web-api/admin/sales', $sale)->assertForbidden();
+        $session = ['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'sales:create']), 'refresh' => 'r']];
+        $this->withSession($session)->postJson('/web-api/admin/sales', [...$sale, 'payment' => ['method' => 'YAPE']])->assertUnprocessable();
+        $this->withSession($session)->postJson('/web-api/admin/sales', array_diff_key($sale, ['idempotencyKey' => 1]))->assertUnprocessable();
+        $this->withSession($session)->postJson('/web-api/admin/sales', $sale)->assertOk()->assertJsonPath('data.status', 'DELIVERED');
+        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/admin/sales' && $request['payment']['method'] === 'CASH');
+        $this->withSession($session)->getJson('/web-api/admin/customers?q=a')->assertUnprocessable();
+        $this->withSession($session)->getJson('/web-api/admin/customers?q=ana')->assertOk();
+    }
+
     public function test_notification_resend_requires_order_management(): void
     {
         $id = '00000000-0000-0000-0000-0000000000cc';

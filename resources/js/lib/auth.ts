@@ -16,6 +16,7 @@ export const permissions = {
   invoicesSubmit: 'invoices:submit',
   suppliersManage: 'suppliers:manage',
   reportsView: 'reports:view',
+  salesCreate: 'sales:create',
 } as const;
 
 export type Permission = (typeof permissions)[keyof typeof permissions];

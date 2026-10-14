@@ -14,6 +14,8 @@ import type {
   OrderNotification,
   Payment,
   Product,
+  StoreSale,
+  CustomerMatch,
   SaleRow,
   SalesSummary,
   Profile,
@@ -126,6 +128,14 @@ export const api = {
   adminOrder: (id: string) => request<AdminOrder>(`/admin/orders/${encodeURIComponent(id)}`),
   adminPayments: (filters: PaymentFilters) =>
     request<AdminPage<AdminPayment>>(`/admin/payments${query(filters)}`),
+  createSale: (sale: {
+    items: { productId: string; quantity: number }[];
+    customerId: string | null;
+    billing: Billing;
+    payment: { method: string; reference: string | null };
+    idempotencyKey: string;
+  }) => request<StoreSale>('/admin/sales', { method: 'POST', body: json(sale) }),
+  searchCustomers: (q: string) => request<CustomerMatch[]>(`/admin/customers${query({ q })}`),
   salesSummary: (period: { from: string; to: string }) =>
     request<SalesSummary>(`/admin/reports/summary${query(period)}`),
   sales: (filters: { from: string; to: string; page: number; mismatched?: string }) =>

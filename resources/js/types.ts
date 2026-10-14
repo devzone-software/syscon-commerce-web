@@ -39,6 +39,8 @@ export type Order = {
   /** Decimal string from the platform, e.g. "159.70". */
   total: string;
   customerId?: string;
+  /** WEB (online checkout) or STORE (direct sale by staff). */
+  channel?: 'WEB' | 'STORE';
   /** Null for orders created before billing data was captured. */
   billing?: Billing | null;
   /** Null for orders created before the delivery method was captured. */
@@ -95,6 +97,8 @@ export type SalesSummary = {
     deliveryTotal: string;
     averageTicket: string;
     byDay: { date: string; orders: number; total: string }[];
+    byChannel: Record<'WEB' | 'STORE', { orders: number; total: string }>;
+    byPaymentMethod: { method: string; payments: number; total: string }[];
   };
   releasedOrders: Record<'CANCELLED' | 'EXPIRED', { orders: number; total: string }>;
   pendingPayments: {
@@ -116,6 +120,7 @@ export type SalesSummary = {
 /** GET /admin/reports/sales: one sold order with its payment and documents. */
 export type SaleRow = {
   orderId: string;
+  channel: 'WEB' | 'STORE';
   paidAt: string;
   status: string;
   customerEmail: string;
@@ -178,6 +183,17 @@ export type AdminOrder = Order & {
   events: OrderEvent[];
   /** Customer emails of the order (outbox), oldest first. */
   notifications?: OrderNotification[];
+};
+/** Order returned by POST /admin/sales, with the approved counter payment. */
+export type StoreSale = Order & { payment: Payment | null };
+/** Registered customer found by GET /admin/customers. */
+export type CustomerMatch = {
+  id: string;
+  email: string;
+  name: string | null;
+  documentType: string | null;
+  documentNumber: string | null;
+  phone: string | null;
 };
 export type OrderNotification = {
   id: string;

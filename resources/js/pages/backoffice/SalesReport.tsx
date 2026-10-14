@@ -6,6 +6,7 @@ import { Pagination } from '../../components/shared/Pagination';
 import { invoiceStatusLabels, invoiceTypeLabel } from '../../lib/billing';
 import { formatDateTime, orderStatusLabels, shortId, statusLabel } from '../../lib/orders';
 import { defaultPeriod, issueLabels, periodError } from '../../lib/reports';
+import { paymentMethodLabel } from '../../lib/sales';
 import { api } from '../../services/api';
 import { money } from '../../state';
 import type { SalesSummary } from '../../types';
@@ -117,6 +118,30 @@ function Summary({ data }: { data: SalesSummary }) {
             </table>
           </div>
           {data.sales.orders === 0 && <p className="muted">Sin ventas en el período.</p>}
+          <h3 className="flow-subtitle">Por canal y medio de pago</h3>
+          <div className="table-wrap">
+            <table className="data-table">
+              <tbody>
+                <tr>
+                  <th scope="row">Web</th>
+                  <td className="num">{data.sales.byChannel.WEB.orders}</td>
+                  <td className="num">{money(Number(data.sales.byChannel.WEB.total))}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Venta directa (tienda)</th>
+                  <td className="num">{data.sales.byChannel.STORE.orders}</td>
+                  <td className="num">{money(Number(data.sales.byChannel.STORE.total))}</td>
+                </tr>
+                {data.sales.byPaymentMethod.map((row) => (
+                  <tr key={row.method}>
+                    <th scope="row">Cobrado con {paymentMethodLabel(row.method)}</th>
+                    <td className="num">{row.payments}</td>
+                    <td className="num">{money(Number(row.total))}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
         <section className="bo-card" aria-labelledby="documents-title">
           <h2 id="documents-title">Comprobantes generados</h2>

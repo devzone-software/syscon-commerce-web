@@ -6,6 +6,7 @@ use App\Http\Controllers\Gateway\InvoiceGatewayController;
 use App\Http\Controllers\Gateway\OrderGatewayController;
 use App\Http\Controllers\Gateway\PaymentGatewayController;
 use App\Http\Controllers\Gateway\ReportGatewayController;
+use App\Http\Controllers\Gateway\SaleGatewayController;
 use App\Http\Controllers\Gateway\SupplierGatewayController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,6 +40,8 @@ Route::prefix('web-api')->group(function () {
     Route::patch('/admin/invoices/{id}', [InvoiceGatewayController::class, 'update'])->whereUuid('id');
     Route::post('/admin/invoices/{id}/submit', [InvoiceGatewayController::class, 'submit'])->whereUuid('id');
     Route::get('/admin/invoices/{id}/{format}', [InvoiceGatewayController::class, 'file'])->whereUuid('id')->whereIn('format', ['pdf', 'xml', 'cdr']);
+    Route::post('/admin/sales', [SaleGatewayController::class, 'store']);
+    Route::get('/admin/customers', [SaleGatewayController::class, 'customers']);
     Route::get('/admin/reports/summary', [ReportGatewayController::class, 'summary']);
     Route::get('/admin/reports/sales', [ReportGatewayController::class, 'sales']);
     Route::match(['get', 'post'], '/admin/suppliers', [SupplierGatewayController::class, 'suppliers']);

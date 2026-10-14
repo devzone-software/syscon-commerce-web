@@ -49,6 +49,7 @@ export const paymentStatusLabels: Record<string, string> = {
 /** Entries of the order history (order_events). */
 export const orderEventLabels: Record<string, string> = {
   CREATED: 'Pedido registrado',
+  STORE_SALE: 'Venta directa registrada',
   PAYMENT_REQUESTED: 'Pago manual solicitado',
   PAYMENT_CONFIRMED: 'Pago confirmado',
   STATUS_CHANGED: 'Cambio de estado',

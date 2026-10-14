@@ -7,6 +7,7 @@ import { useShop } from '../../state';
 import { Empty } from '../../ui';
 import { BillingAdmin } from './BillingAdmin';
 import { Dashboard } from './Dashboard';
+import { DirectSale } from './DirectSale';
 import { InventoryAdmin } from './InventoryAdmin';
 import { OrdersAdmin } from './OrdersAdmin';
 import { PaymentsAdmin } from './PaymentsAdmin';
@@ -69,6 +70,13 @@ const sections: Section[] = [
     group: 'Ventas',
     permission: permissions.ordersManage,
     element: <OrdersAdmin />,
+  },
+  {
+    path: 'venta-directa',
+    label: 'Venta directa',
+    group: 'Ventas',
+    permission: permissions.salesCreate,
+    element: <DirectSale />,
   },
   {
     path: 'pagos',
