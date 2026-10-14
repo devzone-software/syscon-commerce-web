@@ -13,6 +13,8 @@ import { useData, Empty, ErrorBox, Loading } from '../../ui';
 
 const PER_PAGE = 20;
 
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
 function Summary({ data }: { data: SalesSummary }) {
   const max = Math.max(...data.sales.byDay.map((day) => Number(day.total)), 0);
   const r = data.reconciliation;
@@ -22,7 +24,7 @@ function Summary({ data }: { data: SalesSummary }) {
         <StatCard
           label="Ventas"
           value={money(Number(data.sales.total))}
-          hint={`${data.sales.orders} pedidos pagados · ticket ${money(Number(data.sales.averageTicket))}`}
+          hint={`${plural(data.sales.orders, 'pedido pagado', 'pedidos pagados')} · ticket ${money(Number(data.sales.averageTicket))}`}
         />
         <StatCard
           label="Op. gravada / IGV"
@@ -32,7 +34,7 @@ function Summary({ data }: { data: SalesSummary }) {
         <StatCard
           label="Pagos pendientes (ahora)"
           value={money(Number(data.pendingPayments.total))}
-          hint={`${data.pendingPayments.orders} pedidos · ${data.pendingPayments.expiringIn24h} vencen en 24 h`}
+          hint={`${plural(data.pendingPayments.orders, 'pedido', 'pedidos')} · ${data.pendingPayments.expiringIn24h} vencen en 24 h`}
         />
         <StatCard
           label="Stock reservado (ahora)"
@@ -63,7 +65,7 @@ function Summary({ data }: { data: SalesSummary }) {
         </div>
         <p className={r.mismatchedOrders ? 'notice error' : 'notice success'} role="status">
           {r.mismatchedOrders
-            ? `${r.mismatchedOrders} pedidos no concilian (${r.ordersWithoutInvoice} sin comprobante aceptado). Revisa el detalle filtrando “Solo con diferencias”.`
+            ? `${plural(r.mismatchedOrders, 'pedido no concilia', 'pedidos no concilian')} (${r.ordersWithoutInvoice} sin comprobante aceptado). Revisa el detalle filtrando “Solo con diferencias”.`
             : 'Todos los pedidos pagados del período concilian con su pago y su comprobante.'}
         </p>
         <p className="muted">

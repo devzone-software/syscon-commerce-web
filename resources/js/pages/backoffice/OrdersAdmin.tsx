@@ -7,7 +7,12 @@ import { OrderTimeline } from '../../components/orders/OrderTimeline';
 import { Pagination } from '../../components/shared/Pagination';
 import { StatusBadge } from '../../components/shared/StatusBadge';
 import { can, permissions } from '../../lib/auth';
-import { billingRows, invoiceFileUrl, invoiceTypeLabel } from '../../lib/billing';
+import {
+  billingRows,
+  invoiceFileUrl,
+  invoiceStatusLabels,
+  invoiceTypeLabel,
+} from '../../lib/billing';
 import { deliveryMethodLabels, deliveryRows } from '../../lib/delivery';
 import {
   allowedTransitions,
@@ -243,7 +248,7 @@ function OrderDetail({ id, onChanged }: { id: string; onChanged: () => void }) {
                 {can(user, permissions.invoicesSubmit) ? (
                   <span>
                     <Link className="link-button" to={`/admin/facturacion?id=${invoice.id}`}>
-                      {invoice.status}
+                      {statusLabel(invoiceStatusLabels, invoice.status)}
                     </Link>{' '}
                     <a
                       className="link-button"
@@ -255,7 +260,7 @@ function OrderDetail({ id, onChanged }: { id: string; onChanged: () => void }) {
                     </a>
                   </span>
                 ) : (
-                  <span>{invoice.status}</span>
+                  <span>{statusLabel(invoiceStatusLabels, invoice.status)}</span>
                 )}
               </li>
             ))}
