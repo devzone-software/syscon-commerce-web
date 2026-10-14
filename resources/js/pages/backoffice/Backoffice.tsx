@@ -13,6 +13,7 @@ import { PaymentsAdmin } from './PaymentsAdmin';
 import { ProductBulkAdmin } from './ProductBulkAdmin';
 import { ProductsAdmin } from './ProductsAdmin';
 import { ReportsAdmin } from './ReportsAdmin';
+import { SalesReport } from './SalesReport';
 import { SuppliersAdmin } from './SuppliersAdmin';
 import { TaxonomyAdmin } from './TaxonomyAdmin';
 
@@ -82,6 +83,13 @@ const sections: Section[] = [
     group: 'Facturación',
     permission: permissions.invoicesSubmit,
     element: <BillingAdmin />,
+  },
+  {
+    path: 'reportes/ventas',
+    label: 'Ventas y conciliación',
+    group: 'Reportes',
+    permission: permissions.reportsView,
+    element: <SalesReport />,
   },
   {
     path: 'reportes',
@@ -159,11 +167,7 @@ export function Backoffice() {
               {allowed
                 .filter((section) => section.group === group)
                 .map((section) => (
-                  <NavLink
-                    key={section.path}
-                    to={`/admin/${section.path}`}
-                    end={section.path === ''}
-                  >
+                  <NavLink key={section.path} to={`/admin/${section.path}`} end>
                     {section.label}
                   </NavLink>
                 ))}

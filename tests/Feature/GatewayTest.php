@@ -239,6 +239,24 @@ class GatewayTest extends TestCase
         $this->withSession($admin)->get("/web-api/admin/invoices/$invoice/xml")->assertOk()->assertHeader('Content-Disposition', 'attachment; filename="x.xml"');
     }
 
+    public function test_sales_reports_require_permission_and_forward_the_period(): void
+    {
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            'java.test/api/admin/reports/summary*' => Http::response(['success' => true, 'data' => ['sales' => ['orders' => 2]]], 200),
+            'java.test/api/admin/reports/sales*' => Http::response("\u{FEFF}Pedido;Total\r\na;20.30", 200, ['Content-Type' => 'text/csv; charset=UTF-8', 'Content-Disposition' => 'attachment; filename="ventas.csv"']),
+        ]);
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'orders:manage']), 'refresh' => 'r']])
+            ->getJson('/web-api/admin/reports/summary')->assertForbidden();
+        $session = ['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'reports:view']), 'refresh' => 'r']];
+        $this->withSession($session)->getJson('/web-api/admin/reports/summary?from=2026-10-13&to=2026-10-01')->assertUnprocessable();
+        $this->withSession($session)->getJson('/web-api/admin/reports/summary?from=2026-10-01&to=2026-10-13')->assertOk()->assertJsonPath('data.sales.orders', 2);
+        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/admin/reports/summary?from=2026-10-01&to=2026-10-13');
+        $csv = $this->withSession($session)->get('/web-api/admin/reports/sales?from=2026-10-01&to=2026-10-13&format=csv')->assertOk()
+            ->assertHeader('Content-Disposition', 'attachment; filename="ventas.csv"');
+        $this->assertStringContainsString('a;20.30', $csv->getContent());
+    }
+
     public function test_notification_resend_requires_order_management(): void
     {
         $id = '00000000-0000-0000-0000-0000000000cc';

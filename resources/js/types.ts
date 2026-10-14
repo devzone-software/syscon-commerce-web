@@ -83,6 +83,54 @@ export type AdminPayment = Payment & {
   orderExpiresAt: string | null;
 };
 export type AdminPage<T> = { items: T[]; page: number; perPage: number; total: number };
+/** GET /admin/reports/summary: period figures (Lima days) plus current snapshots. */
+export type SalesSummary = {
+  period: { from: string; to: string; timezone: string };
+  sales: {
+    orders: number;
+    total: string;
+    taxableAmount: string;
+    taxAmount: string;
+    deliveryTotal: string;
+    averageTicket: string;
+    byDay: { date: string; orders: number; total: string }[];
+  };
+  releasedOrders: Record<'CANCELLED' | 'EXPIRED', { orders: number; total: string }>;
+  pendingPayments: {
+    orders: number;
+    total: string;
+    oldestCreatedAt: string | null;
+    expiringIn24h: number;
+  };
+  reservations: { units: number; products: number; value: string };
+  invoices: { type: string; byStatus: Record<string, number>; acceptedTotal: string }[];
+  reconciliation: {
+    paidOrdersTotal: string;
+    approvedPaymentsTotal: string;
+    netInvoicedTotal: string;
+    ordersWithoutInvoice: number;
+    mismatchedOrders: number;
+  };
+};
+/** GET /admin/reports/sales: one sold order with its payment and documents. */
+export type SaleRow = {
+  orderId: string;
+  paidAt: string;
+  status: string;
+  customerEmail: string;
+  billingName: string | null;
+  billingDocument: string | null;
+  total: string;
+  taxableAmount: string;
+  taxAmount: string;
+  deliveryCost: string;
+  paidAmount: string;
+  paymentReferences: string[];
+  invoices: { id: string; type: string; serialNumber: string; status: string; total: string }[];
+  netInvoiced: string;
+  issues: string[];
+  reconciled: boolean;
+};
 /** Row of the backoffice orders inbox (GET /admin/orders). */
 export type AdminOrderSummary = {
   id: string;

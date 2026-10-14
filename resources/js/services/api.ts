@@ -14,6 +14,8 @@ import type {
   OrderNotification,
   Payment,
   Product,
+  SaleRow,
+  SalesSummary,
   Profile,
   Supplier,
   SupplierHistory,
@@ -124,6 +126,13 @@ export const api = {
   adminOrder: (id: string) => request<AdminOrder>(`/admin/orders/${encodeURIComponent(id)}`),
   adminPayments: (filters: PaymentFilters) =>
     request<AdminPage<AdminPayment>>(`/admin/payments${query(filters)}`),
+  salesSummary: (period: { from: string; to: string }) =>
+    request<SalesSummary>(`/admin/reports/summary${query(period)}`),
+  sales: (filters: { from: string; to: string; page: number; mismatched?: string }) =>
+    request<AdminPage<SaleRow>>(`/admin/reports/sales${query(filters)}`),
+  /** CSV with every sale of the period, downloaded by the browser. */
+  salesCsvUrl: (filters: { from: string; to: string; mismatched?: string }) =>
+    `/web-api/admin/reports/sales${query({ ...filters, format: 'csv' })}`,
   resendNotification: (id: string) =>
     request<OrderNotification>(`/admin/notifications/${encodeURIComponent(id)}/resend`, {
       method: 'POST',
