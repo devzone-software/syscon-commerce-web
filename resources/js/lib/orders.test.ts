@@ -20,7 +20,7 @@ describe('order states', () => {
   it('treats expired orders as closed and unpaid', () => {
     expect(statusLabel(orderStatusLabels, 'EXPIRED')).toBe('Vencido');
     expect(statusTone('EXPIRED')).toBe('danger');
-    const summary = accountSummary([{ id: '1', status: 'EXPIRED', total: 80, details: [] }]);
+    const summary = accountSummary([{ id: '1', status: 'EXPIRED', total: '80.00', details: [] }]);
     expect(summary).toMatchObject({ active: 0, spent: 0, current: null });
   });
   it('labels known states and keeps unknown ones visible', () => {
@@ -32,7 +32,12 @@ describe('order states', () => {
 });
 
 describe('account dashboard', () => {
-  const order = (id: string, status: string, total: number) => ({ id, status, total, details: [] });
+  const order = (id: string, status: string, total: number) => ({
+    id,
+    status,
+    total: total.toFixed(2),
+    details: [],
+  });
   it('counts orders, active ones and confirmed spending', () => {
     const summary = accountSummary([
       order('3', 'PAYMENT_PENDING', 50),

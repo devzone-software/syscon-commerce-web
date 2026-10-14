@@ -36,7 +36,8 @@ export type DeliveryOptions = {
 export type Order = {
   id: string;
   status: string;
-  total: number;
+  /** Decimal string from the platform, e.g. "159.70". */
+  total: string;
   customerId?: string;
   /** Null for orders created before billing data was captured. */
   billing?: Billing | null;
@@ -54,7 +55,7 @@ export type Order = {
     sku: string;
     name: string;
     quantity: number;
-    unitPrice: number;
+    unitPrice: string;
     lineTotal?: string;
     taxableAmount?: string;
     taxAmount?: string;
@@ -66,7 +67,7 @@ export type Payment = {
   orderId: string;
   provider: string;
   status: string;
-  amount: number;
+  amount: string;
   paymentUrl?: string | null;
   externalReference?: string | null;
   /** Configured manual payment instructions, only while the payment is pending. */
