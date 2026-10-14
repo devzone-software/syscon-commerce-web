@@ -1,4 +1,12 @@
-import { boletaDocuments, type BillingForm } from '../../lib/billing';
+import { useState } from 'react';
+import {
+  boletaDocuments,
+  isValidRuc,
+  normalizeDocument,
+  rucStatusText,
+  type BillingForm,
+} from '../../lib/billing';
+import { api } from '../../services/api';
 
 const billingOptions = [
   ['03', 'Boleta de venta', 'Persona natural · DNI, carné de extranjería o pasaporte'],
@@ -20,6 +28,27 @@ export function BillingFields({
   onChange: (patch: Partial<BillingForm>) => void;
 }) {
   const factura = type === '01';
+  const [lookup, setLookup] = useState<{ busy: boolean; text: string; warn: boolean }>({
+    busy: false,
+    text: '',
+    warn: false,
+  });
+  const ruc = normalizeDocument(form.documentNumber);
+  // Fills the business name and address; when the lookup fails the user types them.
+  const consult = async () => {
+    setLookup({ busy: true, text: '', warn: false });
+    try {
+      const info = await api.lookupRuc(ruc);
+      onChange({ name: info.name ?? form.name, address: info.address ?? '' });
+      setLookup({ busy: false, text: rucStatusText(info), warn: info.active === false });
+    } catch (e) {
+      setLookup({
+        busy: false,
+        text: `${(e as Error).message} Puedes escribir la razón social.`,
+        warn: true,
+      });
+    }
+  };
   const fieldProps = (key: keyof BillingForm) => ({
     'aria-invalid': errors[key] ? true : undefined,
     'aria-describedby': errors[key] ? `billing-${key}-error` : undefined,
@@ -65,6 +94,19 @@ export function BillingFields({
               {...fieldProps('documentNumber')}
             />
             {fieldError('documentNumber')}
+            <button
+              type="button"
+              className="link-button"
+              disabled={lookup.busy || !isValidRuc(ruc)}
+              onClick={consult}
+            >
+              {lookup.busy ? 'Consultando…' : 'Consultar RUC'}
+            </button>
+            {lookup.text && (
+              <small className={lookup.warn ? 'field-error' : undefined} role="status">
+                {lookup.text}
+              </small>
+            )}
           </label>
         ) : (
           <>

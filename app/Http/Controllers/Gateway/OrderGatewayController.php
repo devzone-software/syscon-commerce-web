@@ -47,6 +47,13 @@ class OrderGatewayController extends GatewayController
         return $this->reply($this->api->authenticated('GET', "/api/orders/$id"));
     }
 
+    /** Business name and status of a RUC for the billing form; the platform checks the format first. */
+    public function ruc(string $ruc): JsonResponse
+    {
+        if ($error = $this->requireLogin()) return $error;
+        return $this->reply($this->api->authenticated('GET', "/api/lookup/ruc/$ruc"));
+    }
+
     /** The customer's documents for one order: the platform lists only accepted ones they own. */
     public function invoices(string $id): JsonResponse
     {

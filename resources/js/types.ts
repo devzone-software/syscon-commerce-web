@@ -16,7 +16,19 @@ export type Billing = {
   documentNumber: string;
   name: string;
   address?: string | null;
+  /** What the platform verified about the RUC when the order was placed. */
+  verification?: RucVerification | null;
 };
+export type RucVerification = {
+  found: boolean;
+  name?: string;
+  status?: string;
+  condition?: string;
+  source: string;
+  checkedAt: string;
+};
+/** GET /lookup/ruc/{ruc}. */
+export type RucInfo = RucVerification & { ruc: string; address?: string | null; active?: boolean };
 export type DeliveryMethod = 'PICKUP' | 'DELIVERY';
 /** Delivery chosen at checkout; the cost is always set by the platform. */
 export type Delivery = {

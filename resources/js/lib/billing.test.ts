@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   billingFromProfile,
+  billingRows,
+  rucStatusText,
   billingPayload,
   invoiceTypeLabel,
   invoiceFileUrl,
@@ -220,5 +222,36 @@ describe('invoice files', () => {
 describe('pending reconciliation', () => {
   it('warns not to issue another document while SUNAT has not answered', () => {
     expect(invoiceValidity('PENDING_CHECK', true)).toMatch(/Concilia/);
+  });
+});
+
+describe('RUC lookup', () => {
+  it('summarizes status and warns about inactive taxpayers', () => {
+    expect(rucStatusText({ status: 'ACTIVO', condition: 'HABIDO', active: true })).toBe(
+      'ACTIVO · HABIDO',
+    );
+    expect(
+      rucStatusText({ status: 'BAJA DE OFICIO', condition: 'NO HABIDO', active: false }),
+    ).toMatch(/Revisa/);
+  });
+  it('shows what was verified in the order detail', () => {
+    const rows = billingRows({
+      type: '01',
+      documentType: '6',
+      documentNumber: '20123456786',
+      name: 'Mi empresa',
+      verification: {
+        found: true,
+        name: 'COMERCIAL ANDINA S.A.C.',
+        status: 'ACTIVO',
+        condition: 'HABIDO',
+        source: 'fake',
+        checkedAt: '2026-10-14T10:00:00Z',
+      },
+    });
+    expect(rows.at(-1)).toEqual({
+      label: 'RUC verificado',
+      value: 'COMERCIAL ANDINA S.A.C. · ACTIVO · HABIDO',
+    });
   });
 });

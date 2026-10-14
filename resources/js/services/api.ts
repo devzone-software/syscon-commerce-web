@@ -14,6 +14,7 @@ import type {
   OrderNotification,
   Payment,
   Product,
+  RucInfo,
   StoreSale,
   CashSession,
   CustomerMatch,
@@ -109,6 +110,7 @@ export const api = {
   orders: () => request<Order[]>('/orders'),
   order: (id: string) => request<Order>(`/orders/${encodeURIComponent(id)}`),
   /** Documents of the customer's order that SUNAT accepted (drafts are never listed). */
+  lookupRuc: (ruc: string) => request<RucInfo>(`/lookup/ruc/${encodeURIComponent(ruc)}`),
   orderInvoices: (id: string) =>
     request<OrderInvoice[]>(`/orders/${encodeURIComponent(id)}/invoices`),
   profile: () => request<Profile>('/profile'),

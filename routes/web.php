@@ -21,6 +21,7 @@ Route::prefix('web-api')->group(function () {
     Route::get('/me', [AuthGatewayController::class, 'me']);
     Route::get('/profile', [AuthGatewayController::class, 'profile']);
     Route::get('/delivery-options', [OrderGatewayController::class, 'deliveryOptions']);
+    Route::get('/lookup/ruc/{ruc}', [OrderGatewayController::class, 'ruc'])->where('ruc', '[0-9]{11}');
     Route::match(['get', 'post'], '/orders', [OrderGatewayController::class, 'orders']);
     Route::get('/orders/{id}', [OrderGatewayController::class, 'order'])->whereUuid('id');
     Route::get('/orders/{id}/invoices', [OrderGatewayController::class, 'invoices'])->whereUuid('id');

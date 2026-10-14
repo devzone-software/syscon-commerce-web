@@ -313,6 +313,14 @@ export function billingFromProfile(profile: Partial<Profile> | null): BillingFor
       };
 }
 
+/** Short status line for a RUC lookup; inactive or not-located taxpayers get a warning. */
+export function rucStatusText(info: { status?: string; condition?: string; active?: boolean }) {
+  const text = [info.status, info.condition].filter(Boolean).join(' · ');
+  return info.active === false
+    ? `${text}. Revisa con el cliente antes de emitir la factura.`
+    : text;
+}
+
 export const documentLabel = (code: string) =>
   documentTypes.find((item) => item.value === code)?.label ?? code;
 
@@ -327,5 +335,15 @@ export function billingRows(billing: Billing | null | undefined) {
     },
     { label: billing.type === '01' ? 'Razón social' : 'Cliente', value: billing.name },
     ...(billing.address ? [{ label: 'Dirección fiscal', value: billing.address }] : []),
+    ...(billing.verification
+      ? [
+          {
+            label: 'RUC verificado',
+            value: billing.verification.found
+              ? `${billing.verification.name} · ${rucStatusText(billing.verification)}`
+              : 'No registrado en la consulta',
+          },
+        ]
+      : []),
   ];
 }
