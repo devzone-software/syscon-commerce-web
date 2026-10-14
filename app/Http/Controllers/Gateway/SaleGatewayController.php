@@ -18,7 +18,7 @@ class SaleGatewayController extends GatewayController
             'customerId' => 'nullable|uuid',
             'billing' => 'required|array',
             'billing.type' => 'required|in:01,03',
-            'billing.documentType' => 'required|in:1,4,6,7',
+            'billing.documentType' => 'required|in:0,1,4,6,7',
             'billing.documentNumber' => 'required|string|max:15',
             'billing.name' => 'required|string|max:255',
             'billing.address' => 'nullable|string|max:255',

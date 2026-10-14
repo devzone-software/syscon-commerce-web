@@ -255,3 +255,27 @@ describe('RUC lookup', () => {
     });
   });
 });
+
+describe('boleta without document', () => {
+  const anonymous: BillingForm = {
+    type: '03',
+    documentType: '0',
+    documentNumber: '',
+    name: '',
+    address: '',
+  };
+  it('is allowed only for boletas under S/ 700', () => {
+    expect(validateBilling(anonymous, 699.99)).toEqual({});
+    expect(validateBilling(anonymous, 700).documentType).toMatch(/700/);
+    expect(validateBilling({ ...anonymous, type: '01' }).documentType).toMatch(/RUC/);
+  });
+  it('sends "-" and the generic name', () => {
+    expect(billingPayload(anonymous)).toEqual({
+      type: '03',
+      documentType: '0',
+      documentNumber: '-',
+      name: 'CLIENTES VARIOS',
+      address: null,
+    });
+  });
+});

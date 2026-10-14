@@ -17,7 +17,7 @@ class OrderGatewayController extends GatewayController
             'items' => 'required|array|min:1|max:100', 'items.*.productId' => 'required|uuid|distinct', 'items.*.quantity' => 'required|integer|min:1|max:999',
             'billing' => 'required|array',
             'billing.type' => 'required|in:01,03',
-            'billing.documentType' => 'required|in:1,4,6,7',
+            'billing.documentType' => 'required|in:0,1,4,6,7',
             'billing.documentNumber' => 'required|string|max:15',
             'billing.name' => 'required|string|max:255',
             'billing.address' => 'nullable|string|max:255',

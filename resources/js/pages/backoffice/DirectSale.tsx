@@ -229,7 +229,7 @@ export function DirectSale() {
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setError('');
-    const found = validateBilling({ ...billing, type: billing.type });
+    const found = validateBilling(billing, total);
     setBillingErrors(found);
     if (!lines.length) return setError('Agrega al menos un producto.');
     if (Object.keys(found).length || payError) return;

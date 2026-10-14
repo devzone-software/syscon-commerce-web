@@ -12,7 +12,7 @@ import {
   validateBilling,
   type BillingForm,
 } from '../lib/billing';
-import { issueMessages } from '../lib/cart';
+import { cartTotal, issueMessages } from '../lib/cart';
 import {
   checkoutAttemptKey,
   deliveryCost,
@@ -67,10 +67,10 @@ export function Checkout() {
   }, []);
 
   const billing = forms[type];
-  const billingErrors = validateBilling(billing);
+  const shipping = deliveryCost(delivery.method, options);
+  const billingErrors = validateBilling(billing, cartTotal(cart) + (shipping ?? 0));
   const deliveryErrors = validateDelivery(delivery, options);
   const invalid = Object.keys(billingErrors).length + Object.keys(deliveryErrors).length > 0;
-  const shipping = deliveryCost(delivery.method, options);
   const updateBilling = (patch: Partial<BillingForm>) => {
     edited.current = true;
     setForms((current) => ({ ...current, [type]: { ...current[type], ...patch } }));

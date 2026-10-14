@@ -127,19 +127,25 @@ export function BillingFields({
               </select>
               {fieldError('documentType')}
             </label>
-            <label className="field">
-              Número de documento
-              <input
-                value={form.documentNumber}
-                onChange={(event) => onChange({ documentNumber: event.target.value })}
-                inputMode={form.documentType === '1' ? 'numeric' : 'text'}
-                maxLength={15}
-                placeholder={form.documentType === '1' ? '8 dígitos' : '6 a 12 letras o números'}
-                autoComplete="off"
-                {...fieldProps('documentNumber')}
-              />
-              {fieldError('documentNumber')}
-            </label>
+            {form.documentType === '0' ? (
+              <p className="flow-note">
+                Boleta sin identificar al cliente: solo para compras menores a S/ 700.
+              </p>
+            ) : (
+              <label className="field">
+                Número de documento
+                <input
+                  value={form.documentNumber}
+                  onChange={(event) => onChange({ documentNumber: event.target.value })}
+                  inputMode={form.documentType === '1' ? 'numeric' : 'text'}
+                  maxLength={15}
+                  placeholder={form.documentType === '1' ? '8 dígitos' : '6 a 12 letras o números'}
+                  autoComplete="off"
+                  {...fieldProps('documentNumber')}
+                />
+                {fieldError('documentNumber')}
+              </label>
+            )}
           </>
         )}
       </div>
@@ -150,7 +156,13 @@ export function BillingFields({
           onChange={(event) => onChange({ name: event.target.value })}
           maxLength={255}
           autoComplete={factura ? 'organization' : 'name'}
-          placeholder={factura ? 'Ej. Comercial Andina S.A.C.' : 'Nombres y apellidos'}
+          placeholder={
+            factura
+              ? 'Ej. Comercial Andina S.A.C.'
+              : form.documentType === '0'
+                ? 'Opcional: CLIENTES VARIOS'
+                : 'Nombres y apellidos'
+          }
           {...fieldProps('name')}
         />
         {fieldError('name')}

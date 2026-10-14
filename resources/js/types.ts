@@ -12,7 +12,8 @@ export type Product = {
 /** Billing data chosen at checkout; the order keeps it as a copy (SUNAT catalogs 01 and 06). */
 export type Billing = {
   type: '01' | '03';
-  documentType: '1' | '4' | '6' | '7';
+  /** 0: no document, only boletas under S/ 700 (number "-"). */
+  documentType: '0' | '1' | '4' | '6' | '7';
   documentNumber: string;
   name: string;
   address?: string | null;

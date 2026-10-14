@@ -21,7 +21,7 @@ class InvoiceGatewayController extends GatewayController
             'series' => ['nullable', 'string', self::SERIES],
             // SUNAT catalog 06: DNI, carné de extranjería, RUC, pasaporte. When omitted the
             // platform uses the billing data the customer chose for the order.
-            'customerDocumentType' => 'nullable|in:1,4,6,7',
+            'customerDocumentType' => 'nullable|in:0,1,4,6,7',
             'customerDocumentNumber' => 'nullable|string|max:15',
             'customerName' => 'nullable|string|max:255',
             'referencedSerialNumber' => ['nullable', 'required_if:type,07,08', 'string', 'regex:/^[FB][A-Z0-9]{3}-[1-9][0-9]{0,7}$/'],
@@ -49,7 +49,7 @@ class InvoiceGatewayController extends GatewayController
     {
         if ($error = $this->requirePermission('invoices:submit')) return $error;
         $data = $request->validate([
-            'customerDocumentType' => 'required|in:1,4,6,7',
+            'customerDocumentType' => 'required|in:0,1,4,6,7',
             'customerDocumentNumber' => 'required|string|max:15',
             'customerName' => 'required|string|max:255',
         ]);

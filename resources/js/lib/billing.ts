@@ -14,7 +14,12 @@ export const documentTypes = [
   { value: '6', label: 'RUC', length: 11 },
   { value: '4', label: 'Carné de extranjería', length: 0 },
   { value: '7', label: 'Pasaporte', length: 0 },
+  { value: '0', label: 'Sin documento (menos de S/ 700)', length: 0 },
 ] as const;
+
+/** Boletas from this total must identify the customer (same limit as the platform). */
+export const ANONYMOUS_LIMIT = 700;
+export const ANONYMOUS_NAME = 'CLIENTES VARIOS';
 
 export const invoiceStatusLabels: Record<string, string> = {
   DRAFT: 'Borrador',
@@ -235,6 +240,7 @@ export function documentError(documentType: string, number: string): string | nu
       return 'El RUC tiene 11 dígitos y empieza con 10, 15, 17 o 20.';
     return isValidRuc(number) ? null : 'El RUC no es válido: revisa los dígitos.';
   }
+  if (documentType === '0') return number === '-' ? null : 'Sin documento el número es "-".';
   if (documentType === '4' || documentType === '7')
     return /^[A-Z0-9]{6,12}$/.test(number) ? null : 'Usa de 6 a 12 letras o números.';
   return 'Selecciona el tipo de documento.';
@@ -245,7 +251,7 @@ export const normalizeDocument = (value: string) => value.replace(/\s+/g, '').to
 /** Checkout form: the billing block the order keeps as a copy. */
 export type BillingForm = {
   type: '01' | '03';
-  documentType: '1' | '4' | '6' | '7';
+  documentType: '0' | '1' | '4' | '6' | '7';
   documentNumber: string;
   name: string;
   address: string;
@@ -254,10 +260,20 @@ export type BillingForm = {
 /** Documents accepted for a boleta; a factura always uses RUC. */
 export const boletaDocuments = documentTypes.filter((item) => item.value !== '6');
 
-export function validateBilling(form: BillingForm): Partial<Record<keyof BillingForm, string>> {
+/** `total` (when known) enforces the S/ 700 limit of a boleta without document. */
+export function validateBilling(
+  form: BillingForm,
+  total?: number,
+): Partial<Record<keyof BillingForm, string>> {
   const errors: Partial<Record<keyof BillingForm, string>> = {};
+  if (form.documentType === '0' && total !== undefined && total >= ANONYMOUS_LIMIT)
+    errors.documentType = 'Desde S/ 700 la boleta requiere el documento del cliente.';
   if (form.type === '01' && form.documentType !== '6')
     errors.documentType = 'La factura requiere el RUC de la empresa.';
+  if (form.documentType === '0') {
+    if (form.type === '01') errors.documentType = 'La factura requiere el RUC de la empresa.';
+    return errors;
+  }
   const number = normalizeDocument(form.documentNumber);
   if (!number) errors.documentNumber = 'Ingresa el número de documento.';
   else {
@@ -273,6 +289,14 @@ export function validateBilling(form: BillingForm): Partial<Record<keyof Billing
 
 /** Payload sent to the platform: trimmed values, document without spaces, empty address as null. */
 export function billingPayload(form: BillingForm): Billing {
+  if (form.documentType === '0')
+    return {
+      type: form.type,
+      documentType: '0',
+      documentNumber: '-',
+      name: form.name.trim().replace(/\s+/g, ' ') || ANONYMOUS_NAME,
+      address: null,
+    };
   return {
     type: form.type,
     documentType: form.documentType,
