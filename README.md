@@ -1,6 +1,6 @@
 # SYSCON Commerce Web
 
-Aplicación Laravel 12 + React 19 + TypeScript + Tailwind para el backend [SYSCON Commerce Platform](https://github.com/devzone-software/syscon-commerce-platform). Laravel actúa como proxy de las API Java y guarda el JWT y el refresh token en una sesión cifrada del servidor. El navegador solo recibe la cookie de sesión `HttpOnly` y usa CSRF para las mutaciones.
+Aplicación Laravel 12 + React 19 + TypeScript + Tailwind para el backend [SYSCON Commerce Platform](https://github.com/devzone-software/syscon-commerce-platform). Laravel actúa como proxy (BFF) de la API de la plataforma, también Laravel, y guarda el JWT y el refresh token en una sesión cifrada del servidor. El navegador solo recibe la cookie de sesión `HttpOnly` y usa CSRF para las mutaciones.
 
 ## Funciones
 
@@ -10,28 +10,32 @@ Aplicación Laravel 12 + React 19 + TypeScript + Tailwind para el backend [SYSCO
 - Catálogo con búsqueda sin tildes, filtros por categoría, marca y disponibilidad, orden y paginación.
 - Detalle de producto con cantidad limitada por stock y productos relacionados.
 - Carrito persistente que sincroniza precio y stock con el catálogo y bloquea productos no disponibles.
-- Checkout con pago `MANUAL` y página de pedido con estado, detalle y solicitud de pago.
+- Checkout con boleta o factura (DNI/RUC), retiro en tienda o envío con costo del servidor, pago `MANUAL` e idempotencia ante reintentos.
+- Página de pedido con estado, detalle con IGV, solicitud de pago y comprobantes aceptados (PDF, XML y CDR).
 - Cuenta del cliente: resumen, pedidos recientes y listado filtrable.
 
 **Backoffice** (`/admin`, layout propio, secciones visibles según permisos)
 
-| Sección | Permiso |
-| --- | --- |
-| Panel, reportes de catálogo e inventario | cualquier permiso de personal |
-| Productos, carga masiva CSV, categorías y marcas, existencias | `catalog:write` |
-| Proveedores (sincronización de feeds) | `suppliers:manage` |
-| Pedidos (consulta por ID y cambio de estado) | `orders:manage` |
-| Pagos (consulta por ID y confirmación manual) | `payments:confirm` |
-| Comprobantes (emisión, consulta y envío) | `invoices:submit` |
+| Sección                                                                                                           | Permiso                       |
+| ----------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| Panel, reportes de catálogo e inventario                                                                          | cualquier permiso de personal |
+| Reportes de ventas y conciliación (CSV)                                                                           | `reports:view`                |
+| Productos, carga masiva CSV, categorías y marcas, existencias                                                     | `catalog:write`               |
+| Proveedores (sincronización de feeds)                                                                             | `suppliers:manage`            |
+| Pedidos (bandeja filtrable, detalle con pagos, comprobantes, correos al cliente e historial, cambio de estado)    | `orders:manage`               |
+| Venta directa en tienda (cobro en efectivo, tarjeta, Yape, Plin o transferencia, entrega inmediata y comprobante) | `sales:create`                |
+| Caja (apertura, ingresos y egresos, cierre con arqueo e historial)                                                | `sales:create`                |
+| Pagos (bandeja de pagos por verificar y confirmación manual)                                                      | `payments:confirm`            |
+| Comprobantes (emisión con serie automática, notas de crédito/débito, PDF/XML/CDR y envío)                         | `invoices:submit`             |
 
-POS, caja, sucursales, almacenes, movimientos, kardex, clientes, listados globales y reportes de
-ventas dependen de APIs que el backend aún no ofrece. Están detalladas en
+POS, caja, sucursales, almacenes, movimientos, kardex, clientes y administración de usuarios
+dependen de APIs que el backend aún no ofrece. Están detalladas en
 [docs/API-NECESARIAS.md](docs/API-NECESARIAS.md); la web no las simula.
 
 ## Requisitos
 
 - PHP 8.3, Composer 2, Node 22 y npm, o Docker Engine con Compose.
-- Backend SYSCON disponible a través de su Nginx. `JAVA_API_URL` es una URL **interna al servidor Laravel**, no una variable del navegador.
+- La plataforma `syscon-commerce-platform` en ejecución. `PLATFORM_API_URL` es una URL **interna al servidor Laravel**, no una variable del navegador.
 
 ## Desarrollo local
 
@@ -47,21 +51,21 @@ Inicia `npm run dev` en una terminal y `php artisan serve` en otra. Abre
 recursos de Vite. Si quieres ejecutar únicamente `php artisan serve`, detén
 Vite y ejecuta `npm run build` antes de abrir la página.
 
-Configura `JAVA_API_URL` en `.env` antes de probar datos reales. Si Laravel se ejecuta fuera de Docker y el backend publica Nginx en el puerto 80, usa `JAVA_API_URL=http://localhost`. El `JWT_SECRET` debe coincidir exactamente con el del Auth Service y tener al menos 32 bytes aleatorios; Laravel lo usa para verificar la firma HS256 y las autoridades del token. No uses variables `VITE_*` para estos secretos. `APP_KEY` debe ser única y persistente.
+Configura `PLATFORM_API_URL` en `.env` antes de probar datos reales; con `php artisan serve` de la plataforma en el puerto 8000, usa `PLATFORM_API_URL=http://127.0.0.1:8000`. `JAVA_API_URL`, el nombre anterior de cuando el backend era Java, se sigue leyendo si `PLATFORM_API_URL` no está definida. El `JWT_SECRET` debe coincidir exactamente con el de la plataforma y tener al menos 32 bytes aleatorios; Laravel lo usa para verificar la firma HS256 y las autoridades del token. No uses variables `VITE_*` para estos secretos. `APP_KEY` debe ser única y persistente.
 
-El proyecto no guarda usuarios, productos, pedidos ni pagos en una base Laravel. Las sesiones y la caché usan archivos. El precio, el stock, el total y las transiciones de estado los decide el backend Java.
+El proyecto no guarda usuarios, productos, pedidos ni pagos en una base Laravel. Las sesiones y la caché usan archivos. El precio, el stock, el IGV, el total y las transiciones de estado los decide la plataforma; la web muestra los importes como cadenas decimales tal como llegan.
 
 ## Docker y Hostinger VPS
 
 ```bash
 cp .env.example .env
 # Edita APP_ENV=production, APP_DEBUG=false, APP_URL=https://tu-dominio,
-# JAVA_API_URL y JWT_SECRET; pega una APP_KEY persistente generada previamente.
+# PLATFORM_API_URL y JWT_SECRET; pega una APP_KEY persistente generada previamente.
 docker compose build
 docker compose up -d
 ```
 
-La web escucha solo en `127.0.0.1:8081`. En Hostinger VPS coloca Nginx o Caddy del host delante con certificado TLS y proxy a ese puerto; configura renovación del certificado y redirección HTTP→HTTPS. Usa `SESSION_SECURE_COOKIE=true`, `APP_ENV=production` y `APP_DEBUG=false` en producción. El proxy Java debe ser accesible desde el contenedor; `host.docker.internal` se resuelve al host mediante `host-gateway` en Compose. Si el backend corre en otra red o servidor, ajusta `JAVA_API_URL` y restringe su acceso por red. Conserva el volumen `sessions` durante despliegues para no cerrar sesiones activas.
+La web escucha solo en `127.0.0.1:8081`. En Hostinger VPS coloca Nginx o Caddy del host delante con certificado TLS y proxy a ese puerto; configura renovación del certificado y redirección HTTP→HTTPS. Usa `SESSION_SECURE_COOKIE=true`, `APP_ENV=production` y `APP_DEBUG=false` en producción. La plataforma debe ser accesible desde el contenedor; `host.docker.internal` se resuelve al host mediante `host-gateway` en Compose. Si el backend corre en otra red o servidor, ajusta `PLATFORM_API_URL` y restringe su acceso por red. Conserva el volumen `sessions` durante despliegues para no cerrar sesiones activas.
 
 Para generar `APP_KEY` sin PHP instalado en el host, ejecuta `docker run --rm php:8.3-cli php -r 'echo "base64:".base64_encode(random_bytes(32)).PHP_EOL;'` y copia el resultado a `.env`. El archivo `.env` no se incluye en la imagen; Compose inyecta sus valores al iniciar el contenedor.
 
@@ -96,42 +100,55 @@ contra producción.
 
 ## Rutas del BFF (`/web-api`)
 
-Laravel valida la entrada, conserva el JWT en la sesión y aplica el mismo permiso que el servicio
-Java (`requirePermission`), sin depender del nombre del rol.
+Laravel valida la entrada, conserva el JWT en la sesión y aplica el mismo permiso que la plataforma
+(`requirePermission`), sin depender del nombre del rol. Los errores conservan el formato
+`{ success, message, data }` de la plataforma, y los archivos se reenvían con su tipo y nombre.
 
-| Ruta web | API Java | Acceso |
-| --- | --- | --- |
-| `GET catalog/{products,categories,brands}`, `GET product/{id}` | `/api/catalog/...` | Público (caché de 60 s) |
-| `POST register`, `login`, `logout`; `GET me` | `/api/auth/...` | `me` devuelve roles y permisos |
-| `GET/POST orders`, `GET orders/{id}` | `/api/orders` | Sesión |
-| `POST payments`, `GET payments/{id}` | `/api/payments` | Sesión; solo proveedor `MANUAL` |
-| `POST admin/products` | `POST /api/catalog/products` | `catalog:write` |
-| `PATCH admin/orders/{id}/status` | `PATCH /api/orders/{id}/status/{status}` | `orders:manage` |
-| `POST admin/payments/{id}/confirm` | `POST /api/payments/{id}/confirm` | `payments:confirm` |
-| `POST admin/invoices`, `GET admin/invoices/{id}`, `POST admin/invoices/{id}/submit` | `/api/invoices` | `invoices:submit` |
-| `GET/POST admin/suppliers`, `POST admin/suppliers/{id}/run`, `GET admin/supplier-jobs[/{id}/history]` | `/api/suppliers` | `suppliers:manage` |
+| Ruta web                                                                                              | API de la plataforma                                                                                         | Acceso                                                        |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| `GET catalog/{products,categories,brands}`, `GET product/{id}`                                        | `/api/catalog/...`                                                                                           | Público (caché de 60 s)                                       |
+| `POST register`, `login`, `login/google`, `logout`; `GET me`                                          | `/api/auth/...`                                                                                              | `me` devuelve nombres, roles y permisos                       |
+| `GET delivery-options`                                                                                | `/api/orders/delivery-options`                                                                               | Público                                                       |
+| `GET/POST orders`, `GET orders/{id}`                                                                  | `/api/orders`                                                                                                | Sesión                                                        |
+| `GET orders/{id}/invoices`, `GET orders/{id}/invoices/{invoice}/{pdf,xml,cdr}`                        | `/api/orders/{id}/invoices...`                                                                               | Sesión; solo comprobantes aceptados del propio pedido         |
+| `POST payments`, `GET payments/{id}`                                                                  | `/api/payments`                                                                                              | Sesión; solo proveedor `MANUAL`                               |
+| `POST admin/products`                                                                                 | `POST /api/catalog/products`                                                                                 | `catalog:write`                                               |
+| `GET admin/orders`, `GET admin/orders/{id}`                                                           | `GET /api/admin/orders[/{id}]`                                                                               | `orders:manage`                                               |
+| `GET admin/payments`                                                                                  | `GET /api/admin/payments`                                                                                    | `payments:confirm`                                            |
+| `PATCH admin/orders/{id}/status`                                                                      | `PATCH /api/orders/{id}/status/{status}`                                                                     | `orders:manage`                                               |
+| `POST admin/notifications/{id}/resend`                                                                | `POST /api/admin/notifications/{id}/resend`                                                                  | `orders:manage`                                               |
+| `POST admin/payments/{id}/confirm`                                                                    | `POST /api/payments/{id}/confirm`                                                                            | `payments:confirm`                                            |
+| `POST admin/invoices` (sin correlativo), `GET                                                         | PATCH admin/invoices/{id}`, `POST admin/invoices/{id}/submit`, `GET admin/invoices/{id}/{pdf,xml,cdr}`, `GET | POST admin/invoice-series`, `PATCH admin/invoice-series/{id}` | `/api/invoices`, `/api/invoices/series` | `invoices:submit` |
+| `POST admin/sales`, `GET admin/customers`                                                             | `/api/admin/sales`, `/api/admin/customers`                                                                   | `sales:create`                                                |
+| `GET admin/cash/current`, `POST admin/cash/{open,movements,close}`, `GET admin/cash/sessions`         | `/api/admin/cash/...`                                                                                        | `sales:create`                                                |
+| `GET admin/reports/summary`, `GET admin/reports/sales` (`format=csv`)                                 | `/api/admin/reports/...`                                                                                     | `reports:view`                                                |
+| `GET/POST admin/suppliers`, `POST admin/suppliers/{id}/run`, `GET admin/supplier-jobs[/{id}/history]` | `/api/suppliers`                                                                                             | `suppliers:manage`                                            |
 
 ## Límites conocidos del backend
 
-- El stock solo cambia al guardar un producto o sincronizar un proveedor (ambos **reemplazan** el valor); ningún pedido lo descuenta.
-- La sincronización de proveedores sobrescribe precio y stock propios.
-- La facturación no está homologada: el XML no incluye IGV y se envía directo a SUNAT, no a un OSE.
+- La facturación no está homologada: el XML incluye IGV, pero no se ha validado contra el servicio beta de SUNAT ni con un OSE.
 - El catálogo devuelve la lista completa; filtros y paginación se hacen en el navegador.
 - La carga masiva envía un upsert por fila porque no existe un endpoint masivo ni transaccional.
+
+## Ingreso con Google
+
+`/ingresar` y `/registro` muestran el botón oficial de Google cuando `GOOGLE_CLIENT_ID` está definido en `.env` (el mismo ID que usa la plataforma). El botón entrega un ID token a `POST /web-api/login/google`, que lo reenvía a `/api/auth/google` y abre la sesión igual que el login por contraseña. El ID de cliente es público; no uses el secreto del cliente en la web. El origen desde el que se abre la web (por ejemplo `http://localhost:8081`) debe figurar en los orígenes autorizados del cliente en Google Cloud Console.
+
+El registro con correo pide nombres, apellidos, tipo y número de documento, celular, correo y contraseña con confirmación.
 
 ## Diagnóstico de sesión
 
 Si el login responde 200 pero la sesión no se mantiene, revisa `JWT_SECRET` en el `.env` de la
-web: debe ser idéntico al del Auth Service (mínimo 32 bytes). Si falta, `/web-api/login` y
+web: debe ser idéntico al de la plataforma (mínimo 32 bytes). Si falta, `/web-api/login` y
 `/web-api/me` responden 500 y `storage/logs/laravel.log` indica el problema; si no coincide, el
 login responde 502 y no guarda la sesión. Tras cambiar `.env`, recrea el contenedor con
 `docker compose up -d app` (sin `-v`).
 
 ## Estructura
 
-- `app/Services/JavaApi.php`: cliente HTTP y rotación de refresh token.
+- `app/Services/JavaApi.php`: cliente HTTP de la plataforma (nombre heredado del backend Java), descargas de archivos y rotación de refresh token.
 - `app/Services/Identity.php`: validación de firma, emisor y vencimiento del JWT.
-- `app/Http/Controllers/Gateway/`: un controlador por módulo (`Auth`, `Catalog`, `Order`, `Payment`, `Invoice`, `Supplier`) sobre una base común con `requirePermission`.
+- `app/Http/Controllers/Gateway/`: un controlador por módulo (`Auth`, `Catalog`, `Order`, `Payment`, `Invoice`, `Report`, `Sale`, `Supplier`) sobre una base común con `requirePermission`.
 - `resources/js/services/api.ts`: cliente del navegador para `/web-api`.
 - `resources/js/state.tsx`: sesión visible y carrito local; las operaciones del carrito están en `lib/cart.ts`.
 - `resources/js/lib/`: reglas sin interfaz y con pruebas (catálogo, carrito, pedidos, permisos, facturación, inventario, validaciones).

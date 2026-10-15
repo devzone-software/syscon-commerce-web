@@ -1,0 +1,219 @@
+/* Confirmation window shown before a product is added to the order. */
+.add-dialog {
+  width: min(520px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 24px 60px rgb(0 38 93 / 0.25);
+  overflow: auto;
+}
+.add-dialog::backdrop {
+  background: rgb(0 26 66 / 0.45);
+  backdrop-filter: blur(2px);
+}
+.add-dialog[open] {
+  animation: add-dialog-in 0.18s ease-out;
+}
+@keyframes add-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+.add-dialog-card {
+  display: grid;
+  gap: 18px;
+  padding: 22px 24px 24px;
+}
+.add-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.add-dialog-head h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #00265d;
+}
+.add-dialog-head h2 svg {
+  color: #1f8a5b;
+}
+.add-dialog-close {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: 0;
+  border-radius: 8px;
+  background: #f0f3ff;
+  color: #00265d;
+}
+.add-dialog-close:hover {
+  background: #e1e8fb;
+}
+.add-dialog-product {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f0f3ff;
+}
+.add-dialog-media {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+.add-dialog-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.add-dialog-cat {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0d3b82;
+}
+.add-dialog-product h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  line-height: 1.3;
+  color: #111827;
+}
+.add-dialog-product code {
+  font: 500 12px 'JetBrains Mono', monospace;
+  color: #5f6b85;
+}
+.add-dialog-stock {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1f8a5b;
+}
+.add-dialog-stock i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.add-dialog-stock.is-out {
+  color: #b4473a;
+}
+.add-dialog-summary {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+.add-dialog-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+.add-dialog-summary dt {
+  color: #5f6b85;
+}
+.add-dialog-summary dd {
+  margin: 0;
+  font-weight: 700;
+}
+.add-dialog-summary .is-total {
+  padding-top: 12px;
+  border-top: 1px solid #e5e8ef;
+}
+.add-dialog-summary .is-total dd {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #00265d;
+}
+.add-dialog-card > .notice {
+  margin: 0;
+}
+.add-dialog-notes {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: #5f6b85;
+}
+.add-dialog-notes li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.add-dialog-notes svg {
+  flex: none;
+  color: #0d3b82;
+}
+.add-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.add-dialog-actions > * {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 800;
+}
+.add-dialog-actions .is-soft {
+  background: #f0f3ff;
+  color: #00265d;
+}
+.add-dialog-actions .is-soft:hover {
+  background: #e1e8fb;
+}
+.add-dialog-actions .is-primary {
+  background: #00265d;
+  color: #fff;
+}
+.add-dialog-actions .is-primary:hover:not(:disabled) {
+  background: #0d3b82;
+}
+.add-dialog-actions .is-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+@media (max-width: 520px) {
+  .add-dialog-card {
+    padding: 18px 16px 20px;
+  }
+  .add-dialog-product {
+    grid-template-columns: 72px 1fr;
+  }
+  .add-dialog-actions > * {
+    flex: 1 1 auto;
+  }
+}

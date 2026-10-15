@@ -6,13 +6,16 @@ import { can, canUseBackoffice, permissions, type Permission } from '../../lib/a
 import { useShop } from '../../state';
 import { Empty } from '../../ui';
 import { BillingAdmin } from './BillingAdmin';
+import { CashRegister } from './CashRegister';
 import { Dashboard } from './Dashboard';
+import { DirectSale } from './DirectSale';
 import { InventoryAdmin } from './InventoryAdmin';
 import { OrdersAdmin } from './OrdersAdmin';
 import { PaymentsAdmin } from './PaymentsAdmin';
 import { ProductBulkAdmin } from './ProductBulkAdmin';
 import { ProductsAdmin } from './ProductsAdmin';
 import { ReportsAdmin } from './ReportsAdmin';
+import { SalesReport } from './SalesReport';
 import { SuppliersAdmin } from './SuppliersAdmin';
 import { TaxonomyAdmin } from './TaxonomyAdmin';
 
@@ -70,6 +73,20 @@ const sections: Section[] = [
     element: <OrdersAdmin />,
   },
   {
+    path: 'venta-directa',
+    label: 'Venta directa',
+    group: 'Ventas',
+    permission: permissions.salesCreate,
+    element: <DirectSale />,
+  },
+  {
+    path: 'caja',
+    label: 'Caja',
+    group: 'Ventas',
+    permission: permissions.salesCreate,
+    element: <CashRegister />,
+  },
+  {
     path: 'pagos',
     label: 'Pagos',
     group: 'Ventas',
@@ -82,6 +99,13 @@ const sections: Section[] = [
     group: 'Facturación',
     permission: permissions.invoicesSubmit,
     element: <BillingAdmin />,
+  },
+  {
+    path: 'reportes/ventas',
+    label: 'Ventas y conciliación',
+    group: 'Reportes',
+    permission: permissions.reportsView,
+    element: <SalesReport />,
   },
   {
     path: 'reportes',
@@ -159,11 +183,7 @@ export function Backoffice() {
               {allowed
                 .filter((section) => section.group === group)
                 .map((section) => (
-                  <NavLink
-                    key={section.path}
-                    to={`/admin/${section.path}`}
-                    end={section.path === ''}
-                  >
+                  <NavLink key={section.path} to={`/admin/${section.path}`} end>
                     {section.label}
                   </NavLink>
                 ))}

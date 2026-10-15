@@ -72,7 +72,7 @@
   white-space: nowrap;
 }
 .data-table tbody tr:hover {
-  background: #fafcfd;
+  background: #fafbfd;
 }
 
 .detail-list {
@@ -101,6 +101,20 @@
 }
 .detail-list code {
   font-size: 12px;
+}
+.payment-instructions {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--store-line);
+  border-radius: 10px;
+  background: var(--store-soft);
+  font-size: 14px;
+}
+.payment-instructions p {
+  margin: 6px 0 0;
+  line-height: 1.6;
+  white-space: pre-line;
+  color: var(--store-ink-soft);
 }
 
 .field {

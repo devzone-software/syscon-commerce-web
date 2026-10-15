@@ -3,33 +3,64 @@ import { cartTotal, cartUnits } from '../../lib/cart';
 import { money } from '../../state';
 import type { CartLine } from '../../types';
 
-/** Totals shared by the cart and the checkout; the backend confirms the final amount. */
+/** Label / value rows of the Figma summaries (cart, checkout, confirmation, product specs). */
+export function InfoRows({
+  rows,
+}: {
+  rows: { label: ReactNode; value: ReactNode; tone?: 'success' | 'total' }[];
+}) {
+  return (
+    <dl className="info-rows">
+      {rows.map((row, index) => (
+        <div key={index} className={row.tone ? `is-${row.tone}` : undefined}>
+          <dt>{row.label}</dt>
+          <dd>{row.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+/**
+ * Totals shared by the cart and the checkout; the backend confirms the final amount.
+ * `shipping`: omitted in the cart (chosen later), null while loading, otherwise the cost.
+ */
 export function OrderSummary({
   lines,
-  title = 'Resumen',
+  totalLabel = 'Total',
+  shipping,
   children,
 }: {
   lines: CartLine[];
-  title?: string;
+  totalLabel?: string;
+  shipping?: number | null;
   children?: ReactNode;
 }) {
   const units = cartUnits(lines);
-  const total = cartTotal(lines);
+  const subtotal = cartTotal(lines);
+  const total = subtotal + (shipping ?? 0);
+  const shippingLabel =
+    shipping === undefined
+      ? 'Se elige en el checkout'
+      : shipping === null
+        ? '…'
+        : shipping === 0
+          ? 'Gratis'
+          : money(shipping);
   return (
-    <aside className="summary-card order-summary" aria-labelledby="order-summary-title">
-      <h2 id="order-summary-title">{title}</h2>
-      <div>
-        <span>
-          Productos ({units} {units === 1 ? 'unidad' : 'unidades'})
-        </span>
-        <strong>{money(total)}</strong>
-      </div>
-      <div className="summary-total">
-        <span>Total estimado</span>
-        <strong>{money(total)}</strong>
-      </div>
-      <p>El precio y el stock se confirman al crear el pedido.</p>
+    <div className="order-summary">
+      <InfoRows
+        rows={[
+          {
+            label: `Subtotal (${units} ${units === 1 ? 'unidad' : 'unidades'})`,
+            value: money(subtotal),
+          },
+          { label: 'Envío', value: shippingLabel },
+          { label: totalLabel, value: money(total), tone: 'total' },
+        ]}
+      />
+      <p className="order-summary-note">El precio y el stock se confirman al crear el pedido.</p>
       {children}
-    </aside>
+    </div>
   );
 }

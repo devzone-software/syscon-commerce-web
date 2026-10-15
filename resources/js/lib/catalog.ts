@@ -38,7 +38,7 @@ export const productCount = (count: number) => `${count} ${count === 1 ? 'produc
 
 export type SortKey = 'relevancia' | 'precio-asc' | 'precio-desc' | 'nombre';
 export const sortOptions: { value: SortKey; label: string }[] = [
-  { value: 'relevancia', label: 'Orden del catálogo' },
+  { value: 'relevancia', label: 'Recomendados' },
   { value: 'precio-asc', label: 'Precio: menor a mayor' },
   { value: 'precio-desc', label: 'Precio: mayor a menor' },
   { value: 'nombre', label: 'Nombre: A a Z' },
@@ -49,6 +49,9 @@ export type CatalogFilters = {
   category: string;
   brand: string;
   onlyAvailable: boolean;
+  /** Price range in soles; null when that bound is not set. */
+  minPrice: number | null;
+  maxPrice: number | null;
   sort: SortKey;
 };
 
@@ -58,9 +61,16 @@ export const catalogParams = {
   category: 'categoria',
   brand: 'marca',
   onlyAvailable: 'disponible',
+  minPrice: 'desde',
+  maxPrice: 'hasta',
   sort: 'orden',
   page: 'pagina',
 } as const;
+
+const readPrice = (value: string | null) => {
+  const amount = value ? Number(value) : NaN;
+  return Number.isFinite(amount) && amount >= 0 ? amount : null;
+};
 
 export function readFilters(params: URLSearchParams): CatalogFilters {
   const sort = params.get(catalogParams.sort);
@@ -69,6 +79,8 @@ export function readFilters(params: URLSearchParams): CatalogFilters {
     category: params.get(catalogParams.category) ?? '',
     brand: params.get(catalogParams.brand) ?? '',
     onlyAvailable: params.get(catalogParams.onlyAvailable) === '1',
+    minPrice: readPrice(params.get(catalogParams.minPrice)),
+    maxPrice: readPrice(params.get(catalogParams.maxPrice)),
     sort: sortOptions.some((option) => option.value === sort) ? (sort as SortKey) : 'relevancia',
   };
 }
@@ -95,7 +107,9 @@ export function filterProducts(products: Product[], filters: CatalogFilters): Pr
       matchesQuery(product, filters.query) &&
       (!filters.category || product.category === filters.category) &&
       (!filters.brand || product.brand === filters.brand) &&
-      (!filters.onlyAvailable || product.stock > 0),
+      (!filters.onlyAvailable || product.stock > 0) &&
+      (filters.minPrice === null || Number(product.price) >= filters.minPrice) &&
+      (filters.maxPrice === null || Number(product.price) <= filters.maxPrice),
   );
   const byPrice = (a: Product, b: Product) => Number(a.price) - Number(b.price);
   if (filters.sort === 'precio-asc') result.sort(byPrice);
@@ -108,6 +122,16 @@ export function paginate<T>(items: T[], requestedPage: number, size: number) {
   const pages = Math.max(1, Math.ceil(items.length / size));
   const page = Math.min(Math.max(1, Math.floor(requestedPage) || 1), pages);
   return { items: items.slice((page - 1) * size, page * size), page, pages };
+}
+
+/** Page numbers with gaps, e.g. 1 2 3 4 5 … 12. */
+export function pageNumbers(page: number, pages: number): (number | null)[] {
+  if (pages <= 7) return Array.from({ length: pages }, (_, index) => index + 1);
+  const around = new Set([1, pages, page - 1, page, page + 1]);
+  if (page <= 4) [2, 3, 4, 5].forEach((n) => around.add(n));
+  if (page >= pages - 3) [pages - 4, pages - 3, pages - 2, pages - 1].forEach((n) => around.add(n));
+  const sorted = [...around].filter((n) => n >= 1 && n <= pages).sort((a, b) => a - b);
+  return sorted.flatMap((n, index) => (index && n - sorted[index - 1] > 1 ? [null, n] : [n]));
 }
 
 /** Products sharing the category (or the brand when there is no category), in stock first. */

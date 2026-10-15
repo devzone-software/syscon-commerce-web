@@ -1,10 +1,10 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { money, useShop } from './state';
+import { useConfirmAdd } from './components/cart/AddToCartDialog';
 import type { Product } from './types';
+import cartAddIcon from '../images/home/cart-add.svg';
 import { ProductImage } from './components/ProductImage';
-import { CartIcon } from './components/icons';
-import { StockBadge } from './components/product/StockBadge';
 import { Footer } from './components/layout/Footer';
 import { Header } from './components/layout/Header';
 
@@ -70,41 +70,43 @@ export function Empty({
     </div>
   );
 }
-export function ProductCard({ product }: { product: Product }) {
-  const { add } = useShop();
+/**
+ * Product card from the Figma home: image with availability, category, name, price and the
+ * "Ver producto" / "Agregar" actions. `compact` is the smaller variant of the catalog grid.
+ */
+export function ProductCard({ product, compact = false }: { product: Product; compact?: boolean }) {
+  const add = useConfirmAdd();
+  const available = product.stock > 0;
+  const details = [product.brand, `SKU ${product.sku}`].filter(Boolean).join(' · ');
+  const url = `/producto/${product.id}`;
   return (
-    <article className="card-product">
-      <Link
-        to={`/producto/${product.id}`}
-        className="card-product-media"
-        tabIndex={-1}
-        aria-hidden="true"
-      >
+    <article className={`card-product${compact ? ' is-compact' : ''}`}>
+      <Link to={url} className="card-product-media" tabIndex={-1} aria-hidden="true">
         <ProductImage product={product} />
-      </Link>
-      <div className="card-product-body">
-        {product.brand && <span className="card-product-brand">{product.brand}</span>}
-        <Link className="card-product-title" to={`/producto/${product.id}`}>
-          {product.name}
-        </Link>
-        <span className="card-product-meta">
-          {product.category ? `${product.category} · ` : ''}SKU {product.sku}
+        <span className={`card-product-stock${available ? '' : ' out'}`}>
+          {available ? 'DISPONIBLE' : 'SIN STOCK'}
         </span>
-        <div className="card-product-footer">
-          <div>
-            <strong className="card-product-price">{money(Number(product.price))}</strong>
-            <StockBadge stock={product.stock} />
-          </div>
-          <button
-            type="button"
-            className="card-product-add"
-            onClick={() => add(product)}
-            disabled={product.stock < 1}
-            aria-label={`Agregar ${product.name} al carrito`}
-          >
-            <CartIcon />
-          </button>
-        </div>
+      </Link>
+      {product.category && <span className="card-product-category">{product.category}</span>}
+      <Link className="card-product-title" to={url}>
+        {product.name}
+      </Link>
+      <span className="card-product-meta">{details}</span>
+      <strong className="card-product-price">{money(Number(product.price))}</strong>
+      <div className="card-product-actions">
+        <Link className="card-product-view" to={url}>
+          {compact ? 'Ver' : 'Ver producto'}
+        </Link>
+        <button
+          type="button"
+          className="card-product-add"
+          onClick={() => add(product)}
+          disabled={!available}
+          aria-label={`Agregar ${product.name} al carrito`}
+        >
+          <img src={cartAddIcon} alt="" />
+          Agregar
+        </button>
       </div>
     </article>
   );

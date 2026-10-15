@@ -86,7 +86,7 @@ export function ReportsAdmin() {
     <>
       <PageHeader
         title="Reportes"
-        description="Reportes calculados con el catálogo publicado y su stock actual. Los reportes de ventas, comprobantes, caja y clientes requieren endpoints agregados que el backend todavía no ofrece."
+        description="Reportes calculados con el catálogo publicado y su stock actual. Las ventas, pagos y comprobantes están en “Ventas y conciliación”."
         actions={
           rows.length > 0 && (
             <button type="button" className="button button-secondary" onClick={exportCsv}>

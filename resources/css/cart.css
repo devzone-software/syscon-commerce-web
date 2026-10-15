@@ -40,7 +40,7 @@
   display: grid;
   place-items: center;
   border-radius: 10px;
-  background: #f2f7f9;
+  background: #f2f4f9;
   overflow: hidden;
 }
 .cart-line-media img {
@@ -59,7 +59,7 @@
   min-width: 0;
 }
 .cart-line-name {
-  font: 700 15px/1.4 Manrope, sans-serif;
+  font: 700 15px/1.4 Inter, sans-serif;
   color: var(--store-ink);
   overflow-wrap: anywhere;
 }

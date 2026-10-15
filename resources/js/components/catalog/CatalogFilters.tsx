@@ -1,16 +1,30 @@
-import { useState } from 'react';
-import type { CatalogFilters as Filters, CatalogGroup } from '../../lib/catalog';
+import { useState, type ReactNode } from 'react';
+import {
+  catalogParams,
+  type CatalogFilters as Filters,
+  type CatalogGroup,
+} from '../../lib/catalog';
 
-const VISIBLE_OPTIONS = 8;
+const VISIBLE_OPTIONS = 7;
 
-function FacetGroup({
-  legend,
+type Change = (changes: Record<string, string>, replace?: boolean) => void;
+
+/** Collapsible white block of the sidebar (Figma "Filter Block"). */
+function FilterBlock({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <details className="filter-block" open>
+      <summary>{title}</summary>
+      <div className="filter-block-body">{children}</div>
+    </details>
+  );
+}
+
+function OptionList({
   name,
   options,
   selected,
   onSelect,
 }: {
-  legend: string;
   name: string;
   options: CatalogGroup[];
   selected: string;
@@ -23,32 +37,26 @@ function FacetGroup({
       ? [{ name: selected, count: 0 }, ...options]
       : options;
   const visible = expanded ? all : all.slice(0, VISIBLE_OPTIONS);
-  if (!all.length) return null;
   return (
-    <fieldset className="facet">
-      <legend>{legend}</legend>
-      <label className="facet-option">
-        <input type="radio" name={name} checked={!selected} onChange={() => onSelect('')} />
-        <span>Todas</span>
-      </label>
+    <>
       {visible.map((option) => (
-        <label className="facet-option" key={option.name}>
+        <label className="filter-option" key={option.name}>
           <input
-            type="radio"
+            type="checkbox"
             name={name}
             checked={selected === option.name}
-            onChange={() => onSelect(option.name)}
+            onChange={() => onSelect(selected === option.name ? '' : option.name)}
           />
           <span>{option.name}</span>
           <small>{option.count}</small>
         </label>
       ))}
       {all.length > VISIBLE_OPTIONS && (
-        <button type="button" className="facet-more" onClick={() => setExpanded((v) => !v)}>
+        <button type="button" className="filter-more" onClick={() => setExpanded((v) => !v)}>
           {expanded ? 'Ver menos' : `Ver ${all.length - VISIBLE_OPTIONS} más`}
         </button>
       )}
-    </fieldset>
+    </>
   );
 }
 
@@ -56,40 +64,83 @@ export function CatalogFilters({
   filters,
   categories,
   brands,
+  inStock,
   onChange,
 }: {
   filters: Filters;
   categories: CatalogGroup[];
   brands: CatalogGroup[];
-  onChange: (changes: Record<string, string>) => void;
+  inStock?: number;
+  onChange: Change;
 }) {
+  const price = (key: string, value: string) => onChange({ [key]: value }, true);
   return (
     <div className="catalog-filters">
-      <fieldset className="facet">
-        <legend>Disponibilidad</legend>
-        <label className="facet-option">
+      {(categories.length > 0 || filters.category) && (
+        <FilterBlock title="Categorías">
+          <OptionList
+            name={catalogParams.category}
+            options={categories}
+            selected={filters.category}
+            onSelect={(value) => onChange({ [catalogParams.category]: value })}
+          />
+        </FilterBlock>
+      )}
+      <FilterBlock title="Rango de precio">
+        <div className="filter-price">
+          <label>
+            Desde
+            <span>
+              S/
+              <input
+                type="number"
+                min={0}
+                inputMode="decimal"
+                placeholder="0"
+                value={filters.minPrice ?? ''}
+                onChange={(event) => price(catalogParams.minPrice, event.target.value)}
+              />
+            </span>
+          </label>
+          <label>
+            Hasta
+            <span>
+              S/
+              <input
+                type="number"
+                min={0}
+                inputMode="decimal"
+                placeholder="Sin límite"
+                value={filters.maxPrice ?? ''}
+                onChange={(event) => price(catalogParams.maxPrice, event.target.value)}
+              />
+            </span>
+          </label>
+        </div>
+      </FilterBlock>
+      <FilterBlock title="Disponibilidad">
+        <label className="filter-option">
           <input
             type="checkbox"
             checked={filters.onlyAvailable}
-            onChange={(event) => onChange({ disponible: event.target.checked ? '1' : '' })}
+            onChange={(event) =>
+              onChange({ [catalogParams.onlyAvailable]: event.target.checked ? '1' : '' })
+            }
           />
-          <span>Solo con stock</span>
+          <span>En stock inmediato</span>
+          {inStock !== undefined && <small>{inStock}</small>}
         </label>
-      </fieldset>
-      <FacetGroup
-        legend="Categoría"
-        name="categoria"
-        options={categories}
-        selected={filters.category}
-        onSelect={(value) => onChange({ categoria: value })}
-      />
-      <FacetGroup
-        legend="Marca"
-        name="marca"
-        options={brands}
-        selected={filters.brand}
-        onSelect={(value) => onChange({ marca: value })}
-      />
+      </FilterBlock>
+      {(brands.length > 0 || filters.brand) && (
+        <FilterBlock title="Marcas oficiales">
+          <OptionList
+            name={catalogParams.brand}
+            options={brands}
+            selected={filters.brand}
+            onSelect={(value) => onChange({ [catalogParams.brand]: value })}
+          />
+        </FilterBlock>
+      )}
     </div>
   );
 }

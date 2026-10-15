@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="google-client-id" content="{{ config('services.google.client_id') }}">
     <meta name="description" content="SYSCON: catálogo y compras de tecnología para empresas.">
     <title>SYSCON Commerce</title>
     @viteReactRefresh

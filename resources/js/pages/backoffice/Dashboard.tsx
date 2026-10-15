@@ -19,13 +19,13 @@ export function Dashboard() {
     },
     can(user, permissions.ordersManage) && {
       to: '/admin/pedidos',
-      title: 'Gestionar un pedido',
-      text: 'Consulta un pedido por su ID y avanza su estado.',
+      title: 'Bandeja de pedidos',
+      text: 'Filtra pedidos por estado o cliente y avanza su preparación.',
     },
     can(user, permissions.paymentsConfirm) && {
       to: '/admin/pagos',
-      title: 'Confirmar un pago manual',
-      text: 'Verifica una solicitud de pago y registra su referencia.',
+      title: 'Pagos por verificar',
+      text: 'Revisa los pagos manuales pendientes y registra su referencia.',
     },
   ].filter((item): item is { to: string; title: string; text: string } => Boolean(item));
 
