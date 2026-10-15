@@ -11,7 +11,7 @@ import { billingRows } from '../lib/billing';
 import { deliveryRows } from '../lib/delivery';
 import { formatDateTime, orderStatusLabels, shortId, statusLabel } from '../lib/orders';
 import { api } from '../services/api';
-import { gatewayReturnNotice } from '../lib/sales';
+import { gatewayReturnNotice, onlineGateway, type OnlineGateway } from '../lib/sales';
 import { money } from '../state';
 import type { Payment } from '../types';
 import { useData, ErrorBox, Loading } from '../ui';
@@ -61,11 +61,13 @@ export function OrderPage() {
     };
   }, [fromGateway, id]);
 
-  const payOnline = async () => {
+  const gateway = onlineGateway(methods.data?.gateways);
+
+  const payOnline = async (provider: OnlineGateway) => {
     setBusy(true);
     setPayError('');
     try {
-      const attempt = await api.createPayment(id, 'SANDBOX');
+      const attempt = await api.createPayment(id, provider);
       if (!attempt.paymentUrl) throw new Error('La pasarela no devolvió la página de pago.');
       window.location.assign(attempt.paymentUrl);
     } catch (e) {
@@ -161,20 +163,21 @@ export function OrderPage() {
               {data.status === 'PAYMENT_PENDING' ? (
                 <>
                   <p className="flow-note">
-                    El método disponible es el pago manual. Un asesor confirmará el pago tras
-                    verificarlo; conserva el identificador de la solicitud.
+                    {gateway
+                      ? 'Paga en línea o con pago manual; en el pago manual, un asesor lo confirmará tras verificarlo.'
+                      : 'El método disponible es el pago manual. Un asesor confirmará el pago tras verificarlo; conserva el identificador de la solicitud.'}
                     {data.expiresAt &&
                       ` Reservamos tu stock hasta el ${formatDateTime(data.expiresAt)}; si el pago no se confirma antes, el pedido vence.`}
                   </p>
                   {payError && <ErrorBox message={payError} />}
-                  {methods.data?.gateways.includes('SANDBOX') && (
+                  {gateway && (
                     <button
                       type="button"
                       className="flow-button"
                       disabled={busy}
-                      onClick={payOnline}
+                      onClick={() => payOnline(gateway.provider)}
                     >
-                      {busy ? 'Redirigiendo…' : 'Pagar en línea (pasarela de prueba)'}
+                      {busy ? 'Redirigiendo…' : gateway.label}
                     </button>
                   )}
                   {!payment && (

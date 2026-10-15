@@ -12,9 +12,26 @@ export type PaymentMethod = (typeof paymentMethods)[number]['value'];
 export const paymentMethodLabel = (method: string) =>
   paymentMethods.find((item) => item.value === method)?.label ??
   (
-    { MANUAL: 'Pago manual (web)', SANDBOX: 'Pasarela en línea (prueba)' } as Record<string, string>
+    {
+      MANUAL: 'Pago manual (web)',
+      SANDBOX: 'Pasarela en línea (prueba)',
+      MERCADOPAGO: 'Mercado Pago',
+    } as Record<string, string>
   )[method] ??
   method;
+
+export type OnlineGateway = 'MERCADOPAGO' | 'SANDBOX';
+
+/** Online gateway the order page offers: the real one when enabled, otherwise the test one. */
+export function onlineGateway(
+  gateways: string[] | undefined,
+): { provider: OnlineGateway; label: string } | null {
+  if (gateways?.includes('MERCADOPAGO'))
+    return { provider: 'MERCADOPAGO', label: 'Pagar con Mercado Pago' };
+  if (gateways?.includes('SANDBOX'))
+    return { provider: 'SANDBOX', label: 'Pagar en línea (pasarela de prueba)' };
+  return null;
+}
 
 /** Message after returning from the gateway, decided by the order state the backend reports. */
 export function gatewayReturnNotice(orderStatus: string | null): {

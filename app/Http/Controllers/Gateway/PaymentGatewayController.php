@@ -10,8 +10,8 @@ class PaymentGatewayController extends GatewayController
     public function pay(Request $request): JsonResponse
     {
         if ($error = $this->requireLogin()) return $error;
-        // SANDBOX is the simulated online gateway; the platform rejects it unless it is enabled.
-        $data = $request->validate(['orderId' => 'required|uuid', 'provider' => 'required|in:MANUAL,SANDBOX']);
+        // Online gateways (SANDBOX is simulated): the platform rejects any that is not enabled.
+        $data = $request->validate(['orderId' => 'required|uuid', 'provider' => 'required|in:MANUAL,SANDBOX,MERCADOPAGO']);
         return $this->reply($this->api->authenticated('POST', '/api/payments', $data));
     }
 

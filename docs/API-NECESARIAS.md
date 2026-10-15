@@ -73,11 +73,10 @@ Revisado el 14 de octubre de 2026.
 
 ## Pagos — `payment-service`
 
-| Endpoint                                             | Método         | Request                                                            | Response                   | Motivo                                                             |
-| ---------------------------------------------------- | -------------- | ------------------------------------------------------------------ | -------------------------- | ------------------------------------------------------------------ |
-| `/api/payments`                                      | GET            | `?orderId` (dueño o `payments:confirm`)                            | `Payment[]`                | La web no puede consultar el pago de un pedido sin conocer su ID.  |
-| Proveedores `CASH`, `CARD`, `YAPE` y pagos múltiples | POST           | `{ orderId, provider, amount, reference }` por personal autorizado | `Payment`                  | Cobro en tienda; hoy solo el dueño del pedido puede crear el pago. |
-| Mercado Pago / Culqi                                 | POST + webhook | según pasarela                                                     | `Payment` con `paymentUrl` | Pago en línea sin confirmación manual.                             |
+| Endpoint                                             | Método | Request                                                            | Response    | Motivo                                                             |
+| ---------------------------------------------------- | ------ | ------------------------------------------------------------------ | ----------- | ------------------------------------------------------------------ |
+| `/api/payments`                                      | GET    | `?orderId` (dueño o `payments:confirm`)                            | `Payment[]` | La web no puede consultar el pago de un pedido sin conocer su ID.  |
+| Proveedores `CASH`, `CARD`, `YAPE` y pagos múltiples | POST   | `{ orderId, provider, amount, reference }` por personal autorizado | `Payment`   | Cobro en tienda; hoy solo el dueño del pedido puede crear el pago. |
 
 ## Punto de venta y caja — nuevo
 

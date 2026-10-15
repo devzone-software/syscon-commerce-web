@@ -3,6 +3,7 @@ import {
   billingForCustomer,
   cashChange,
   gatewayReturnNotice,
+  onlineGateway,
   paymentError,
   paymentMethodLabel,
 } from './sales';
@@ -54,5 +55,13 @@ describe('gateway return', () => {
     expect(gatewayReturnNotice('PAYMENT_PENDING').tone).toBe('info');
     expect(gatewayReturnNotice(null).text).toMatch(/intentar de nuevo/);
     expect(paymentMethodLabel('SANDBOX')).toMatch(/prueba/);
+    expect(paymentMethodLabel('MERCADOPAGO')).toBe('Mercado Pago');
+  });
+
+  it('offers Mercado Pago before the test gateway', () => {
+    expect(onlineGateway(['SANDBOX', 'MERCADOPAGO'])?.provider).toBe('MERCADOPAGO');
+    expect(onlineGateway(['SANDBOX'])?.label).toMatch(/prueba/);
+    expect(onlineGateway([])).toBeNull();
+    expect(onlineGateway(undefined)).toBeNull();
   });
 });

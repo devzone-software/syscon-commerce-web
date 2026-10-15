@@ -122,8 +122,8 @@ export const api = {
     delivery: Delivery;
     idempotencyKey: string;
   }) => request<Order>('/orders', { method: 'POST', body: json(order) }),
-  /** MANUAL returns the order's existing request; a gateway opens a new attempt when the last was rejected. */
-  createPayment: (orderId: string, provider: 'MANUAL' | 'SANDBOX' = 'MANUAL') =>
+  /** MANUAL returns the order's existing request; a gateway reuses its pending attempt or opens a new one. */
+  createPayment: (orderId: string, provider: 'MANUAL' | 'SANDBOX' | 'MERCADOPAGO' = 'MANUAL') =>
     request<Payment>('/payments', { method: 'POST', body: json({ orderId, provider }) }),
   paymentMethods: () => request<{ manual: boolean; gateways: string[] }>('/payment-methods'),
   payment: (id: string) => request<Payment>(`/payments/${encodeURIComponent(id)}`),

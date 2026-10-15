@@ -52,7 +52,7 @@ export const paymentStatusLabels: Record<string, string> = {
 export const orderEventLabels: Record<string, string> = {
   CREATED: 'Pedido registrado',
   STORE_SALE: 'Venta directa registrada',
-  PAYMENT_REQUESTED: 'Pago manual solicitado',
+  PAYMENT_REQUESTED: 'Pago solicitado',
   PAYMENT_CONFIRMED: 'Pago confirmado',
   STATUS_CHANGED: 'Cambio de estado',
   EXPIRED: 'Reserva vencida',
@@ -62,6 +62,7 @@ export const orderEventLabels: Record<string, string> = {
   NOTIFICATION_RESENT: 'Correo reenviado',
   PAYMENT_REJECTED: 'Pago en línea rechazado',
   PAYMENT_REFUND_REQUIRED: 'Pago recibido tras cancelar: requiere devolución',
+  PAYMENT_DUPLICATE_REFUND_REQUIRED: 'Cobro duplicado: requiere devolución',
   INVOICE_VOIDED: 'Comprobante anulado',
 };
 
