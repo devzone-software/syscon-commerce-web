@@ -511,7 +511,7 @@ export function Auth({ register = false }: { register?: boolean }) {
             )}
           </div>
           <div className="auth-strength-bars" aria-hidden="true">
-            {strength.checks.map((check, index) => (
+            {strength.checks.map((_, index) => (
               <i key={index} className={index < strength.passed ? 'is-on' : undefined} />
             ))}
           </div>
