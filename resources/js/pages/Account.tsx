@@ -36,7 +36,7 @@ export function Account() {
   const firstName = user?.firstName?.trim() || (user ? displayName(user) : '');
 
   return (
-    <AccountLayout title="Dashboard">
+    <AccountLayout title="Resumen">
       <section className="portal-welcome" aria-labelledby="portal-welcome-title">
         <div>
           <span className="portal-pill">

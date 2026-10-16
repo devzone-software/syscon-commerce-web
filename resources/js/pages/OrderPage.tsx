@@ -119,18 +119,20 @@ export function OrderPage() {
         data && (
           <>
             <PageSection title="Resumen de la compra">
-              <InfoRows
-                rows={[
-                  {
-                    label: 'Estado',
-                    value: <StatusBadge status={data.status} labels={orderStatusLabels} />,
-                  },
-                  { label: 'Total', value: money(Number(data.total)) },
-                  ...deliveryRows(data.delivery),
-                  ...billingRows(data.billing),
-                ]}
-              />
               <OrderTimeline status={data.status} />
+              <div className="order-info">
+                <InfoRows
+                  rows={[
+                    {
+                      label: 'Estado',
+                      value: <StatusBadge status={data.status} labels={orderStatusLabels} />,
+                    },
+                    { label: 'Total', value: money(Number(data.total)) },
+                    ...deliveryRows(data.delivery),
+                    ...billingRows(data.billing),
+                  ]}
+                />
+              </div>
               <h3 className="flow-subtitle">Productos</h3>
               <OrderLines order={data} />
             </PageSection>

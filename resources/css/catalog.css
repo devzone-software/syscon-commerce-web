@@ -9,21 +9,6 @@
   border-radius: var(--store-radius);
   padding: 8px 18px 16px;
 }
-.facet {
-  border: 0;
-  border-bottom: 1px solid var(--store-line);
-  margin: 0;
-  padding: 12px 0 14px;
-  min-width: 0;
-}
-.facet:last-child {
-  border-bottom: 0;
-}
-.facet legend {
-  padding: 12px 0 8px;
-  font: 700 13px Inter, sans-serif;
-  color: var(--store-ink);
-}
 .facet-option {
   display: flex;
   align-items: center;
@@ -88,21 +73,6 @@
 .catalog-sort select {
   padding: 9px 12px;
   font-size: 14px;
-}
-.active-filters {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-.active-filters ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 .chip {
   display: inline-flex;

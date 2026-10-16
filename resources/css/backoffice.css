@@ -155,7 +155,7 @@
 }
 .bo-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 18px;
 }
@@ -389,11 +389,11 @@
 
 @media (max-width: 1100px) {
   .bo-stats {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .bo-detail-grid,
   .bo-two-columns {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 @media (max-width: 860px) {
@@ -401,7 +401,7 @@
     display: grid;
   }
   .bo-body {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .bo-sidebar {
     display: none;
@@ -431,7 +431,7 @@
     display: none;
   }
   .bo-filters {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .bo-page-header {
     flex-direction: column;
@@ -439,6 +439,133 @@
 }
 @media (max-width: 480px) {
   .bo-stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .bo-stat {
+    padding: 14px;
+  }
+  .bo-stat strong {
+    font-size: 20px;
+  }
+  .bo-main > .bo-shortcuts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .bo-main > .bo-shortcuts .bo-shortcut {
+    padding: 14px;
+  }
+  .bo-main > .bo-shortcuts .bo-shortcut span {
+    display: none;
+  }
+}
+
+/* Panel: shortcuts first, then one bar per day of paid sales. */
+.bo-main > .bo-shortcuts {
+  margin-bottom: 18px;
+}
+.bo-week-chart {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.bo-week-chart li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  outline: none;
+}
+.bo-week-track {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  width: 100%;
+  height: 180px;
+  padding-top: 20px;
+  border-bottom: 1px solid var(--store-line);
+}
+.bo-week-bar {
+  width: min(48px, 60%);
+  border-radius: 4px 4px 0 0;
+  background: var(--store-brand);
+  transition: background 0.15s;
+}
+.bo-week-day {
+  font-size: 12px;
+  color: var(--store-muted);
+  white-space: nowrap;
+}
+.bo-week-tip {
+  position: absolute;
+  bottom: calc(100% - 8px);
+  z-index: 2;
+  display: none;
+  flex-direction: column;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--store-ink);
+  color: #fff;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.bo-week-chart li:hover .bo-week-tip,
+.bo-week-chart li:focus-visible .bo-week-tip {
+  display: flex;
+}
+.bo-week-chart li:hover .bo-week-bar,
+.bo-week-chart li:focus-visible .bo-week-bar {
+  background: var(--store-brand-strong, #0d3b82);
+}
+.bo-week-chart li:focus-visible .bo-week-day {
+  color: var(--store-ink);
+  font-weight: 700;
+}
+@media (max-width: 480px) {
+  .bo-week-chart {
+    gap: 4px;
+  }
+  .bo-week-track {
+    height: 120px;
+  }
+  .bo-week-day {
+    font-size: 10px;
+  }
+}
+.bo-week-value {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--store-ink);
+  white-space: nowrap;
+}
+
+/* Phones: status tabs in one scrollable row, dates side by side. */
+@media (max-width: 480px) {
+  .bo-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: -4px;
+    padding: 0 4px 4px;
+    scrollbar-width: none;
+  }
+  .bo-tabs button {
+    flex-shrink: 0;
+  }
+  .bo-filters-dates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bo-filters-dates > :first-child {
+    grid-column: 1 / -1;
+  }
+  .bo-main .data-table td:first-child {
+    white-space: nowrap;
   }
 }

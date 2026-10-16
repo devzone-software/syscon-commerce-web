@@ -788,7 +788,7 @@
   }
   .contact-main,
   .contact-location {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .contact-hero,
   .contact-whatsapp,
@@ -801,7 +801,7 @@
   .contact-channels,
   .contact-areas ul,
   .contact-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .contact-hero h1 {
     font-size: 28px;

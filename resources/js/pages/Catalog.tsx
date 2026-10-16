@@ -69,6 +69,18 @@ export function Catalog() {
   const filters = useMemo(() => readFilters(new URLSearchParams(paramsKey)), [paramsKey]);
   const [query, setQuery] = useState(filters.query);
   useEffect(() => setQuery(filters.query), [filters.query]);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  // The mobile filter panel covers the page: freeze the page behind it and close it with Escape.
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const close = (event: KeyboardEvent) => event.key === 'Escape' && setFiltersOpen(false);
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', close);
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', close);
+    };
+  }, [filtersOpen]);
 
   const facets = useMemo(() => {
     const products = data ?? [];
@@ -217,11 +229,24 @@ export function Catalog() {
             total={facets.total}
             inStock={facets.inStock}
             priceBounds={facets.bounds}
+            results={facets.results.length}
+            open={filtersOpen}
             onChange={update}
             onClear={clear}
+            onClose={() => setFiltersOpen(false)}
           />
           <section className="catalog-main" aria-label="Resultados">
             <div className="catalog-bar">
+              <button
+                type="button"
+                className="catalog-filter-toggle"
+                aria-controls="catalog-filters"
+                aria-expanded={filtersOpen}
+                onClick={() => setFiltersOpen(true)}
+              >
+                <img src={filterIcon} alt="" /> Filtros
+                {chips.length > 0 && <span>{chips.length}</span>}
+              </button>
               <p aria-live="polite">
                 Mostrando{' '}
                 <strong>

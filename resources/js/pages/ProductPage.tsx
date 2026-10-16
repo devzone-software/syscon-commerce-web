@@ -7,10 +7,17 @@ import { ProductImage } from '../components/ProductImage';
 import { InfoRows } from '../components/cart/OrderSummary';
 import { PageSection } from '../components/layout/PageHero';
 import { QuantityStepper } from '../components/shared/QuantityStepper';
-import { CartIcon } from '../components/icons';
+import { CartIcon, HeadsetIcon, ReceiptIcon, ShieldIcon, TruckIcon } from '../components/icons';
 import { relatedProducts } from '../lib/catalog';
 import { useData, Loading, Empty, ProductCard } from '../ui';
 import '../../css/storefront.css';
+
+const perks = [
+  { icon: <ReceiptIcon size={18} />, text: 'Boleta o factura electrónica con tu compra' },
+  { icon: <ShieldIcon size={18} />, text: 'Garantía oficial del fabricante' },
+  { icon: <TruckIcon size={18} />, text: 'Recojo en tienda o envío coordinado' },
+  { icon: <HeadsetIcon size={18} />, text: 'Asesoría técnica antes y después de comprar' },
+];
 
 export function ProductPage() {
   const { id = '' } = useParams();
@@ -127,6 +134,14 @@ export function ProductPage() {
                   Tienes {inCart} {inCart === 1 ? 'unidad' : 'unidades'} en tu carrito.
                 </p>
               )}
+              <ul className="product-perks">
+                {perks.map(({ icon, text }) => (
+                  <li key={text}>
+                    {icon}
+                    {text}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
@@ -146,19 +161,6 @@ export function ProductPage() {
         <p className="flow-note">
           El precio y el stock se validan nuevamente al confirmar el pedido.
         </p>
-      </PageSection>
-      <PageSection soft>
-        <ul className="benefit-cards">
-          <li>
-            <strong>Pago seguro</strong>Compra protegida y facturación electrónica.
-          </li>
-          <li>
-            <strong>Garantía</strong>Producto con respaldo y soporte.
-          </li>
-          <li>
-            <strong>Asesoría</strong>Orientación técnica antes de comprar.
-          </li>
-        </ul>
       </PageSection>
       {related.length > 0 && (
         <PageSection title={data.category ? `Más en ${data.category}` : `Más de ${data.brand}`}>

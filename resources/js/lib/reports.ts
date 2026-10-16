@@ -15,12 +15,22 @@ export function limaDate(date: Date): string {
   }).format(date);
 }
 
-/** Default period: the last 30 days including today, same as the platform. */
-export function defaultPeriod(now = new Date()) {
+/** The last `days` days including today; 30 by default, same as the platform. */
+export function defaultPeriod(now = new Date(), days = 30) {
   const to = limaDate(now);
   const from = new Date(`${to}T12:00:00Z`);
-  from.setUTCDate(from.getUTCDate() - 29);
+  from.setUTCDate(from.getUTCDate() - (days - 1));
   return { from: from.toISOString().slice(0, 10), to };
+}
+
+/** Every date of a period (YYYY-MM-DD), so days without sales still show up. */
+export function periodDays({ from, to }: { from: string; to: string }): string[] {
+  const days: string[] = [];
+  for (let day = new Date(`${from}T12:00:00Z`); day.toISOString().slice(0, 10) <= to;) {
+    days.push(day.toISOString().slice(0, 10));
+    day.setUTCDate(day.getUTCDate() + 1);
+  }
+  return days;
 }
 
 /** Same limits as ReportController: valid dates, ordered, at most 366 days. */

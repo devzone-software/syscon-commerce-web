@@ -645,7 +645,7 @@
   .about-hero,
   .about-identity,
   .about-trust .container {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .about-hero figure {
     margin-bottom: 20px;
@@ -683,7 +683,7 @@
   .about-reasons,
   .about-purpose,
   .about-trust ul {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .about-purpose article,
   .about-cta {

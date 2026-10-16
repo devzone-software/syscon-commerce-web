@@ -7,7 +7,7 @@ import {
   type CatalogFilters,
   type CatalogGroup,
 } from '../../lib/catalog';
-import { ArrowRightIcon, HeadsetIcon, SearchIcon } from '../icons';
+import { ArrowRightIcon, CloseIcon, HeadsetIcon, SearchIcon } from '../icons';
 import '../../../css/products.css';
 
 type Change = (changes: Record<string, string>, replace?: boolean) => void;
@@ -46,6 +46,7 @@ function Option({
 /**
  * Filter panel of Figma "Client / Productos": categories, price range with a dual slider,
  * brands with their own search and availability, plus the corporate desk banner.
+ * On small screens it is a full-screen panel that `open` shows and `onClose` hides.
  */
 export function CatalogSidebar({
   filters,
@@ -54,8 +55,11 @@ export function CatalogSidebar({
   total,
   inStock,
   priceBounds,
+  results,
+  open,
   onChange,
   onClear,
+  onClose,
 }: {
   filters: CatalogFilters;
   categories: CatalogGroup[];
@@ -63,8 +67,11 @@ export function CatalogSidebar({
   total: number;
   inStock: number;
   priceBounds: [number, number];
+  results: number;
+  open: boolean;
   onChange: Change;
   onClear: () => void;
+  onClose: () => void;
 }) {
   const [brandQuery, setBrandQuery] = useState('');
   const [min, max] = priceBounds;
@@ -78,7 +85,11 @@ export function CatalogSidebar({
     onChange({ [key]: value === bound ? '' : String(value) }, true);
 
   return (
-    <aside className="catalog-side" aria-label="Filtros del catálogo">
+    <aside
+      id="catalog-filters"
+      className={`catalog-side${open ? ' is-open' : ''}`}
+      aria-label="Filtros del catálogo"
+    >
       <div className="side-card">
         <div className="side-head">
           <h2>
@@ -86,6 +97,14 @@ export function CatalogSidebar({
           </h2>
           <button type="button" onClick={onClear}>
             Limpiar filtros
+          </button>
+          <button
+            type="button"
+            className="side-close"
+            onClick={onClose}
+            aria-label="Cerrar filtros"
+          >
+            <CloseIcon />
           </button>
         </div>
         <Block title="Categorías">
@@ -227,6 +246,11 @@ export function CatalogSidebar({
         <Link to="/contacto">
           Cotizar con Asesor <ArrowRightIcon size={14} />
         </Link>
+      </div>
+      <div className="side-apply">
+        <button type="button" onClick={onClose}>
+          Ver {results} {results === 1 ? 'producto' : 'productos'}
+        </button>
       </div>
     </aside>
   );

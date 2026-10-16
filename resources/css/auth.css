@@ -555,7 +555,7 @@
 
 @media (max-width: 860px) {
   .auth-card {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .auth-panel ul {
     display: none;
@@ -574,7 +574,7 @@
   }
   .auth-grid,
   .auth-assurance {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .auth-title-row {
     flex-direction: column;

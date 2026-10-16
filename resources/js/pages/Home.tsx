@@ -1,6 +1,5 @@
-import { useEffect, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
-import { ProductBrowser } from '../components/catalog/ProductBrowser';
+import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import {
   B2BBanner,
   CategoryShowcase,
@@ -9,31 +8,28 @@ import {
   PromoBanner,
   TrustStrip,
 } from '../components/home/HomeSections';
+import { ArrowRightIcon } from '../components/icons';
 import { groupProducts, pickFeatured } from '../lib/catalog';
 import { api } from '../services/api';
 import { useData, ErrorBox, Loading, Empty } from '../ui';
 
+const count = new Intl.NumberFormat('es-PE');
+
 export function Home() {
   const { data, loading, error, reload } = useData(api.products);
-  const { hash } = useLocation();
   const summary = useMemo(
     () =>
       data && {
         categories: groupProducts(data, 'category').slice(0, 8),
-        featured: pickFeatured(data, 4),
+        featured: pickFeatured(data, 8),
       },
     [data],
   );
 
-  // Links such as /#productos point at sections that only exist once the catalog loads.
-  useEffect(() => {
-    if (hash && summary) document.getElementById(hash.slice(1))?.scrollIntoView();
-  }, [hash, summary]);
-
   return (
     <div className="container home">
-      <TrustStrip />
       <HomeHero />
+      <TrustStrip />
       {loading ? (
         <Loading />
       ) : error ? (
@@ -42,14 +38,16 @@ export function Home() {
         <>
           <CategoryShowcase categories={summary.categories} />
           <FeaturedProducts products={summary.featured} />
-          <PromoBanner />
-          <div id="productos">
-            <ProductBrowser
-              products={data}
-              eyebrow="Catálogo oficial SYSCON"
-              title="Nuestros productos"
-            />
+          <div className="home-catalog-cta">
+            <p>
+              <strong>{count.format(data.length)} productos</strong> con stock y precios
+              actualizados, con filtros por categoría, marca y precio.
+            </p>
+            <Link to="/catalogo">
+              Ver todo el catálogo <ArrowRightIcon size={16} />
+            </Link>
           </div>
+          <PromoBanner />
         </>
       ) : (
         <Empty

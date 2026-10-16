@@ -1,13 +1,5 @@
 import { Link } from 'react-router-dom';
 import arrowIcon from '../../../images/categories/arrow-right.svg';
-import componentsIcon from '../../../images/categories/components.svg';
-import laptopIcon from '../../../images/categories/laptop.svg';
-import officeIcon from '../../../images/categories/office.svg';
-import peripheralsIcon from '../../../images/categories/peripherals.svg';
-import securityIcon from '../../../images/categories/security.svg';
-import serverIcon from '../../../images/categories/server.svg';
-import softwareIcon from '../../../images/categories/software.svg';
-import storageIcon from '../../../images/categories/storage.svg';
 import b2bIcon from '../../../images/home/b2b-building.svg';
 import b2bMailIcon from '../../../images/home/b2b-mail.svg';
 import heroBagIcon from '../../../images/home/hero-bag.svg';
@@ -21,7 +13,8 @@ import trustBoltIcon from '../../../images/home/trust-bolt.svg';
 import trustLockIcon from '../../../images/home/trust-lock.svg';
 import trustShieldIcon from '../../../images/home/trust-shield.svg';
 import trustSupportIcon from '../../../images/home/trust-support.svg';
-import { catalogParams, normalize, productCount, type CatalogGroup } from '../../lib/catalog';
+import { catalogParams, productCount, type CatalogGroup } from '../../lib/catalog';
+import { categoryIcon } from '../../lib/categoryIcon';
 import type { Product } from '../../types';
 import { ProductCard } from '../../ui';
 import '../../../css/storefront.css';
@@ -84,19 +77,6 @@ export function HomeHero() {
     </section>
   );
 }
-
-/** The catalog categories are free text, so each one gets the icon of the closest family. */
-const categoryIcons: [RegExp, string][] = [
-  [/office|ofimatic|productiv/, officeIcon],
-  [/software|licenc|windows|sistema/, softwareIcon],
-  [/segur|antivirus|camara|vigilan/, securityIcon],
-  [/laptop|computa|\bpc\b|notebook|equipo/, laptopIcon],
-  [/servidor|red|router|switch|rack|cable|conect|access/, serverIcon],
-  [/almacen|ssd|disco|nas/, storageIcon],
-  [/componente|memoria|ram|tarjeta|grafica|procesador/, componentsIcon],
-];
-export const categoryIcon = (name: string) =>
-  categoryIcons.find(([pattern]) => pattern.test(normalize(name)))?.[1] ?? peripheralsIcon;
 
 export function CategoryShowcase({ categories }: { categories: CatalogGroup[] }) {
   return (

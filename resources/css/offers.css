@@ -744,7 +744,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .offers-spotlight-body {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .offers-filters-row {
     grid-template-columns: 1fr 1fr;
@@ -765,7 +765,7 @@
   .offers-ending ul,
   .offers-trust ul,
   .offers-filters-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .offers-b2b {
     flex-direction: column;
@@ -776,5 +776,10 @@
   }
   .offers-spotlight-stock {
     margin-left: 0;
+  }
+}
+@media (max-width: 560px) {
+  .offers-ending {
+    padding: 20px 16px;
   }
 }

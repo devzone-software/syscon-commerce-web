@@ -28,8 +28,15 @@
 }
 
 .table-wrap {
+  position: relative;
   width: 100%;
   overflow-x: auto;
+  /* Scroll shadows: a soft edge appears on the side where more columns are hidden. */
+  background:
+    linear-gradient(to right, #fff 30%, #fff0) left / 32px 100% no-repeat local,
+    linear-gradient(to left, #fff 30%, #fff0) right / 32px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, #00265d26, #00265d00) left / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, #00265d26, #00265d00) right / 12px 100% no-repeat scroll;
 }
 .data-table {
   width: 100%;

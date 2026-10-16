@@ -63,7 +63,7 @@ export function AccountLayout({ title, children }: { title: string; children: Re
         <nav onClick={() => setOpen(false)}>
           <p>Mi cuenta</p>
           <NavLink to="/cuenta" end>
-            <GridIcon size={18} /> Dashboard / Resumen
+            <GridIcon size={18} /> Resumen
           </NavLink>
           <p>Pedidos</p>
           <NavLink to="/cuenta/pedidos">

@@ -8,7 +8,7 @@ import trustLockIcon from '../../images/home/trust-lock.svg';
 import trustShieldIcon from '../../images/home/trust-shield.svg';
 import trustSupportIcon from '../../images/home/trust-support.svg';
 import { ProductImage } from '../components/ProductImage';
-import { categoryIcon } from '../components/home/HomeSections';
+import { categoryIcon } from '../lib/categoryIcon';
 import { company } from '../components/layout/Header';
 import { ArrowRightIcon, CartIcon, HeadsetIcon, SearchIcon, ShieldIcon } from '../components/icons';
 import { catalogParams, groupProducts, productCount } from '../lib/catalog';

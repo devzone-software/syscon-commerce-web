@@ -714,7 +714,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .category-campaigns {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .categories-cta {
     flex-direction: column;
@@ -736,7 +736,7 @@
   .showcase-grid,
   .brand-tiles,
   .categories-trust {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .categories-cta {
     padding: 28px 22px;

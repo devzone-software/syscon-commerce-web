@@ -302,46 +302,15 @@
   min-height: 48px;
   margin: 0;
 }
-.benefit-cards {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.benefit-cards li {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-height: 150px;
-  padding: 18px;
-  border-radius: 14px;
-  background: #fff;
-  font-size: 12px;
-  line-height: 18px;
-  color: #59616e;
-}
-.benefit-cards strong {
-  font-size: 15px;
-  line-height: 20px;
-  color: #00265d;
-}
 
 @media (max-width: 860px) {
   .product-detail {
-    grid-template-columns: 1fr;
-  }
-  .benefit-cards {
-    grid-template-columns: 1fr;
-  }
-  .benefit-cards li {
-    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 @media (max-width: 600px) {
   .info-rows > div {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2px;
     padding: 10px 14px;
   }
@@ -421,7 +390,7 @@
 }
 @media (max-width: 560px) {
   .billing-choice {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 .billing-option strong {
@@ -445,4 +414,50 @@
 .billing-option > span {
   flex: 1;
   min-width: 0;
+}
+
+/* Purchase assurances under the buy button. */
+.product-perks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 20px;
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid #e3e8f2;
+  list-style: none;
+  font-size: 13px;
+  line-height: 18px;
+  color: #434751;
+}
+.product-perks li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.product-perks svg {
+  flex-shrink: 0;
+  color: #00658d;
+}
+@media (max-width: 600px) {
+  .product-perks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Order detail: the timeline first, then the data in two columns. */
+.order-info {
+  margin-top: 24px;
+}
+.order-info .info-rows {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.order-info .info-rows > div {
+  grid-template-columns: minmax(0, 140px) minmax(0, 1fr);
+}
+@media (max-width: 860px) {
+  .order-info .info-rows {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

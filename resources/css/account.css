@@ -775,12 +775,12 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .portal-columns {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 @media (max-width: 960px) {
   .portal {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .portal-sidebar {
     position: fixed;
@@ -829,7 +829,7 @@
   .portal-kpis,
   .portal-ops,
   .portal-items {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 @media (min-width: 961px) {
@@ -840,5 +840,25 @@
 @media (prefers-reduced-motion: reduce) {
   .portal-sidebar {
     transition: none;
+  }
+}
+
+/* Phones: two compact KPI cards per row. */
+@media (max-width: 480px) {
+  .portal-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .portal-kpis li {
+    padding: 14px;
+  }
+  .portal-kpis i,
+  .portal-kpis em,
+  .portal-kpis small {
+    display: none;
+  }
+  .portal-kpis strong {
+    font-size: 22px;
+    line-height: 28px;
   }
 }

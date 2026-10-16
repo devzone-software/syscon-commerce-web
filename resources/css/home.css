@@ -331,7 +331,7 @@ input:focus-visible {
 }
 .store-menu nav {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   padding: 12px 0 18px;
 }
@@ -718,12 +718,56 @@ input:focus-visible {
     display: none;
   }
   .store-footer-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .card-product {
     transition: none;
+  }
+}
+
+/* Small phones: two compact cards per row. */
+@media (max-width: 480px) {
+  .card-product {
+    padding: 10px;
+    gap: 2px;
+  }
+  .card-product-media {
+    height: 120px;
+  }
+  .card-product-stock {
+    bottom: 6px;
+    left: 6px;
+    font-size: 9px;
+  }
+  .card-product-category {
+    font-size: 10px;
+  }
+  .card-product-title {
+    font-size: 14px;
+    line-height: 19px;
+  }
+  .card-product-meta,
+  .card-product-view {
+    display: none;
+  }
+  .card-product-price {
+    padding-top: 8px;
+    font-size: 18px;
+    line-height: 24px;
+  }
+  .card-product-actions {
+    margin-top: 8px;
+  }
+  .card-product-add {
+    min-height: 40px;
+  }
+}
+@media (max-width: 480px) {
+  .card-product-stock {
+    top: 6px;
+    bottom: auto;
   }
 }

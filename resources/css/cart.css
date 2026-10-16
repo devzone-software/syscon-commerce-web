@@ -1,11 +1,4 @@
 /* Cart and order summary (the summary is reused by checkout). */
-.cart-heading {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
 .cart-clear-confirm {
   display: flex;
   align-items: center;
@@ -48,6 +41,9 @@
   height: 100%;
   object-fit: contain;
   padding: 8px;
+}
+.cart-line-media .image-fallback small {
+  display: none;
 }
 .cart-line-media .image-fallback {
   font-size: 9px;
