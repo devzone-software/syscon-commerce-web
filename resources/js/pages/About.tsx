@@ -22,6 +22,7 @@ import {
 import { groupProducts } from '../lib/catalog';
 import { api } from '../services/api';
 import { useData } from '../ui';
+import '../../css/about.css';
 
 const count = new Intl.NumberFormat('es-PE');
 

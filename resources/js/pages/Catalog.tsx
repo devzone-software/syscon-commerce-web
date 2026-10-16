@@ -23,6 +23,8 @@ import {
 } from '../lib/catalog';
 import { api } from '../services/api';
 import { useData, ErrorBox, Loading, Empty } from '../ui';
+import '../../css/products.css';
+import '../../css/storefront.css';
 
 const PAGE_SIZES = [12, 24, 48];
 const count = new Intl.NumberFormat('es-PE');

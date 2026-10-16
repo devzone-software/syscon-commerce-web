@@ -25,6 +25,8 @@ import { money } from '../state';
 import { useConfirmAdd } from '../components/cart/AddToCartDialog';
 import type { Product } from '../types';
 import { useData, ErrorBox, Loading, Empty } from '../ui';
+import '../../css/offers.css';
+import '../../css/categories.css';
 
 const PAGE_SIZE = 8;
 const priceRanges = [

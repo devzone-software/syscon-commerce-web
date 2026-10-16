@@ -4,6 +4,7 @@ import { money } from '../../state';
 import { useConfirmAdd } from '../cart/AddToCartDialog';
 import type { Product } from '../../types';
 import { ProductImage } from '../ProductImage';
+import '../../../css/products.css';
 
 /** Stock at or below this level shows the red "últimas unidades" state from Figma. */
 export const LOW_STOCK = 5;

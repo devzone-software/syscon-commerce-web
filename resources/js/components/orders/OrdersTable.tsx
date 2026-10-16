@@ -3,6 +3,7 @@ import { orderStatusLabels, shortId } from '../../lib/orders';
 import { money } from '../../state';
 import type { Order } from '../../types';
 import { StatusBadge } from '../shared/StatusBadge';
+import '../../../css/account.css';
 
 const units = (order: Order) => order.details.reduce((sum, line) => sum + line.quantity, 0);
 

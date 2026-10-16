@@ -4,6 +4,7 @@ import {
   type CatalogFilters as Filters,
   type CatalogGroup,
 } from '../../lib/catalog';
+import '../../../css/storefront.css';
 
 const VISIBLE_OPTIONS = 7;
 

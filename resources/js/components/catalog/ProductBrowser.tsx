@@ -12,6 +12,7 @@ import type { Product } from '../../types';
 import { Empty, ProductCard } from '../../ui';
 import { ActiveFilters } from './ActiveFilters';
 import { CatalogFilters } from './CatalogFilters';
+import '../../../css/storefront.css';
 
 const FIRST_PAGE = 8;
 const NEXT_PAGE = 8;

@@ -5,6 +5,7 @@ import { orderStatusLabels, statusLabel } from '../lib/orders';
 import { api } from '../services/api';
 import { useData, ErrorBox, Loading, Empty } from '../ui';
 import { OrdersTable } from '../components/orders/OrdersTable';
+import '../../css/storefront.css';
 
 export function Orders() {
   const { data, error, loading, reload } = useData(api.orders);

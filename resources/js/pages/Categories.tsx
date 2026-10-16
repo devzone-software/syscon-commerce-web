@@ -17,6 +17,7 @@ import { money } from '../state';
 import { useConfirmAdd } from '../components/cart/AddToCartDialog';
 import type { Product } from '../types';
 import { useData, ErrorBox, Loading, Empty } from '../ui';
+import '../../css/categories.css';
 
 const byCategory = (name: string) =>
   `/catalogo?${catalogParams.category}=${encodeURIComponent(name)}`;

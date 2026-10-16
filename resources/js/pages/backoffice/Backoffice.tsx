@@ -18,6 +18,7 @@ import { ReportsAdmin } from './ReportsAdmin';
 import { SalesReport } from './SalesReport';
 import { SuppliersAdmin } from './SuppliersAdmin';
 import { TaxonomyAdmin } from './TaxonomyAdmin';
+import '../../../css/backoffice.css';
 
 type Section = {
   path: string;

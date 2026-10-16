@@ -10,6 +10,7 @@ import { QuantityStepper } from '../components/shared/QuantityStepper';
 import { CartIcon } from '../components/icons';
 import { relatedProducts } from '../lib/catalog';
 import { useData, Loading, Empty, ProductCard } from '../ui';
+import '../../css/storefront.css';
 
 export function ProductPage() {
   const { id = '' } = useParams();

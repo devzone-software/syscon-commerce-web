@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import logo from '../../../images/header/logo-grupo-syscon.jpg';
 import { company } from '../layout/Header';
 import { ArrowLeftIcon, PhoneIcon, ShieldIcon } from '../icons';
+import '../../../css/auth.css';
 
 export type AuthFeature = { icon: ReactNode; text: ReactNode };
 

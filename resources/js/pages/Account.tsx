@@ -24,6 +24,7 @@ import { api } from '../services/api';
 import { money, useShop } from '../state';
 import type { Order } from '../types';
 import { useData, ErrorBox, Loading, Empty } from '../ui';
+import '../../css/account.css';
 
 const units = (order: Order) => order.details.reduce((sum, line) => sum + line.quantity, 0);
 

@@ -8,6 +8,7 @@ import {
   type CatalogGroup,
 } from '../../lib/catalog';
 import { ArrowRightIcon, HeadsetIcon, SearchIcon } from '../icons';
+import '../../../css/products.css';
 
 type Change = (changes: Record<string, string>, replace?: boolean) => void;
 

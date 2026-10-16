@@ -55,6 +55,10 @@ Configura `PLATFORM_API_URL` en `.env` antes de probar datos reales; con `php ar
 
 El proyecto no guarda usuarios, productos, pedidos ni pagos en una base Laravel. Las sesiones y la caché usan archivos. El precio, el stock, el IGV, el total y las transiciones de estado los decide la plataforma; la web muestra los importes como cadenas decimales tal como llegan.
 
+## Hostinger compartido (despliegue ligero)
+
+`bash bin/build-hostinger.sh` genera un ZIP listo para subir, sin Docker ni Node en el servidor. La guía está en [docs/HOSTINGER.md](docs/HOSTINGER.md).
+
 ## Docker y Hostinger VPS
 
 ```bash

@@ -16,6 +16,7 @@ import {
   StoreIcon,
   TruckIcon,
 } from '../icons';
+import '../../../css/account.css';
 
 /**
  * Customer portal shell from Figma "Client / Mi cuenta": sidebar with the profile card and the

@@ -19,6 +19,7 @@ import {
 } from '../components/icons';
 import { company } from '../components/layout/Header';
 import { isEmail } from '../lib/validation';
+import '../../css/contact.css';
 
 const whatsapp = { label: '+51 987 654 321', href: 'https://wa.me/51987654321' };
 const address = 'Av. República de Panamá 3545, San Isidro, Lima';

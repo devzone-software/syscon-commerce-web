@@ -24,6 +24,7 @@ import trustSupportIcon from '../../../images/home/trust-support.svg';
 import { catalogParams, normalize, productCount, type CatalogGroup } from '../../lib/catalog';
 import type { Product } from '../../types';
 import { ProductCard } from '../../ui';
+import '../../../css/storefront.css';
 
 const trust = [
   { icon: trustLockIcon, title: 'Compra segura', text: 'Pagos protegidos y certificados' },
