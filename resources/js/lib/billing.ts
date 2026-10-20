@@ -40,7 +40,7 @@ export type NoteMode = 'full' | 'items' | 'amount';
 /** Reasons the platform supports: catalog 09 for credit notes, catalog 10 for debit notes. */
 export const noteReasons: Record<
   '07' | '08',
-  { value: string; label: string; mode: NoteMode; help: string }[]
+  { value: string; label: string; mode: NoteMode; help: string; invoiceOnly?: boolean }[]
 > = {
   '07': [
     {
@@ -54,6 +54,8 @@ export const noteReasons: Record<
       label: 'Anulación por error en el RUC',
       mode: 'full',
       help: 'Revierte todo el comprobante para emitir otro con el documento correcto.',
+      // A boleta has no customer RUC: it is annulled with 01.
+      invoiceOnly: true,
     },
     {
       value: '06',
@@ -100,6 +102,18 @@ export const noteReasonFor = (type: string, code: string | null | undefined) =>
   type === '07' || type === '08'
     ? noteReasons[type].find((item) => item.value === code)
     : undefined;
+
+/** Warning for a draft with a SUNAT send deadline; `today` is the Lima date (YYYY-MM-DD). */
+export function sendDeadlineNotice(deadline: string | null | undefined, today: string) {
+  if (!deadline) return null;
+  const day = deadline.split('-').reverse().join('/');
+  return deadline < today
+    ? {
+        expired: true,
+        text: `El plazo para enviarlo a SUNAT venció el ${day}; ya no se puede enviar.`,
+      }
+    : { expired: false, text: `Envíalo a SUNAT a más tardar el ${day}.` };
+}
 
 export type InvoiceFormat = 'pdf' | 'xml' | 'cdr';
 

@@ -9,6 +9,8 @@ import {
   invoiceValidity,
   isValidRuc,
   notePayload,
+  noteReasons,
+  sendDeadlineNotice,
   seriesFor,
   seriesPrefix,
   taxPercent,
@@ -277,5 +279,22 @@ describe('boleta without document', () => {
       name: 'CLIENTES VARIOS',
       address: null,
     });
+  });
+});
+
+describe('SUNAT rules for notes and send deadline', () => {
+  it('marks reason 02 as invoice only', () => {
+    expect(noteReasons['07'].filter((item) => item.invoiceOnly).map((item) => item.value)).toEqual([
+      '02',
+    ]);
+  });
+
+  it('warns before the deadline and blocks after it', () => {
+    expect(sendDeadlineNotice(null, '2026-10-20')).toBeNull();
+    expect(sendDeadlineNotice('2026-10-20', '2026-10-20')).toEqual({
+      expired: false,
+      text: 'Envíalo a SUNAT a más tardar el 20/10/2026.',
+    });
+    expect(sendDeadlineNotice('2026-10-19', '2026-10-20')?.expired).toBe(true);
   });
 });

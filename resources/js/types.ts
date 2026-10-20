@@ -400,6 +400,8 @@ export type Invoice = {
   /** The endpoint is SUNAT's test service: accepted documents are tests. */
   test?: boolean;
   hasCdr?: boolean;
+  /** Last day (YYYY-MM-DD, Lima) to send a draft to SUNAT; null when no limit is configured. */
+  sendDeadline?: string | null;
   /** Voiding requests: RA (voided notice) or RC (daily summary), processed by ticket. */
   voids?: {
     id: string;

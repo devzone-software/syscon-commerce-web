@@ -17,12 +17,14 @@ import {
   notePayload,
   SERIES,
   seriesFor,
+  sendDeadlineNotice,
   seriesPrefix,
   taxPercent,
   validateInvoice,
   type InvoiceInput,
 } from '../../lib/billing';
 import { formatDateTime, shortId } from '../../lib/orders';
+import { limaDate } from '../../lib/reports';
 import { isUuid } from '../../lib/validation';
 import { api } from '../../services/api';
 import { money, useShop } from '../../state';
@@ -312,11 +314,15 @@ function InvoiceForm({
                 {...invalid('noteCode')}
               >
                 <option value="">Selecciona…</option>
-                {noteReasons[form.type].map((item) => (
-                  <option key={item.value} value={item.value}>
-                    {item.value} · {item.label}
-                  </option>
-                ))}
+                {noteReasons[form.type]
+                  .filter(
+                    (item) => !(item.invoiceOnly && form.referencedSerialNumber?.startsWith('B')),
+                  )
+                  .map((item) => (
+                    <option key={item.value} value={item.value}>
+                      {item.value} · {item.label}
+                    </option>
+                  ))}
               </select>
               {fieldError('noteCode')}
               {reason && <small>{reason.help}</small>}
@@ -703,7 +709,8 @@ function InvoiceDetail({ id, notice }: { id: string; notice: string }) {
   if (loading) return <Loading />;
   if (error || !data)
     return <ErrorBox message={error || 'Comprobante no encontrado.'} retry={reload} />;
-  const canSubmit = data.status === 'DRAFT' || data.status === 'FAILED';
+  const deadline = sendDeadlineNotice(data.sendDeadline, limaDate(new Date()));
+  const canSubmit = (data.status === 'DRAFT' || data.status === 'FAILED') && !deadline?.expired;
   const runAction = async (action: () => Promise<Invoice>, done: string) => {
     setBusy(true);
     setMessage('');
@@ -832,6 +839,11 @@ function InvoiceDetail({ id, notice }: { id: string; notice: string }) {
           </a>
         )}
       </div>
+      {deadline && (
+        <p className={`notice${deadline.expired ? ' error' : ''}`} role="note">
+          {deadline.text}
+        </p>
+      )}
       {data.error && (
         <p className="notice error">
           Último error de envío: {data.error}. El reintento usa el mismo número {data.serialNumber}.
