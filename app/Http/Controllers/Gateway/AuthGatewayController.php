@@ -87,6 +87,23 @@ class AuthGatewayController extends GatewayController
             'lastName' => $claims['family_name'] ?? null,
             'roles' => array_values(array_filter($authorities, fn ($a) => str_starts_with($a, 'ROLE_'))),
             'permissions' => array_values(array_filter($authorities, fn ($a) => ! str_starts_with($a, 'ROLE_'))),
+            // Temporary password handed out by the superadmin: the store asks for a new one before anything else.
+            'mustChangePassword' => (bool) ($claims['pwd_change'] ?? false),
         ]]);
+    }
+
+    /** Own password change; the platform closes every other session and returns a fresh token pair. */
+    public function password(Request $request): JsonResponse
+    {
+        if ($error = $this->requireIdentityConfig()) return $error;
+        if ($error = $this->requireLogin()) return $error;
+        $data = $request->validate([
+            'currentPassword' => 'required|string',
+            'newPassword' => 'required|string|min:12|max:128|confirmed|different:currentPassword',
+        ]);
+        $result = $this->api->authenticated('POST', '/api/auth/password', ['currentPassword' => $data['currentPassword'], 'newPassword' => $data['newPassword']]);
+        if ($result['status'] !== 200 || ! isset($result['body']['data']['accessToken'], $result['body']['data']['refreshToken'])) return $this->reply($result);
+        session(['syscon.access' => $result['body']['data']['accessToken'], 'syscon.refresh' => $result['body']['data']['refreshToken']]);
+        return response()->json(['success' => true, 'message' => 'Contraseña actualizada.', 'data' => null]);
     }
 }

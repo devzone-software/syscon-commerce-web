@@ -280,6 +280,18 @@ class GatewayTest extends TestCase
         $this->withSession($session)->getJson('/web-api/admin/customers?q=ana')->assertOk();
     }
 
+    public function test_cash_register_has_its_own_permission(): void
+    {
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            'java.test/api/admin/cash/current' => Http::response(['success' => true, 'data' => null], 200),
+        ]);
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_SUPERADMIN', 'sales:create']), 'refresh' => 'r']])
+            ->getJson('/web-api/admin/cash/current')->assertForbidden();
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'cash:manage']), 'refresh' => 'r']])
+            ->getJson('/web-api/admin/cash/current')->assertOk();
+    }
+
     public function test_notification_resend_requires_order_management(): void
     {
         $id = '00000000-0000-0000-0000-0000000000cc';
@@ -339,5 +351,72 @@ class GatewayTest extends TestCase
             ->postJson('/web-api/logout')->assertOk()->assertHeader('X-CSRF-TOKEN');
         $this->assertNull(session('syscon.refresh'));
         $this->getJson('/web-api/me')->assertUnauthorized();
+    }
+
+    public function test_me_flags_a_temporary_password(): void
+    {
+        Http::fake(['java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200)]);
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_ADMIN'], ['pwd_change' => true]), 'refresh' => 'r']])
+            ->getJson('/web-api/me')->assertOk()->assertJsonPath('data.mustChangePassword', true)->assertJsonPath('data.permissions', []);
+        $this->withSession(['syscon' => ['access' => $this->token(), 'refresh' => 'r']])
+            ->getJson('/web-api/me')->assertOk()->assertJsonPath('data.mustChangePassword', false);
+    }
+
+    public function test_password_change_requires_confirmation_and_keeps_the_new_tokens(): void
+    {
+        $fresh = $this->token(['ROLE_ADMIN', 'orders:manage']);
+        Http::fake(['java.test/api/auth/password' => Http::response(['success' => true, 'data' => ['accessToken' => $fresh, 'refreshToken' => 'new-refresh']], 200)]);
+        $session = ['syscon' => ['access' => $this->token(['ROLE_ADMIN'], ['pwd_change' => true]), 'refresh' => 'old-refresh']];
+        $this->postJson('/web-api/password', ['currentPassword' => 'Temporal-123456', 'newPassword' => 'Nueva-clave-2026'])->assertUnauthorized();
+        $this->withSession($session)->postJson('/web-api/password', ['currentPassword' => 'Temporal-123456', 'newPassword' => 'Nueva-clave-2026', 'newPassword_confirmation' => 'otra'])->assertUnprocessable();
+        $this->withSession($session)->postJson('/web-api/password', ['currentPassword' => 'Temporal-123456', 'newPassword' => 'Nueva-clave-2026', 'newPassword_confirmation' => 'Nueva-clave-2026'])
+            ->assertOk()->assertDontSee('new-refresh');
+        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/auth/password' && ! isset($request['newPassword_confirmation']));
+        $this->assertSame(['access' => $fresh, 'refresh' => 'new-refresh'], session('syscon'));
+    }
+
+    public function test_user_management_and_audit_are_superadmin_permissions(): void
+    {
+        $id = '00000000-0000-0000-0000-0000000000bb';
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            'java.test/api/admin/users*' => Http::response(['success' => true, 'data' => ['items' => [], 'total' => 0]], 200),
+            'java.test/api/admin/audit*' => Http::response(['success' => true, 'data' => ['items' => [], 'total' => 0]], 200),
+        ]);
+        $admin = ['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'orders:manage', 'catalog:write']), 'refresh' => 'r']];
+        $this->withSession($admin)->getJson('/web-api/admin/users')->assertForbidden();
+        $this->withSession($admin)->getJson('/web-api/admin/audit')->assertForbidden();
+        $super = ['syscon' => ['access' => $this->token(['ROLE_SUPERADMIN', 'users:manage', 'audit:view']), 'refresh' => 'r']];
+        $this->withSession($super)->getJson('/web-api/admin/users?role=ADMIN&status=PENDING&q=rosa')->assertOk();
+        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/admin/users?role=ADMIN&status=PENDING&q=rosa');
+        $this->withSession($super)->getJson('/web-api/admin/users?role=ROOT')->assertUnprocessable();
+        $this->withSession($super)->postJson('/web-api/admin/users', ['email' => 'rosa@syscon.pe', 'firstName' => 'Rosa', 'lastName' => 'Mamani', 'documentType' => 'RUC', 'documentNumber' => '1', 'phone' => '987654321'])->assertUnprocessable();
+        $this->withSession($super)->postJson('/web-api/admin/users', ['email' => 'rosa@syscon.pe', 'firstName' => 'Rosa', 'lastName' => 'Mamani', 'documentType' => 'DNI', 'documentNumber' => '45678912', 'phone' => '987654321'])->assertOk();
+        $this->withSession($super)->postJson("/web-api/admin/users/$id/validate")->assertOk();
+        Http::assertSent(fn ($request) => $request->url() === "http://java.test/api/admin/users/$id/validate");
+        $this->withSession($super)->postJson("/web-api/admin/users/$id/delete")->assertNotFound();
+        $this->withSession($super)->getJson('/web-api/admin/audit?role=ADMIN&from=2026-10-01&to=2026-10-19')->assertOk();
+        $this->withSession($super)->getJson('/web-api/admin/audit?from=19/10/2026')->assertUnprocessable();
+    }
+
+    public function test_purchases_and_internal_use_require_inventory_permission_and_clear_the_catalog(): void
+    {
+        $product = '00000000-0000-0000-0000-0000000000cc';
+        Cache::put('catalog.products', ['status' => 200, 'body' => ['success' => true, 'data' => []]], 60);
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            'java.test/api/admin/purchases*' => Http::response(['success' => true, 'data' => ['id' => 'p1']], 201),
+            'java.test/api/admin/internal-uses*' => Http::response(['success' => true, 'data' => ['id' => 'u1']], 201),
+        ]);
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'catalog:write']), 'refresh' => 'r']])
+            ->getJson('/web-api/admin/purchases')->assertForbidden();
+        $super = ['syscon' => ['access' => $this->token(['ROLE_SUPERADMIN', 'inventory:manage']), 'refresh' => 'r']];
+        $this->withSession($super)->postJson('/web-api/admin/purchases', ['supplierName' => 'Mayorista', 'items' => [['productId' => $product, 'quantity' => 2, 'unitCost' => '1.999']]])->assertUnprocessable();
+        $this->withSession($super)->postJson('/web-api/admin/purchases', ['supplierName' => 'Mayorista', 'items' => [['productId' => $product, 'quantity' => 2, 'unitCost' => '80.50']]])->assertCreated();
+        $this->assertNull(Cache::get('catalog.products'));
+        Cache::put('catalog.products', ['status' => 200, 'body' => ['success' => true, 'data' => []]], 60);
+        $this->withSession($super)->postJson('/web-api/admin/internal-uses', ['productId' => $product, 'quantity' => 1, 'reason' => 'x'])->assertUnprocessable();
+        $this->withSession($super)->postJson('/web-api/admin/internal-uses', ['productId' => $product, 'quantity' => 1, 'reason' => 'Equipo de oficina'])->assertCreated();
+        $this->assertNull(Cache::get('catalog.products'));
     }
 }

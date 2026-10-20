@@ -84,8 +84,9 @@ export const statusLabel = (labels: Record<string, string>, status: string) =>
   labels[status] ?? status;
 
 export function statusTone(status: string): 'success' | 'warning' | 'danger' | 'info' {
-  if (['PAID', 'DELIVERED', 'APPROVED', 'ACCEPTED', 'SUCCEEDED'].includes(status)) return 'success';
-  if (['CANCELLED', 'EXPIRED', 'REJECTED', 'FAILED'].includes(status)) return 'danger';
+  if (['PAID', 'DELIVERED', 'APPROVED', 'ACCEPTED', 'SUCCEEDED', 'ACTIVE'].includes(status))
+    return 'success';
+  if (['CANCELLED', 'EXPIRED', 'REJECTED', 'FAILED', 'SUSPENDED'].includes(status)) return 'danger';
   if (['PAYMENT_PENDING', 'PENDING', 'DRAFT', 'RUNNING'].includes(status)) return 'warning';
   return 'info';
 }

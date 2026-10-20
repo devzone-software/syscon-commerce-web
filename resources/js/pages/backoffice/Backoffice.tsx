@@ -2,22 +2,26 @@ import { useEffect, useState, type ReactElement } from 'react';
 import { Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Brand } from '../../components/layout/Header';
 import { CloseIcon, MenuIcon } from '../../components/icons';
-import { can, canUseBackoffice, permissions, type Permission } from '../../lib/auth';
+import { can, canUseBackoffice, permissions, roleLabel, type Permission } from '../../lib/auth';
 import { useShop } from '../../state';
 import { Empty } from '../../ui';
+import { ActivityAdmin } from './ActivityAdmin';
 import { BillingAdmin } from './BillingAdmin';
 import { CashRegister } from './CashRegister';
 import { Dashboard } from './Dashboard';
 import { DirectSale } from './DirectSale';
+import { InternalUseAdmin } from './InternalUseAdmin';
 import { InventoryAdmin } from './InventoryAdmin';
 import { OrdersAdmin } from './OrdersAdmin';
 import { PaymentsAdmin } from './PaymentsAdmin';
 import { ProductBulkAdmin } from './ProductBulkAdmin';
 import { ProductsAdmin } from './ProductsAdmin';
+import { PurchasesAdmin } from './PurchasesAdmin';
 import { ReportsAdmin } from './ReportsAdmin';
 import { SalesReport } from './SalesReport';
 import { SuppliersAdmin } from './SuppliersAdmin';
 import { TaxonomyAdmin } from './TaxonomyAdmin';
+import { UsersAdmin } from './UsersAdmin';
 import '../../../css/backoffice.css';
 
 type Section = {
@@ -67,6 +71,20 @@ const sections: Section[] = [
     element: <InventoryAdmin />,
   },
   {
+    path: 'compras',
+    label: 'Compras al por mayor',
+    group: 'Inventario',
+    permission: permissions.inventoryManage,
+    element: <PurchasesAdmin />,
+  },
+  {
+    path: 'uso-interno',
+    label: 'Uso interno',
+    group: 'Inventario',
+    permission: permissions.inventoryManage,
+    element: <InternalUseAdmin />,
+  },
+  {
     path: 'pedidos',
     label: 'Pedidos',
     group: 'Ventas',
@@ -84,7 +102,7 @@ const sections: Section[] = [
     path: 'caja',
     label: 'Caja',
     group: 'Ventas',
-    permission: permissions.salesCreate,
+    permission: permissions.cashManage,
     element: <CashRegister />,
   },
   {
@@ -113,6 +131,20 @@ const sections: Section[] = [
     label: 'Catálogo e inventario',
     group: 'Reportes',
     element: <ReportsAdmin />,
+  },
+  {
+    path: 'usuarios',
+    label: 'Usuarios',
+    group: 'Seguridad',
+    permission: permissions.usersManage,
+    element: <UsersAdmin />,
+  },
+  {
+    path: 'actividad',
+    label: 'Actividad del personal',
+    group: 'Seguridad',
+    permission: permissions.auditView,
+    element: <ActivityAdmin />,
   },
 ];
 
@@ -163,7 +195,10 @@ export function Backoffice() {
         <Brand />
         <span className="bo-topbar-tag">Backoffice</span>
         <div className="bo-topbar-user">
-          <span>{user?.email}</span>
+          <span>
+            {user?.email}
+            {user?.roles[0] && <small> · {roleLabel(user.roles[0])}</small>}
+          </span>
           <Link to="/" className="link-button">
             Ver tienda
           </Link>

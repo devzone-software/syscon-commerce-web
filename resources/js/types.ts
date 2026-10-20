@@ -254,6 +254,81 @@ export type User = {
   lastName?: string | null;
   roles: string[];
   permissions?: string[];
+  /** Temporary password from the superadmin: nothing else is allowed until it is changed. */
+  mustChangePassword?: boolean;
+};
+/** Account as the superadmin sees it (users:manage). */
+export type StaffAccount = {
+  id: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  /** SUPERADMIN, ADMIN or CUSTOMER. */
+  role: string;
+  /** ACTIVE, PENDING (created, not validated yet) or SUSPENDED. */
+  status: string;
+  documentType: string | null;
+  documentNumber: string | null;
+  phone: string | null;
+  mustChangePassword: boolean;
+  createdBy: string | null;
+  validatedBy: string | null;
+  validatedAt: string | null;
+  lastLoginAt: string | null;
+  createdAt: string | null;
+};
+export type NewAdmin = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  documentType: 'DNI' | 'CE' | 'PASAPORTE';
+  documentNumber: string;
+  phone: string;
+};
+/** The temporary password is only returned once, when it is created. */
+export type IssuedPassword = { user: StaffAccount; temporaryPassword: string };
+export type AuditEntry = {
+  id: number;
+  userId: string;
+  email: string;
+  name: string | null;
+  role: string;
+  action: string;
+  method: string;
+  path: string;
+  status: number;
+  ok: boolean;
+  ip: string | null;
+  at: string | null;
+};
+export type Purchase = {
+  id: string;
+  supplierName: string;
+  documentRef: string | null;
+  notes: string | null;
+  total: string;
+  createdBy: string | null;
+  createdAt: string | null;
+  items: {
+    productId: string;
+    sku: string;
+    name: string;
+    quantity: number;
+    unitCost: string;
+    subtotal: string;
+  }[];
+};
+export type InternalUse = {
+  id: string;
+  productId: string;
+  sku: string;
+  name: string;
+  quantity: number;
+  reason: string;
+  /** Value at the last purchase cost; null when the product was never purchased. */
+  costValue: string | null;
+  createdBy: string | null;
+  createdAt: string | null;
 };
 export type DocumentType = 'DNI' | 'CE' | 'RUC' | 'PASAPORTE';
 export type Profile = {

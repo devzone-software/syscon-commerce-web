@@ -569,3 +569,32 @@
     white-space: nowrap;
   }
 }
+
+.bo-filters-activity {
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+}
+.bo-secret {
+  display: inline-block;
+  padding: 10px 14px;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  background: var(--store-bg, #f5f6f8);
+  border: 1px dashed var(--store-line);
+  border-radius: 8px;
+  user-select: all;
+  word-break: break-all;
+}
+.bo-topbar-user small {
+  color: inherit;
+  opacity: 0.75;
+}
+@media (max-width: 860px) {
+  .bo-filters-activity {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 480px) {
+  .bo-filters-activity {
+    grid-template-columns: 1fr;
+  }
+}

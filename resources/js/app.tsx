@@ -1,7 +1,7 @@
-import { StrictMode, lazy, Suspense } from 'react';
+import { StrictMode, lazy, Suspense, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { StateProvider } from './state';
+import { StateProvider, useShop } from './state';
 import { AddToCartProvider } from './components/cart/AddToCartDialog';
 import { Layout, Loading, RequireAuth } from './ui';
 import '../css/app.css';
@@ -38,6 +38,9 @@ const Categories = lazy(() =>
 const Offers = lazy(() => import('./pages/Offers').then((module) => ({ default: module.Offers })));
 const Contact = lazy(() =>
   import('./pages/Contact').then((module) => ({ default: module.Contact })),
+);
+const ChangePassword = lazy(() =>
+  import('./pages/ChangePassword').then((module) => ({ default: module.ChangePassword })),
 );
 const NotFound = lazy(() =>
   import('./pages/NotFound').then((module) => ({ default: module.NotFound })),
@@ -79,45 +82,53 @@ function StoreRoutes() {
   );
 }
 
+/** A temporary password from the superadmin must be replaced before using any page. */
+function PasswordGate({ children }: { children: ReactNode }) {
+  const { user } = useShop();
+  return user?.mustChangePassword ? <ChangePassword /> : children;
+}
+
 function App() {
   return (
     <StateProvider>
       <BrowserRouter>
         <AddToCartProvider>
           <Suspense fallback={<Loading />}>
-            <Routes>
-              {/* The backoffice has its own layout, separate from the public store. */}
-              <Route
-                path="/admin/*"
-                element={
-                  <RequireAuth>
-                    <Backoffice />
-                  </RequireAuth>
-                }
-              />
-              {/* Sign in, sign up and recovery use their own slim header and footer. */}
-              <Route path="/ingresar" element={<Auth />} />
-              <Route path="/registro" element={<Auth register />} />
-              <Route path="/recuperar" element={<Recover />} />
-              {/* The customer portal has its own sidebar layout (Figma "Client / Mi cuenta"). */}
-              <Route
-                path="/cuenta"
-                element={
-                  <RequireAuth>
-                    <Account />
-                  </RequireAuth>
-                }
-              />
-              <Route
-                path="/cuenta/pedidos"
-                element={
-                  <RequireAuth>
-                    <Orders />
-                  </RequireAuth>
-                }
-              />
-              <Route path="*" element={<StoreRoutes />} />
-            </Routes>
+            <PasswordGate>
+              <Routes>
+                {/* The backoffice has its own layout, separate from the public store. */}
+                <Route
+                  path="/admin/*"
+                  element={
+                    <RequireAuth>
+                      <Backoffice />
+                    </RequireAuth>
+                  }
+                />
+                {/* Sign in, sign up and recovery use their own slim header and footer. */}
+                <Route path="/ingresar" element={<Auth />} />
+                <Route path="/registro" element={<Auth register />} />
+                <Route path="/recuperar" element={<Recover />} />
+                {/* The customer portal has its own sidebar layout (Figma "Client / Mi cuenta"). */}
+                <Route
+                  path="/cuenta"
+                  element={
+                    <RequireAuth>
+                      <Account />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/cuenta/pedidos"
+                  element={
+                    <RequireAuth>
+                      <Orders />
+                    </RequireAuth>
+                  }
+                />
+                <Route path="*" element={<StoreRoutes />} />
+              </Routes>
+            </PasswordGate>
           </Suspense>
         </AddToCartProvider>
       </BrowserRouter>

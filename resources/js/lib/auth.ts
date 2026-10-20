@@ -2,8 +2,16 @@ import type { User } from '../types';
 
 /** Roles issued by auth-service (claim `authorities`, prefixed with ROLE_). */
 export const roleLabels: Record<string, string> = {
+  ROLE_SUPERADMIN: 'Superadministrador',
   ROLE_ADMIN: 'Administrador',
   ROLE_CUSTOMER: 'Cliente',
+};
+
+/** Account states managed by the superadmin. */
+export const accountStatusLabels: Record<string, string> = {
+  ACTIVE: 'Activa',
+  PENDING: 'Pendiente de validación',
+  SUSPENDED: 'Suspendida',
 };
 
 export const roleLabel = (role: string) => roleLabels[role] ?? role.replace(/^ROLE_/, '');
@@ -17,6 +25,10 @@ export const permissions = {
   suppliersManage: 'suppliers:manage',
   reportsView: 'reports:view',
   salesCreate: 'sales:create',
+  cashManage: 'cash:manage',
+  inventoryManage: 'inventory:manage',
+  usersManage: 'users:manage',
+  auditView: 'audit:view',
 } as const;
 
 export type Permission = (typeof permissions)[keyof typeof permissions];

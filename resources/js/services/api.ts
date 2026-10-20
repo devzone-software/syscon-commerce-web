@@ -3,6 +3,12 @@ import type {
   AdminOrderList,
   AdminPage,
   AdminPayment,
+  AuditEntry,
+  InternalUse,
+  IssuedPassword,
+  NewAdmin,
+  Purchase,
+  StaffAccount,
   Billing,
   Delivery,
   DeliveryOptions,
@@ -107,6 +113,11 @@ export const api = {
     request<unknown>('/login', { method: 'POST', body: json({ email, password }) }),
   logout: () => request<null>('/logout', { method: 'POST' }),
   me: () => request<User>('/me'),
+  changePassword: (passwords: {
+    currentPassword: string;
+    newPassword: string;
+    newPassword_confirmation: string;
+  }) => request<null>('/password', { method: 'POST', body: json(passwords) }),
   orders: () => request<Order[]>('/orders'),
   order: (id: string) => request<Order>(`/orders/${encodeURIComponent(id)}`),
   /** Documents of the customer's order that SUNAT accepted (drafts are never listed). */
@@ -182,6 +193,33 @@ export const api = {
   supplierJobs: () => request<SupplierJob[]>('/admin/supplier-jobs'),
   supplierHistory: (jobId: string) =>
     request<SupplierHistory[]>(`/admin/supplier-jobs/${encodeURIComponent(jobId)}/history`),
+  users: (filters: { role?: string; status?: string; q?: string; page?: number }) =>
+    request<AdminPage<StaffAccount>>(`/admin/users${query(filters)}`),
+  createAdmin: (admin: NewAdmin) =>
+    request<IssuedPassword>('/admin/users', { method: 'POST', body: json(admin) }),
+  validateUser: (id: string) =>
+    request<StaffAccount>(`/admin/users/${encodeURIComponent(id)}/validate`, { method: 'POST' }),
+  suspendUser: (id: string) =>
+    request<StaffAccount>(`/admin/users/${encodeURIComponent(id)}/suspend`, { method: 'POST' }),
+  reactivateUser: (id: string) =>
+    request<StaffAccount>(`/admin/users/${encodeURIComponent(id)}/reactivate`, { method: 'POST' }),
+  resetUserPassword: (id: string) =>
+    request<IssuedPassword>(`/admin/users/${encodeURIComponent(id)}/reset-password`, {
+      method: 'POST',
+    }),
+  audit: (filters: { userId?: string; role?: string; from?: string; to?: string; page?: number }) =>
+    request<AdminPage<AuditEntry>>(`/admin/audit${query(filters)}`),
+  purchases: (page: number) => request<AdminPage<Purchase>>(`/admin/purchases${query({ page })}`),
+  createPurchase: (purchase: {
+    supplierName: string;
+    documentRef: string | null;
+    notes: string | null;
+    items: { productId: string; quantity: number; unitCost: string }[];
+  }) => request<Purchase>('/admin/purchases', { method: 'POST', body: json(purchase) }),
+  internalUses: (page: number) =>
+    request<AdminPage<InternalUse>>(`/admin/internal-uses${query({ page })}`),
+  createInternalUse: (use: { productId: string; quantity: number; reason: string }) =>
+    request<InternalUse>('/admin/internal-uses', { method: 'POST', body: json(use) }),
   /** The platform assigns series and number; asking again for the order's document returns it. */
   createInvoice: (
     invoice: InvoiceCustomer & {

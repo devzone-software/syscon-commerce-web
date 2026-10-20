@@ -116,7 +116,7 @@ function InputBox({
   );
 }
 
-function PasswordInput({
+export function PasswordInput({
   label,
   value,
   onChange,
@@ -296,33 +296,17 @@ export function Auth({ register = false }: { register?: boolean }) {
         footnote="Conexión protegida · Cumplimiento Ley N° 29733"
       >
         <h2>Iniciar sesión</h2>
-        <p className="auth-lead">Ingresa tus credenciales para acceder a tu panel de cliente.</p>
-        <Segmented
-          label="Tipo de cliente"
-          value={audience}
-          onChange={chooseAudience}
-          options={[
-            { value: 'empresa', label: 'Empresas / RUC' },
-            { value: 'personal', label: 'Cuenta Personal / DNI' },
-          ]}
-        />
+        <p className="auth-lead">Ingresa tus credenciales para acceder a tu panel.</p>
         {error && <ErrorBox message={error} />}
+        {/* One sign-in for everyone: the account itself says if it is a company, a person or staff. */}
         <form onSubmit={submit} className="auth-fields">
-          <InputBox
-            icon={<MailIcon size={16} />}
-            label={
-              audience === 'empresa'
-                ? 'Correo electrónico corporativo'
-                : 'Correo electrónico personal'
-            }
-            required
-          >
+          <InputBox icon={<MailIcon size={16} />} label="Correo electrónico" required>
             <input
               {...field('email')}
               type="email"
               required
               autoComplete="email"
-              placeholder={audience === 'empresa' ? 'ejemplo@empresa.com' : 'ejemplo@correo.com'}
+              placeholder="ejemplo@correo.com"
             />
           </InputBox>
           <PasswordInput
