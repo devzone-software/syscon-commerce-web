@@ -113,9 +113,12 @@ input:focus-visible {
   gap: 28px;
   min-height: 80px;
 }
+.store-mainbar .brand {
+  flex-shrink: 0;
+}
 .store-mainbar .brand img {
-  width: 158px;
-  height: 44px;
+  width: 215px;
+  height: 60px;
   object-fit: contain;
 }
 .store-search {
@@ -162,6 +165,7 @@ input:focus-visible {
   background: #00265d;
 }
 .store-actions {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 24px;
@@ -220,44 +224,20 @@ input:focus-visible {
 .store-account {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding-left: 12px;
+  gap: 20px;
 }
-.store-account-logo {
-  width: 32px;
-  height: 32px;
-  border-radius: 12px;
-  object-fit: cover;
-  object-position: 49% 50%;
-}
-.store-account > span {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-.store-account > span > a:first-child {
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 13px;
-  letter-spacing: 0.02em;
-  color: #111c2d;
-}
-.store-account-sub,
-.store-account-sub a,
-.store-account-sub button {
-  display: inline-flex;
-  gap: 8px;
+.store-account a,
+.store-account button {
   padding: 0;
   border: 0;
   background: none;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 14px;
-  letter-spacing: 0.04em;
-  color: #434751;
+  font-size: 14px;
+  line-height: 20px;
+  color: #111c2d;
+  white-space: nowrap;
 }
 .store-account a:hover,
-.store-account-sub button:hover {
+.store-account button:hover {
   color: #0d3b82;
   text-decoration: underline;
 }
@@ -652,8 +632,16 @@ input:focus-visible {
 /* Tablet */
 @media (max-width: 1100px) {
   .store-b2b,
+  .store-cart-text,
   .store-topbar-list:first-child li:last-child {
     display: none;
+  }
+  .store-mainbar .brand img {
+    width: 172px;
+    height: 48px;
+  }
+  .store-account {
+    gap: 14px;
   }
   .store-footer-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -665,7 +653,7 @@ input:focus-visible {
 @media (max-width: 900px) {
   .store-navbar,
   .store-cart-text,
-  .store-account > span {
+  .store-account {
     display: none;
   }
   .menu-toggle {
@@ -673,9 +661,6 @@ input:focus-visible {
   }
   .store-actions {
     gap: 8px;
-  }
-  .store-account {
-    padding-left: 0;
   }
 }
 
@@ -694,8 +679,8 @@ input:focus-visible {
     padding: 12px 0;
   }
   .store-mainbar .brand img {
-    width: 126px;
-    height: 36px;
+    width: 158px;
+    height: 44px;
   }
   .store-search {
     order: 3;

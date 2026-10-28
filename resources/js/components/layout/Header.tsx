@@ -6,7 +6,6 @@ import cartIcon from '../../../images/header/cart.svg';
 import logo from '../../../images/header/logo-grupo-syscon.jpg';
 import mailIcon from '../../../images/header/mail.svg';
 import phoneIcon from '../../../images/header/phone.svg';
-import profile from '../../../images/header/profile-sc.jpg';
 import searchIcon from '../../../images/header/search.svg';
 import truckIcon from '../../../images/header/truck.svg';
 import { cartTotal } from '../../lib/cart';
@@ -115,6 +114,24 @@ export function Header() {
             <button type="submit">Buscar</button>
           </form>
           <div className="store-actions">
+            <nav className="store-account" aria-label="Cuenta">
+              {user ? (
+                <>
+                  <Link to="/cuenta">Mi cuenta</Link>
+                  <Link to="/cuenta/pedidos">Mis compras</Link>
+                  {staff && <Link to="/admin">Backoffice</Link>}
+                  <button type="button" onClick={signOut}>
+                    Salir
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/registro">Crea tu cuenta</Link>
+                  <Link to="/ingresar">Ingresa</Link>
+                  <Link to="/cuenta/pedidos">Mis compras</Link>
+                </>
+              )}
+            </nav>
             <Link
               to="/carrito"
               className="store-cart"
@@ -129,24 +146,6 @@ export function Header() {
                 <strong>{money(cartTotal(cart))}</strong>
               </span>
             </Link>
-            <div className="store-account">
-              <img className="store-account-logo" src={profile} alt="" />
-              <span>
-                <Link to={user ? '/cuenta' : '/ingresar'}>Mi Cuenta</Link>
-                {user ? (
-                  <span className="store-account-sub">
-                    {staff && <Link to="/admin">Backoffice</Link>}
-                    <button type="button" onClick={signOut}>
-                      Salir
-                    </button>
-                  </span>
-                ) : (
-                  <Link to="/ingresar" className="store-account-sub">
-                    Ingresar
-                  </Link>
-                )}
-              </span>
-            </div>
             <button
               type="button"
               className="menu-toggle"
@@ -191,7 +190,7 @@ export function Header() {
                 <NavLink to="/cuenta" end>
                   Mi cuenta
                 </NavLink>
-                <NavLink to="/cuenta/pedidos">Mis pedidos</NavLink>
+                <NavLink to="/cuenta/pedidos">Mis compras</NavLink>
                 {staff && <NavLink to="/admin">Backoffice</NavLink>}
                 <button type="button" onClick={signOut}>
                   Salir
@@ -201,6 +200,7 @@ export function Header() {
               <>
                 <NavLink to="/ingresar">Iniciar sesión</NavLink>
                 <NavLink to="/registro">Crear cuenta</NavLink>
+                <NavLink to="/cuenta/pedidos">Mis compras</NavLink>
               </>
             )}
           </div>
