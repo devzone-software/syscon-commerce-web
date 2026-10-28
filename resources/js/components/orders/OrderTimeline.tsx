@@ -5,7 +5,8 @@ export function OrderTimeline({ status }: { status: string }) {
   if (status === 'EXPIRED')
     return (
       <p className="notice error">
-        Este pedido venció porque no se confirmó su pago a tiempo; su reserva de stock se liberó.
+        Este pedido venció porque no se confirmó su pago a tiempo; los productos reservados se
+        liberaron.
       </p>
     );
   const current = orderFlow.indexOf(status);

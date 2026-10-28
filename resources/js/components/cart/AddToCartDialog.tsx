@@ -100,11 +100,12 @@ function AddToCartDialog({ request, onClose }: { request: Request; onClose: () =
             {details && <p className="add-dialog-cat">{details}</p>}
             <h3>{product.name}</h3>
             <code>SKU: {product.sku}</code>
-            <p className={`add-dialog-stock${remaining ? '' : ' is-out'}`}>
-              <i aria-hidden="true" />
-              {product.stock} {product.stock === 1 ? 'unidad disponible' : 'unidades disponibles'}
-              {inCart > 0 && ` · ${inCart} ya en tu carrito`}
-            </p>
+            {inCart > 0 && (
+              <p className="add-dialog-stock">
+                <i aria-hidden="true" />
+                {inCart} {inCart === 1 ? 'unidad' : 'unidades'} ya en tu carrito
+              </p>
+            )}
           </div>
         </div>
 
@@ -152,8 +153,8 @@ function AddToCartDialog({ request, onClose }: { request: Request; onClose: () =
         ) : (
           <p className="notice" role="status">
             {product.stock < 1
-              ? 'Este producto no tiene stock disponible por ahora.'
-              : 'Ya tienes en tu carrito todas las unidades disponibles de este producto.'}
+              ? 'Este producto está agotado por ahora.'
+              : 'Alcanzaste la cantidad máxima disponible para este producto.'}
           </p>
         )}
 
@@ -162,8 +163,8 @@ function AddToCartDialog({ request, onClose }: { request: Request; onClose: () =
             <ShieldIcon size={14} /> Producto original con garantía del fabricante
           </li>
           <li>
-            <TruckIcon size={14} /> Retiro en tienda o envío a domicilio · el precio y el stock se
-            confirman al crear el pedido
+            <TruckIcon size={14} /> Retiro en tienda o envío a domicilio · el precio y la
+            disponibilidad se confirman al crear el pedido
           </li>
         </ul>
 

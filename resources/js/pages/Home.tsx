@@ -40,8 +40,8 @@ export function Home() {
           <FeaturedProducts products={summary.featured} />
           <div className="home-catalog-cta">
             <p>
-              <strong>{count.format(data.length)} productos</strong> con stock y precios
-              actualizados, con filtros por categoría, marca y precio.
+              <strong>{count.format(data.length)} productos</strong> con precios actualizados, con
+              filtros por categoría, marca y precio.
             </p>
             <Link to="/catalogo">
               Ver todo el catálogo <ArrowRightIcon size={16} />

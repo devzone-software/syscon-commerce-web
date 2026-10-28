@@ -224,7 +224,7 @@ export function CatalogSidebar({
           <Option
             label={
               <>
-                <i className="side-dot" aria-hidden="true" /> En Stock / Inmediato
+                <i className="side-dot" aria-hidden="true" /> Solo disponibles
               </>
             }
             count={inStock}

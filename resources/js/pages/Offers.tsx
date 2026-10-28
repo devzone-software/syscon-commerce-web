@@ -7,12 +7,10 @@ import trustBoltIcon from '../../images/home/trust-bolt.svg';
 import trustLockIcon from '../../images/home/trust-lock.svg';
 import trustShieldIcon from '../../images/home/trust-shield.svg';
 import trustSupportIcon from '../../images/home/trust-support.svg';
-import { LOW_STOCK } from '../components/catalog/CatalogCard';
 import { ProductImage } from '../components/ProductImage';
 import {
   ArrowRightIcon,
   BoltIcon,
-  BoxIcon,
   CartIcon,
   GridIcon,
   ReceiptIcon,
@@ -39,7 +37,6 @@ const priceRanges = [
 const sorts = [
   { value: 'asc', label: 'Menor precio (Por defecto)' },
   { value: 'desc', label: 'Mayor precio' },
-  { value: 'stock', label: 'Menos unidades disponibles' },
 ];
 const trust = [
   {
@@ -64,17 +61,10 @@ const trust = [
   },
 ];
 
-function stockNote(product: Product) {
-  if (product.stock <= LOW_STOCK)
-    return { tone: 'is-low', text: `Solo ${product.stock} en almacén` };
-  return { tone: '', text: 'En almacén' };
-}
-
 /** Offer card of the "Ofertas Destacadas del Mes" row and the paged grid. */
 function OfferCard({ product, tag }: { product: Product; tag?: string }) {
   const add = useConfirmAdd();
   const url = `/producto/${product.id}`;
-  const note = stockNote(product);
   return (
     <article className="offer-card">
       <Link to={url} className="offer-card-media" tabIndex={-1} aria-hidden="true">
@@ -90,8 +80,8 @@ function OfferCard({ product, tag }: { product: Product; tag?: string }) {
       </p>
       <div className="offer-card-price">
         <strong>{money(Number(product.price))}</strong>
-        <span className={note.tone}>
-          {note.tone ? <BoxIcon size={13} /> : <TruckIcon size={13} />} {note.text}
+        <span>
+          <TruckIcon size={13} /> Envío coordinado
         </span>
       </div>
       <div className="offer-card-actions">
@@ -137,12 +127,10 @@ export function Offers() {
         (high == null || Number(product.price) <= high),
     );
     if (sort === 'desc') list.sort((a, b) => Number(b.price) - Number(a.price));
-    if (sort === 'stock') list.sort((a, b) => a.stock - b.stock);
     return list;
   }, [inCategory, brand, range, sort]);
   const current = paginate(filtered, page, PAGE_SIZE);
   const spotlight = offers[0];
-  const lastUnits = offers.filter((product) => product.stock <= LOW_STOCK).slice(0, 4);
   const choose = (setter: (value: string) => void) => (value: string) => {
     setter(value);
     setPage(1);
@@ -169,7 +157,7 @@ export function Offers() {
             <span aria-current="page">Ofertas Especiales</span>
           </nav>
           <span className="categories-crumb-tag is-teal">
-            <i aria-hidden="true" /> PRECIOS DEL CATÁLOGO // STOCK REAL
+            <i aria-hidden="true" /> PRECIOS DEL CATÁLOGO
           </span>
         </div>
       </div>
@@ -182,8 +170,8 @@ export function Offers() {
             </span>
             <h1 id="offers-title">Ofertas Especiales y Mejores Precios Corporativos</h1>
             <p>
-              Los productos con los precios más bajos del catálogo, con stock disponible y
-              facturación electrónica SUNAT con RUC 20.
+              Los productos con los precios más bajos del catálogo, con facturación electrónica
+              SUNAT con RUC 20.
             </p>
             <div className="offers-hero-actions">
               <a href="#ofertas" className="is-cyan">
@@ -214,7 +202,7 @@ export function Offers() {
         ) : !offers.length ? (
           <Empty
             title="Sin ofertas por ahora"
-            text="Vuelve pronto: aquí verás los productos con mejor precio y stock disponible."
+            text="Vuelve pronto: aquí verás los productos con mejor precio del catálogo."
           />
         ) : (
           <>
@@ -225,9 +213,6 @@ export function Offers() {
                     <BoltIcon size={13} /> PRECIO MÁS BAJO DEL CATÁLOGO
                   </span>
                   <code>SKU: {spotlight.sku}</code>
-                  <span className="offers-spotlight-stock">
-                    <BoxIcon size={14} /> {spotlight.stock} unidades en stock
-                  </span>
                 </div>
                 <div className="offers-spotlight-body">
                   <Link to={`/producto/${spotlight.id}`} className="offers-spotlight-media">
@@ -240,7 +225,7 @@ export function Offers() {
                     <h2 id="offers-spotlight-title">{spotlight.name}</h2>
                     <p className="offers-spotlight-text">
                       Producto original con el precio más bajo de nuestro catálogo actual. El precio
-                      y el stock se confirman al crear tu pedido.
+                      y la disponibilidad se confirman al crear tu pedido.
                     </p>
                     <p className="offers-spotlight-price">
                       <strong>{money(Number(spotlight.price))}</strong> Inc. IGV / Factura RUC
@@ -285,20 +270,14 @@ export function Offers() {
                 <h2 id="offers-month">
                   Ofertas Destacadas del Mes <span>MÁS AHORRO</span>
                 </h2>
-                <p>Los cuatro precios más bajos con stock disponible</p>
+                <p>Los cuatro precios más bajos del catálogo</p>
               </div>
               <div className="offers-grid">
                 {inCategory.slice(0, 4).map((product, index) => (
                   <OfferCard
                     key={product.id}
                     product={product}
-                    tag={
-                      product.stock <= LOW_STOCK
-                        ? 'ÚLTIMAS UNIDADES'
-                        : index === 0
-                          ? 'PRECIO MÁS BAJO'
-                          : undefined
-                    }
+                    tag={index === 0 ? 'PRECIO MÁS BAJO' : undefined}
                   />
                 ))}
               </div>
@@ -382,35 +361,6 @@ export function Offers() {
               />
             )}
 
-            {lastUnits.length > 0 && (
-              <section className="offers-ending" aria-labelledby="offers-ending-title">
-                <div className="offers-ending-head">
-                  <h2 id="offers-ending-title">
-                    <BoxIcon size={20} /> Últimas unidades en stock
-                  </h2>
-                  <p>Precios válidos hasta agotar el stock disponible</p>
-                </div>
-                <ul>
-                  {lastUnits.map((product) => (
-                    <li key={product.id}>
-                      <Link to={`/producto/${product.id}`}>
-                        <span className="offers-ending-media">
-                          <ProductImage product={product} />
-                        </span>
-                        <span>
-                          <em>
-                            QUEDAN {product.stock} {product.stock === 1 ? 'UNIDAD' : 'UNIDADES'}
-                          </em>
-                          <strong>{product.name}</strong>
-                          <b>{money(Number(product.price))}</b>
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
             <nav className="offers-pager" aria-label="Paginación">
               <p>
                 Mostrando{' '}
@@ -470,7 +420,7 @@ export function Offers() {
             </p>
           </div>
           <Link to="/contacto">
-            <ReceiptIcon size={16} /> Solicitar Cotización Corporativa B2B
+            <ReceiptIcon size={16} /> Solicitar Cotización Corporativa
           </Link>
         </section>
       </div>

@@ -40,7 +40,7 @@ const history = [
   {
     year: '2024',
     title: 'Catálogo Digital',
-    text: 'Catálogo en línea con stock actualizado y atención comercial para empresas y profesionales.',
+    text: 'Catálogo en línea con precios actualizados y atención comercial para empresas y profesionales.',
   },
   {
     year: '2025',
@@ -106,7 +106,7 @@ const reasons = [
   {
     icon: <TagIcon size={18} />,
     title: 'Precios Competitivos Mayoristas',
-    text: 'Tarifas para proyectos B2B, licitaciones y compras por volumen.',
+    text: 'Tarifas para proyectos empresariales, licitaciones y compras por volumen.',
   },
   {
     icon: <HelpIcon size={18} />,
@@ -157,9 +157,9 @@ export function About() {
     },
     {
       icon: <BoxIcon size={22} />,
-      tag: 'Stock Real',
-      value: count.format(products.reduce((sum, product) => sum + product.stock, 0)),
-      label: 'Unidades disponibles en almacén',
+      tag: 'Garantía',
+      value: '100%',
+      label: 'Productos originales con garantía de fábrica',
     },
     {
       icon: <GridIcon size={22} />,
@@ -200,7 +200,7 @@ export function About() {
               Conocer nuestra historia ↓
             </a>
             <Link to="/contacto">
-              <HeadsetIcon size={15} /> Contactar a un Asesor B2B
+              <HeadsetIcon size={15} /> Contactar a un Asesor
             </Link>
           </div>
           <ul className="about-hero-flags">
@@ -208,7 +208,7 @@ export function About() {
               <i className="is-green" /> Facturación RUC 20 SUNAT
             </li>
             <li>
-              <i className="is-cyan" /> Atención Inmediata B2B
+              <i className="is-cyan" /> Atención Personalizada
             </li>
           </ul>
         </div>

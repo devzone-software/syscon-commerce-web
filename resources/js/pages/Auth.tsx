@@ -289,7 +289,7 @@ export function Auth({ register = false }: { register?: boolean }) {
   if (!register)
     return (
       <AuthLayout
-        eyebrow="Acceso corporativo y clientes B2B / B2C"
+        eyebrow="Acceso para empresas y clientes"
         title="Bienvenido nuevamente a Grupo SYSCON"
         text="Gestiona tus compras de tecnología, licencias y cotizaciones con RUC en un solo lugar seguro."
         features={loginFeatures}

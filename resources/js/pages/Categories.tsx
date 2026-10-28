@@ -46,7 +46,7 @@ const trust = [
   },
 ];
 const gradients = ['is-navy', 'is-teal', 'is-green'];
-const campaignTags = ['MÁS SOLICITADO', 'ESTABILIDAD EMPRESARIAL', 'DISPONIBLE HOY'];
+const campaignTags = ['MÁS SOLICITADO', 'ESTABILIDAD EMPRESARIAL', 'RECOMENDADO'];
 
 /** Compact product card of the category rows (SKU, availability, price and actions). */
 function ShowcaseCard({ product }: { product: Product }) {
@@ -57,9 +57,7 @@ function ShowcaseCard({ product }: { product: Product }) {
     <article className="showcase-card">
       <div className="showcase-card-top">
         <code>SKU: {product.sku}</code>
-        <span className={available ? 'is-ok' : 'is-out'}>
-          {available ? 'Disponible' : 'Agotado'}
-        </span>
+        {!available && <span className="is-out">Agotado</span>}
       </div>
       <Link to={url} className="showcase-card-media" tabIndex={-1} aria-hidden="true">
         <ProductImage product={product} />
@@ -195,8 +193,8 @@ export function Categories() {
                   <h2>Categorías Principales</h2>
                 </div>
                 <p>
-                  Hardware certificado con garantía de fábrica y software comercial con stock y
-                  precios actualizados.
+                  Hardware certificado con garantía de fábrica y software comercial con precios
+                  actualizados.
                 </p>
               </div>
               <ul className="category-tiles">
@@ -220,8 +218,8 @@ export function Categories() {
                             ? `Productos de ${brands
                                 .slice(0, 3)
                                 .map((brand) => brand.name)
-                                .join(', ')} con stock y precios actualizados.`
-                            : 'Productos con stock y precios actualizados.'}
+                                .join(', ')} con precios actualizados.`
+                            : 'Productos con precios actualizados.'}
                         </span>
                         <span className="category-tile-link">
                           Ver categoría <ArrowRightIcon size={16} />
@@ -248,8 +246,8 @@ export function Categories() {
                     <span>{campaignTags[index]}</span>
                     <h3>{category.name}</h3>
                     <p>
-                      {productCount(category.count)} seleccionados con stock real, precios
-                      actualizados y atención especializada para empresas.
+                      {productCount(category.count)} seleccionados con precios actualizados y
+                      atención especializada para empresas.
                     </p>
                     <Link to={byCategory(category.name)}>
                       Explorar {category.name} <ArrowRightIcon size={14} />
@@ -331,7 +329,7 @@ export function Categories() {
               </div>
               <div className="categories-cta-actions">
                 <Link to="/contacto" className="is-teal">
-                  <HeadsetIcon size={16} /> Consultar con Asesor B2B
+                  <HeadsetIcon size={16} /> Consultar con un Asesor
                 </Link>
                 <Link to="/catalogo">
                   Ver Catálogo Completo <ArrowRightIcon size={14} />

@@ -41,7 +41,7 @@ const faqs = [
   },
   {
     q: '¿Qué métodos de pago aceptan en la tienda virtual?',
-    a: 'Trabajamos con pago manual: transferencia bancaria o pago coordinado B2B. Al crear el pedido se registra la solicitud y un asesor confirma el pago tras verificarlo.',
+    a: 'Trabajamos con pago manual: transferencia bancaria o pago coordinado con un asesor. Al crear el pedido se registra la solicitud y un asesor confirma el pago tras verificarlo.',
   },
   {
     q: '¿Cómo y en cuánto tiempo recibo mi producto?',
@@ -198,7 +198,7 @@ export function Contact() {
 
         <div className="contact-main">
           <section id="formulario" className="contact-form" aria-labelledby="contact-form-title">
-            <p className="contact-eyebrow">FORMULARIO B2B &amp; CONSUMIDOR</p>
+            <p className="contact-eyebrow">FORMULARIO DE CONTACTO</p>
             <h2 id="contact-form-title">Envíanos un mensaje</h2>
             <p className="contact-form-lead">
               Completa los detalles de tu requerimiento tecnológico para asignarte el asesor técnico
@@ -332,7 +332,7 @@ export function Contact() {
                     <ChatIcon size={16} />
                   </i>
                   <span>
-                    <strong>WhatsApp Comercial B2B</strong>
+                    <strong>WhatsApp Comercial</strong>
                     <a href={whatsapp.href} target="_blank" rel="noreferrer">
                       {whatsapp.label}
                     </a>
@@ -405,8 +405,8 @@ export function Contact() {
               </i>
               <h3>Ventas y Licitaciones</h3>
               <p>
-                Consulta precios por volumen, disponibilidad de stock y cotizaciones formales con
-                RUC 20 para tu organización.
+                Consulta precios por volumen, disponibilidad y cotizaciones formales con RUC 20 para
+                tu organización.
               </p>
               <a href={`mailto:${company.email}?subject=${encodeURIComponent('Ventas')}`}>
                 Contactar ventas <ArrowRightIcon size={14} />
@@ -468,8 +468,8 @@ export function Contact() {
             <p className="contact-eyebrow">CENTRO DE DISTRIBUCIÓN Y OFICINAS</p>
             <h2 id="contact-location-title">Encuéntranos en San Isidro</h2>
             <p>
-              Nuestras instalaciones combinan atención a clientes corporativos B2B y almacén para
-              retiro de pedidos programados.
+              Nuestras instalaciones combinan atención a clientes corporativos y almacén para retiro
+              de pedidos programados.
             </p>
             <dl>
               <div>
@@ -506,7 +506,7 @@ export function Contact() {
             </h2>
             <p>
               Escríbenos directamente a nuestra línea oficial de WhatsApp Business y un asesor
-              comercial te atenderá con stock confirmado y precios mayoristas.
+              comercial te atenderá con disponibilidad confirmada y precios mayoristas.
             </p>
           </div>
           <a href={whatsapp.href} target="_blank" rel="noreferrer">

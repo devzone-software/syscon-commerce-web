@@ -163,7 +163,7 @@ export function B2BBanner() {
         </div>
       </div>
       <Link className="b2b-banner-cta" to="/contacto">
-        <img src={b2bMailIcon} alt="" /> Solicitar Cotización B2B
+        <img src={b2bMailIcon} alt="" /> Solicitar Cotización
       </Link>
     </section>
   );

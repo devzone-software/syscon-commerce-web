@@ -94,20 +94,13 @@ export function ProductPage() {
             </div>
             <div className="product-detail-info">
               <p className="product-detail-eyebrow">
-                {[data.category, data.stock > 0 ? 'Disponible' : 'Sin stock']
-                  .filter(Boolean)
-                  .join(' · ')}
+                {[data.category, data.stock < 1 && 'Agotado'].filter(Boolean).join(' · ')}
               </p>
               <h1>{data.name}</h1>
               <p className="product-detail-sub">
                 {[data.brand, `SKU ${data.sku}`].filter(Boolean).join(' · ')}
               </p>
               <p className="product-detail-price">{money(Number(data.price))}</p>
-              <p className={`product-detail-stock${data.stock > 0 ? '' : ' out'}`}>
-                {data.stock > 0
-                  ? `Stock disponible (${data.stock} ${data.stock === 1 ? 'unidad' : 'unidades'}) · Envío coordinado`
-                  : 'Sin stock por ahora'}
-              </p>
               <div className="product-buy">
                 {remaining > 0 ? (
                   <>
@@ -124,8 +117,8 @@ export function ProductPage() {
                 ) : (
                   <p className="notice">
                     {data.stock < 1
-                      ? 'Este producto no tiene stock disponible por ahora.'
-                      : 'Ya tienes en tu carrito todas las unidades disponibles.'}
+                      ? 'Este producto está agotado por ahora.'
+                      : 'Alcanzaste la cantidad máxima disponible para este producto.'}
                   </p>
                 )}
               </div>
@@ -152,15 +145,9 @@ export function ProductPage() {
             { label: 'Marca', value: data.brand ?? '—' },
             { label: 'Categoría', value: data.category ?? '—' },
             { label: 'SKU', value: data.sku },
-            {
-              label: 'Disponibilidad',
-              value: data.stock > 0 ? `${data.stock} unidades en stock` : 'Sin stock',
-            },
           ]}
         />
-        <p className="flow-note">
-          El precio y el stock se validan nuevamente al confirmar el pedido.
-        </p>
+        <p className="flow-note">El precio y la disponibilidad se confirman al crear el pedido.</p>
       </PageSection>
       {related.length > 0 && (
         <PageSection title={data.category ? `Más en ${data.category}` : `Más de ${data.brand}`}>

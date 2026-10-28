@@ -59,7 +59,9 @@ export function OrderSummary({
           { label: totalLabel, value: money(total), tone: 'total' },
         ]}
       />
-      <p className="order-summary-note">El precio y el stock se confirman al crear el pedido.</p>
+      <p className="order-summary-note">
+        El precio y la disponibilidad se confirman al crear el pedido.
+      </p>
       {children}
     </div>
   );

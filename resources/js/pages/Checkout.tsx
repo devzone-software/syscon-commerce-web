@@ -183,7 +183,7 @@ export function Checkout() {
         <label className="payment-option">
           <input type="radio" name="payment" checked readOnly />
           <span>
-            <strong>Pago manual: transferencia bancaria o pago coordinado B2B</strong>
+            <strong>Pago manual: transferencia bancaria o pago coordinado con un asesor</strong>
             Tras crear el pedido se registra una solicitud de pago. Un asesor la confirma cuando
             verifica el pago.
           </span>

@@ -10,7 +10,7 @@ import searchButtonIcon from '../../images/catalog/search-button.svg';
 import searchIcon from '../../images/catalog/search.svg';
 import { CatalogCard } from '../components/catalog/CatalogCard';
 import { CatalogSidebar } from '../components/catalog/CatalogSidebar';
-import { ChatIcon, SearchIcon } from '../components/icons';
+import { ChatIcon, SearchIcon, TruckIcon } from '../components/icons';
 import {
   catalogParams,
   filterProducts,
@@ -54,7 +54,7 @@ function appliedFilters(filters: CatalogFilters): Chip[] {
     filters.onlyAvailable && {
       keys: [catalogParams.onlyAvailable],
       label: 'Disponibilidad',
-      value: 'En stock',
+      value: 'Disponibles',
     },
   ];
   return chips.filter((chip): chip is Chip => Boolean(chip));
@@ -147,7 +147,7 @@ export function Catalog() {
             Catálogo de Productos{' '}
             {data && <span className="catalog-total">{count.format(data.length)} productos</span>}
           </h1>
-          <p>Explora nuestro catálogo empresarial con stock real y precios actualizados.</p>
+          <p>Explora nuestro catálogo de tecnología con precios actualizados.</p>
         </div>
         <div className="catalog-perks">
           <span>
@@ -158,9 +158,9 @@ export function Catalog() {
           </span>
           <i aria-hidden="true" />
           <span>
-            <SearchIcon size={16} />
+            <TruckIcon size={16} />
             <span>
-              <small>STOCK</small>Actualizado en línea
+              <small>ENTREGA</small>Retiro o envío a domicilio
             </span>
           </span>
         </div>
@@ -313,7 +313,7 @@ export function Catalog() {
                   Restablecer filtros
                 </button>
                 <Link to="/contacto">
-                  <ChatIcon size={16} /> Consultar Stock Directo
+                  <ChatIcon size={16} /> Consultar con un asesor
                 </Link>
               </div>
             </div>

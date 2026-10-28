@@ -171,7 +171,7 @@ export function Header() {
           </nav>
           <Link className="store-b2b" to="/contacto">
             <img src={boltIcon} alt="" />
-            Atención a Empresas y Cotizaciones B2B
+            Atención a Empresas y Cotizaciones
           </Link>
         </div>
       </div>

@@ -83,9 +83,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
     <article className={`card-product${compact ? ' is-compact' : ''}`}>
       <Link to={url} className="card-product-media" tabIndex={-1} aria-hidden="true">
         <ProductImage product={product} />
-        <span className={`card-product-stock${available ? '' : ' out'}`}>
-          {available ? 'DISPONIBLE' : 'SIN STOCK'}
-        </span>
+        {!available && <span className="card-product-stock out">AGOTADO</span>}
       </Link>
       {product.category && <span className="card-product-category">{product.category}</span>}
       <Link className="card-product-title" to={url}>

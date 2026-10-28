@@ -244,7 +244,7 @@ export function Account() {
 
       <section className="portal-card" aria-labelledby="portal-ops-title">
         <p id="portal-ops-title" className="portal-ops-title">
-          OPERACIONES DIRECTAS B2B
+          ACCESOS RÁPIDOS
         </p>
         <ul className="portal-ops">
           <li>
@@ -253,7 +253,7 @@ export function Account() {
                 <TagIcon size={18} />
               </i>
               <span>
-                <strong>Catálogo de ofertas</strong>Precios más bajos con stock
+                <strong>Catálogo de ofertas</strong>Los precios más bajos del catálogo
               </span>
             </Link>
           </li>

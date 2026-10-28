@@ -43,7 +43,7 @@ export function AccountLayout({ title, children }: { title: string; children: Re
         <Link to="/" className="portal-brand">
           <span className="portal-brand-mark">S</span>
           <span>
-            SYSCON<small>PORTAL B2B</small>
+            SYSCON<small>MI CUENTA</small>
           </span>
         </Link>
         {user && (

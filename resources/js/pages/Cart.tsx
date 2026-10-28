@@ -63,8 +63,8 @@ export function Cart() {
       >
         {error && (
           <p className="notice" role="status">
-            No se pudo verificar la disponibilidad actual: {error} El stock se validará al crear el
-            pedido.
+            No se pudo verificar la disponibilidad actual: {error} Se validará nuevamente al crear
+            el pedido.
           </p>
         )}
         <ul className="cart-lines">

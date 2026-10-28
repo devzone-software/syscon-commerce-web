@@ -21,7 +21,10 @@ const nextSteps = [
     title: '1. Confirmación del pago',
     text: 'Un asesor verifica tu pago y lo registra en el pedido.',
   },
-  { title: '2. Preparación del pedido', text: 'Nuestro equipo validará stock y despacho.' },
+  {
+    title: '2. Preparación del pedido',
+    text: 'Nuestro equipo validará la disponibilidad y el despacho.',
+  },
   { title: '3. Seguimiento', text: 'Podrás revisar el estado desde Mi cuenta.' },
 ];
 
@@ -96,7 +99,7 @@ export function OrderPage() {
           large
           eyebrow="COMPRA CONFIRMADA"
           title="¡Gracias por tu compra!"
-          text="Tu pedido fue registrado correctamente. El precio y el stock fueron confirmados."
+          text="Tu pedido fue registrado correctamente. El precio y la disponibilidad fueron confirmados."
         >
           <p className="page-hero-order">Orden #{shortId(id)}</p>
         </PageHero>
@@ -169,7 +172,7 @@ export function OrderPage() {
                       ? 'Paga en línea o con pago manual; en el pago manual, un asesor lo confirmará tras verificarlo.'
                       : 'El método disponible es el pago manual. Un asesor confirmará el pago tras verificarlo; conserva el identificador de la solicitud.'}
                     {data.expiresAt &&
-                      ` Reservamos tu stock hasta el ${formatDateTime(data.expiresAt)}; si el pago no se confirma antes, el pedido vence.`}
+                      ` Reservamos tus productos hasta el ${formatDateTime(data.expiresAt)}; si el pago no se confirma antes, el pedido vence.`}
                   </p>
                   {payError && <ErrorBox message={payError} />}
                   {gateway && (
