@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import arrowIcon from '../../../images/categories/arrow-right.svg';
 import b2bIcon from '../../../images/home/b2b-building.svg';
@@ -17,6 +18,7 @@ import { catalogParams, productCount, type CatalogGroup } from '../../lib/catalo
 import { categoryIcon } from '../../lib/categoryIcon';
 import type { Product } from '../../types';
 import { ProductCard } from '../../ui';
+import { ChevronLeftIcon, ChevronRightIcon } from '../icons';
 import '../../../css/storefront.css';
 
 const trust = [
@@ -42,38 +44,162 @@ export function TrustStrip() {
   );
 }
 
+/** The bag icon is drawn for the light primary button; secondary buttons use light icons only. */
+type HeroAction = { to: string; label: string; icon?: string };
+
+const heroSlides: {
+  tone: string;
+  label: string;
+  title: string;
+  text: string;
+  primary: HeroAction;
+  secondary: HeroAction;
+}[] = [
+  {
+    tone: '',
+    label: 'Distribuidor oficial IT & licenciamiento digital',
+    title: 'Soluciones de Cómputo, Servidores y Software Original para Empresas y Profesionales',
+    text: 'Distribuidor oficial de licencias digitales, hardware para estaciones de trabajo, componentes de alto rendimiento y seguridad informática empresarial.',
+    primary: { to: '/catalogo', label: 'Ver productos', icon: heroBagIcon },
+    secondary: { to: '/ofertas', label: 'Ver ofertas', icon: heroFireIcon },
+  },
+  {
+    tone: 'is-offers',
+    label: 'Ofertas de temporada',
+    title: 'Los precios más bajos del catálogo en hardware y software',
+    text: 'Laptops, almacenamiento, redes y licencias originales con garantía oficial y factura electrónica.',
+    primary: { to: '/ofertas', label: 'Ver ofertas', icon: heroFireIcon },
+    secondary: { to: '/categorias', label: 'Explorar categorías' },
+  },
+  {
+    tone: 'is-business',
+    label: 'Empresas y profesionales',
+    title: 'Cotizaciones por volumen con factura electrónica',
+    text: 'Atención personalizada para compras corporativas, licitaciones e instituciones públicas y privadas.',
+    primary: { to: '/contacto', label: 'Solicitar cotización' },
+    secondary: { to: '/catalogo', label: 'Ver productos' },
+  },
+  {
+    tone: 'is-payment',
+    label: 'Compra en línea',
+    title: 'Paga con Mercado Pago o por transferencia',
+    text: 'Retira en tienda o recibe tu pedido en casa, y sigue cada paso desde Mis compras.',
+    primary: { to: '/catalogo', label: 'Comprar ahora', icon: heroBagIcon },
+    secondary: { to: '/cuenta/pedidos', label: 'Mis compras' },
+  },
+];
+
+/** Time each slide stays visible while the carousel plays on its own. */
+const HERO_INTERVAL = 6000;
+
 export function HomeHero() {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const touchStart = useRef<number | null>(null);
+  const total = heroSlides.length;
+  const go = (next: number) => setIndex((next + total) % total);
+
+  useEffect(() => {
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (paused || reduced) return;
+    const timer = window.setTimeout(() => setIndex((value) => (value + 1) % total), HERO_INTERVAL);
+    return () => window.clearTimeout(timer);
+  }, [index, paused, total]);
+
   return (
-    <section className="home-hero" aria-labelledby="home-hero-title">
-      <span className="home-hero-label">
-        <i aria-hidden="true" /> Distribuidor oficial IT &amp; licenciamiento digital
-      </span>
-      <h1 id="home-hero-title">
-        Soluciones de Cómputo, Servidores y Software Original para Empresas y Profesionales
-      </h1>
-      <p>
-        Distribuidor oficial de licencias digitales, hardware para estaciones de trabajo,
-        componentes de alto rendimiento y seguridad informática empresarial.
-      </p>
-      <div className="home-hero-actions">
-        <Link className="home-hero-primary" to="/catalogo">
-          <img src={heroBagIcon} alt="" /> Ver productos
-        </Link>
-        <Link className="home-hero-secondary" to="/ofertas">
-          <img src={heroFireIcon} alt="" /> Ver ofertas
-        </Link>
+    <section
+      className="home-carousel"
+      aria-roledescription="carrusel"
+      aria-label="Destacados"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === 'ArrowLeft') go(index - 1);
+        if (event.key === 'ArrowRight') go(index + 1);
+      }}
+      onTouchStart={(event) => (touchStart.current = event.touches[0].clientX)}
+      onTouchEnd={(event) => {
+        if (touchStart.current === null) return;
+        const delta = event.changedTouches[0].clientX - touchStart.current;
+        touchStart.current = null;
+        if (Math.abs(delta) > 50) go(index + (delta < 0 ? 1 : -1));
+      }}
+    >
+      <div className="home-carousel-track" style={{ transform: `translateX(-${index * 100}%)` }}>
+        {heroSlides.map((slide, i) => {
+          const Title = i === 0 ? 'h1' : 'h2';
+          return (
+            <div
+              key={slide.title}
+              className={`home-hero ${slide.tone}`}
+              role="group"
+              aria-roledescription="diapositiva"
+              aria-label={`${i + 1} de ${total}`}
+              aria-hidden={i !== index}
+              inert={i !== index}
+            >
+              <span className="home-hero-label">
+                <i aria-hidden="true" /> {slide.label}
+              </span>
+              <Title>{slide.title}</Title>
+              <p>{slide.text}</p>
+              <div className="home-hero-actions">
+                {[slide.primary, slide.secondary].map((action, n) => (
+                  <Link
+                    key={action.to}
+                    className={n === 0 ? 'home-hero-primary' : 'home-hero-secondary'}
+                    to={action.to}
+                  >
+                    {action.icon && <img src={action.icon} alt="" />} {action.label}
+                  </Link>
+                ))}
+              </div>
+              <ul className="home-hero-badges">
+                <li>
+                  <img src={heroVerifiedIcon} alt="" /> Garantía Oficial Certificada
+                </li>
+                <li>
+                  <img src={heroReceiptIcon} alt="" /> Facturación electrónica inmediata
+                </li>
+                <li>
+                  <img src={heroTruckIcon} alt="" /> Envíos express a todo el país
+                </li>
+              </ul>
+            </div>
+          );
+        })}
       </div>
-      <ul className="home-hero-badges">
-        <li>
-          <img src={heroVerifiedIcon} alt="" /> Garantía Oficial Certificada
-        </li>
-        <li>
-          <img src={heroReceiptIcon} alt="" /> Facturación electrónica inmediata
-        </li>
-        <li>
-          <img src={heroTruckIcon} alt="" /> Envíos express a todo el país
-        </li>
-      </ul>
+      <button
+        type="button"
+        className="home-carousel-arrow is-prev"
+        aria-label="Diapositiva anterior"
+        onClick={() => go(index - 1)}
+      >
+        <ChevronLeftIcon size={22} />
+      </button>
+      <button
+        type="button"
+        className="home-carousel-arrow is-next"
+        aria-label="Diapositiva siguiente"
+        onClick={() => go(index + 1)}
+      >
+        <ChevronRightIcon size={22} />
+      </button>
+      <div className="home-carousel-dots">
+        {heroSlides.map((slide, i) => (
+          <button
+            key={slide.title}
+            type="button"
+            aria-label={`Ir a la diapositiva ${i + 1}`}
+            aria-current={i === index}
+            onClick={() => go(i)}
+          />
+        ))}
+      </div>
     </section>
   );
 }

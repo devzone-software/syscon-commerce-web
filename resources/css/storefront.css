@@ -105,18 +105,105 @@ body {
   color: #111c2d;
 }
 
-/* Hero banner */
-.home-hero {
+/* Hero carousel: slides side by side, moved with translateX. */
+.home-carousel {
   position: relative;
   margin-top: 16px;
-  padding: 48px;
   border-radius: 8px;
   overflow: hidden;
-  background: linear-gradient(90deg, #00265d 0%, #0d3b82 50%, #00658d 100%);
-  color: #fff;
   box-shadow:
     0 20px 25px -5px #0000001a,
     0 8px 10px -6px #0000001a;
+}
+.home-carousel-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+.home-carousel-track > .home-hero {
+  flex: 0 0 100%;
+}
+/* Mercado Libre style: white half-pill stuck to each side with a blue chevron. */
+.home-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 64px;
+  padding: 0;
+  border: 0;
+  background: #fff;
+  color: #3483fa;
+  box-shadow: 0 2px 8px #00000026;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition:
+    width 0.15s ease,
+    color 0.15s ease;
+}
+.home-carousel-arrow.is-prev {
+  left: 0;
+  border-radius: 0 64px 64px 0;
+}
+.home-carousel-arrow.is-next {
+  right: 0;
+  border-radius: 64px 0 0 64px;
+}
+.home-carousel-arrow:hover {
+  width: 42px;
+  color: #2968c8;
+}
+.home-carousel-arrow:focus-visible {
+  outline: 3px solid #2dbcfe;
+  outline-offset: -3px;
+}
+.home-carousel-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  z-index: 1;
+  display: flex;
+  gap: 8px;
+  transform: translateX(-50%);
+}
+.home-carousel-dots button {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: #ffffff66;
+  cursor: pointer;
+  transition:
+    width 0.2s ease,
+    background 0.2s ease;
+}
+.home-carousel-dots button[aria-current='true'] {
+  width: 24px;
+  background: #fff;
+}
+.home-carousel-dots button:focus-visible {
+  outline: 2px solid #2dbcfe;
+  outline-offset: 2px;
+}
+
+/* Hero banner (each carousel slide) */
+.home-hero {
+  position: relative;
+  padding: 48px 72px 56px;
+  overflow: hidden;
+  background: linear-gradient(90deg, #00265d 0%, #0d3b82 50%, #00658d 100%);
+  color: #fff;
+}
+.home-hero.is-offers {
+  background: linear-gradient(90deg, #00265d 0%, #00507a 55%, #00838f 100%);
+}
+.home-hero.is-business {
+  background: linear-gradient(90deg, #111c2d 0%, #1d3461 55%, #0d3b82 100%);
+}
+.home-hero.is-payment {
+  background: linear-gradient(90deg, #0d3b82 0%, #1557b0 55%, #0079b8 100%);
 }
 .home-hero::before,
 .home-hero::after {
@@ -165,7 +252,8 @@ body {
   border-radius: 12px;
   background: #2dbcfe;
 }
-.home-hero h1 {
+.home-hero h1,
+.home-hero h2 {
   max-width: 620px;
   margin: 16px 0 0;
   font-size: 36px;
@@ -487,9 +575,14 @@ body {
 
 @media (max-width: 700px) {
   .home-hero {
-    padding: 28px 20px;
+    padding: 28px 20px 44px;
+  }
+  /* On phones the slides are swiped; the side arrows would cover the text. */
+  .home-carousel-arrow {
+    display: none;
   }
   .home-hero h1,
+  .home-hero h2,
   .promo-banner h2 {
     font-size: 26px;
     line-height: 32px;
@@ -594,5 +687,13 @@ body {
   }
   .trust-strip strong {
     font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-carousel-track,
+  .home-carousel-arrow,
+  .home-carousel-dots button {
+    transition: none;
   }
 }
