@@ -284,23 +284,6 @@ input:focus-visible {
   line-height: 24px;
   letter-spacing: 0;
 }
-.store-b2b {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #00658d;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 14px;
-  letter-spacing: 0.04em;
-}
-.store-b2b img {
-  width: 11px;
-  height: 14px;
-}
-.store-b2b:hover {
-  text-decoration: underline;
-}
 .store-menu {
   border-top: 1px solid #e0e8f0;
   background: #fff;
@@ -631,7 +614,6 @@ input:focus-visible {
 
 /* Tablet */
 @media (max-width: 1100px) {
-  .store-b2b,
   .store-cart-text,
   .store-topbar-list:first-child li:last-child {
     display: none;

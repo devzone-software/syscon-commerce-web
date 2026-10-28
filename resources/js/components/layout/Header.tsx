@@ -1,6 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import boltIcon from '../../../images/header/bolt.svg';
 import badgeIcon from '../../../images/header/badge-check.svg';
 import cartIcon from '../../../images/header/cart.svg';
 import logo from '../../../images/header/logo-grupo-syscon.jpg';
@@ -168,10 +167,6 @@ export function Header() {
               </NavLink>
             ))}
           </nav>
-          <Link className="store-b2b" to="/contacto">
-            <img src={boltIcon} alt="" />
-            Atención a Empresas y Cotizaciones
-          </Link>
         </div>
       </div>
       <div id="store-menu" className="store-menu" hidden={!open}>

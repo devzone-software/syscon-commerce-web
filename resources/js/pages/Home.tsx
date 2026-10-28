@@ -13,8 +13,6 @@ import { groupProducts, pickFeatured } from '../lib/catalog';
 import { api } from '../services/api';
 import { useData, ErrorBox, Loading, Empty } from '../ui';
 
-const count = new Intl.NumberFormat('es-PE');
-
 export function Home() {
   const { data, loading, error, reload } = useData(api.products);
   const summary = useMemo(
@@ -39,10 +37,6 @@ export function Home() {
           <CategoryShowcase categories={summary.categories} />
           <FeaturedProducts products={summary.featured} />
           <div className="home-catalog-cta">
-            <p>
-              <strong>{count.format(data.length)} productos</strong> con precios actualizados, con
-              filtros por categoría, marca y precio.
-            </p>
             <Link to="/catalogo">
               Ver todo el catálogo <ArrowRightIcon size={16} />
             </Link>

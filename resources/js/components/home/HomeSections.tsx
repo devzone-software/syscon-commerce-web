@@ -14,7 +14,7 @@ import trustBoltIcon from '../../../images/home/trust-bolt.svg';
 import trustLockIcon from '../../../images/home/trust-lock.svg';
 import trustShieldIcon from '../../../images/home/trust-shield.svg';
 import trustSupportIcon from '../../../images/home/trust-support.svg';
-import { catalogParams, productCount, type CatalogGroup } from '../../lib/catalog';
+import { catalogParams, type CatalogGroup } from '../../lib/catalog';
 import { categoryIcon } from '../../lib/categoryIcon';
 import type { Product } from '../../types';
 import { ProductCard } from '../../ui';
@@ -224,7 +224,6 @@ export function CategoryShowcase({ categories }: { categories: CatalogGroup[] })
                 <img src={categoryIcon(category.name)} alt="" />
               </span>
               <strong>{category.name}</strong>
-              <small>{productCount(category.count)}</small>
             </Link>
           </li>
         ))}

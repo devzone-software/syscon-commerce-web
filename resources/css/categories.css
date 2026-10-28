@@ -250,18 +250,6 @@
   object-fit: contain;
   padding: 12px;
 }
-.category-tile-media em {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 3px 8px;
-  border-radius: 2px;
-  background: #ffffffeb;
-  color: #00265d;
-  font-size: 11px;
-  font-style: normal;
-  font-weight: 700;
-}
 .category-tile-tag {
   display: inline-flex;
   align-items: center;
@@ -412,11 +400,6 @@
 .category-map ul a:hover {
   background: #f0f3ff;
   color: #00265d;
-}
-.category-map small {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: #747782;
 }
 
 /* Product rows */
@@ -628,11 +611,6 @@
 .brand-tiles strong {
   font-size: 16px;
   color: #00265d;
-}
-.brand-tiles small {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: #434751;
 }
 .categories-trust {
   display: grid;

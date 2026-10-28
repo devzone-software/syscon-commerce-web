@@ -383,11 +383,6 @@ body {
   letter-spacing: 0.02em;
   color: #111c2d;
 }
-.category-showcase small {
-  font-size: 12px;
-  line-height: 18px;
-  color: #434751;
-}
 
 /* Featured products */
 .featured-grid {
@@ -629,7 +624,7 @@ body {
 .home-catalog-cta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 16px;
   margin-top: 24px;
   padding: 20px 24px;
@@ -639,12 +634,6 @@ body {
   font-size: 14px;
   line-height: 20px;
   color: #434751;
-}
-.home-catalog-cta p {
-  margin: 0;
-}
-.home-catalog-cta strong {
-  color: #00265d;
 }
 .home-catalog-cta a {
   display: inline-flex;

@@ -11,7 +11,7 @@ import { ProductImage } from '../components/ProductImage';
 import { categoryIcon } from '../lib/categoryIcon';
 import { company } from '../components/layout/Header';
 import { ArrowRightIcon, CartIcon, HeadsetIcon, SearchIcon, ShieldIcon } from '../components/icons';
-import { catalogParams, groupProducts, productCount } from '../lib/catalog';
+import { catalogParams, groupProducts } from '../lib/catalog';
 import { api } from '../services/api';
 import { money } from '../state';
 import { useConfirmAdd } from '../components/cart/AddToCartDialog';
@@ -206,7 +206,6 @@ export function Categories() {
                       <Link to={byCategory(category.name)}>
                         <span className="category-tile-media">
                           {sample && <ProductImage product={sample} />}
-                          <em>{productCount(category.count)}</em>
                         </span>
                         <span className="category-tile-tag">
                           <img src={categoryIcon(category.name)} alt="" />
@@ -246,8 +245,8 @@ export function Categories() {
                     <span>{campaignTags[index]}</span>
                     <h3>{category.name}</h3>
                     <p>
-                      {productCount(category.count)} seleccionados con precios actualizados y
-                      atención especializada para empresas.
+                      Productos seleccionados con precios actualizados y atención especializada para
+                      empresas.
                     </p>
                     <Link to={byCategory(category.name)}>
                       Explorar {category.name} <ArrowRightIcon size={14} />
@@ -281,7 +280,7 @@ export function Categories() {
                           <Link
                             to={`${byCategory(category.name)}&${catalogParams.brand}=${encodeURIComponent(brand.name)}`}
                           >
-                            {brand.name} <small>{brand.count}</small>
+                            {brand.name}
                           </Link>
                         </li>
                       ))}
@@ -357,7 +356,6 @@ export function Categories() {
                         </i>
                         <span>
                           <strong>{brand.name}</strong>
-                          <small>{productCount(brand.count)}</small>
                         </span>
                       </Link>
                     </li>
