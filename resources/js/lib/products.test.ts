@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { cleanProduct, emptyProduct, toProductInput, validateProduct } from './products';
-import { isUuid } from './validation';
+import { isEmail, isUuid } from './validation';
 
 describe('product form rules', () => {
   it('requires sku, name, non negative price and integer stock', () => {
@@ -24,5 +24,7 @@ describe('product form rules', () => {
   it('validates the UUIDs used by the lookups', () => {
     expect(isUuid('0b7f1c2e-8a4d-4f5e-9c1b-2d3e4f5a6b7c')).toBe(true);
     expect(isUuid('pedido-1')).toBe(false);
+    expect(isEmail('ventas@gruposyscon.pe')).toBe(true);
+    expect(isEmail('ventas@gruposyscon')).toBe(false);
   });
 });

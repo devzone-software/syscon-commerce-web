@@ -1,9 +1,15 @@
 /* Internal backoffice: its own shell, separate from the public store layout. */
+/* Backoffice palette: white smoke background, light gray (plomo claro) buttons. */
+:root {
+  --bo-bg: #f5f5f5;
+  --bo-button: #e0e0e0;
+  --bo-button-hover: #d0d0d0;
+}
 .bo-shell {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f4f7f9;
+  background: var(--bo-bg);
 }
 .bo-topbar {
   position: sticky;
@@ -20,15 +26,10 @@
 .bo-topbar .brand {
   font-size: 19px;
 }
-.bo-topbar .brand-icon {
-  width: 34px;
-  height: 34px;
-  font-size: 21px;
-}
 .bo-topbar-tag {
   padding: 4px 10px;
   border-radius: 999px;
-  background: var(--store-navy);
+  background: var(--store-brand);
   color: #fff;
   font-size: 11px;
   font-weight: 700;
@@ -56,7 +57,7 @@
   place-items: center;
   border: 0;
   border-radius: 9px;
-  background: none;
+  background: var(--bo-button);
   color: var(--store-ink);
 }
 .bo-body {
@@ -71,22 +72,22 @@
   height: calc(100vh - 64px);
   overflow-y: auto;
   padding: 20px 14px;
-  background: var(--store-surface);
-  border-right: 1px solid var(--store-line);
+  background: var(--store-brand);
+  border-right: 1px solid var(--store-brand);
 }
 .bo-nav-group {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   margin-bottom: 20px;
 }
 .bo-nav-group > span {
   padding: 0 12px 6px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--store-muted);
+  color: #c9d6ea;
 }
 .bo-nav-group a {
   display: flex;
@@ -94,14 +95,21 @@
   min-height: 40px;
   padding: 0 12px;
   border-radius: 9px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  color: var(--store-ink-soft);
+  color: #e6edf7;
 }
-.bo-nav-group a:hover,
+/* Plain text on the brand blue: hover brightens it, the current section is underlined. */
+.bo-nav-group a:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
 .bo-nav-group a.active {
-  background: var(--store-soft);
-  color: var(--store-brand-strong);
+  color: #fff;
+  font-weight: 800;
+  text-decoration: underline 3px #4fc3f7;
+  text-underline-offset: 6px;
 }
 .bo-main {
   min-width: 0;
@@ -157,7 +165,7 @@
 }
 .bo-stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 18px;
 }
@@ -175,7 +183,7 @@
   color: var(--store-muted);
 }
 .bo-stat strong {
-  font: 800 28px Manrope, sans-serif;
+  font: 800 28px Inter, sans-serif;
   letter-spacing: -0.04em;
   color: var(--store-ink);
 }
@@ -260,6 +268,60 @@
 .bo-lookup .field-error {
   flex-basis: 100%;
 }
+.bo-filters-dates {
+  grid-template-columns: 2fr 1fr 1fr;
+}
+.bo-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.bo-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid var(--store-line);
+  border-radius: 999px;
+  background: var(--store-surface);
+  color: var(--store-ink-soft);
+  font: 600 13px Inter, sans-serif;
+  cursor: pointer;
+}
+.bo-tabs button:hover {
+  border-color: var(--store-brand);
+}
+.bo-tabs button[aria-pressed='true'] {
+  border-color: var(--store-brand);
+  background: var(--store-brand);
+  color: #fff;
+}
+.bo-tabs small {
+  font-size: 12px;
+  opacity: 0.8;
+}
+.bo-row-active td {
+  background: var(--store-soft);
+}
+.bo-history {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.bo-history li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 0 10px 16px;
+  border-left: 2px solid var(--store-line);
+  font-size: 14px;
+}
+.bo-history small {
+  font-size: 12px;
+  color: var(--store-muted);
+}
 .bo-detail-grid {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
@@ -337,11 +399,11 @@
 
 @media (max-width: 1100px) {
   .bo-stats {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .bo-detail-grid,
   .bo-two-columns {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 @media (max-width: 860px) {
@@ -349,7 +411,7 @@
     display: grid;
   }
   .bo-body {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .bo-sidebar {
     display: none;
@@ -362,7 +424,7 @@
     max-height: calc(100vh - 64px);
     border-right: 0;
     border-bottom: 1px solid var(--store-line);
-    box-shadow: 0 16px 30px #0a33461a;
+    box-shadow: 0 16px 30px #0c131f1a;
   }
   .bo-sidebar.is-open {
     display: block;
@@ -379,7 +441,7 @@
     display: none;
   }
   .bo-filters {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .bo-page-header {
     flex-direction: column;
@@ -387,6 +449,235 @@
 }
 @media (max-width: 480px) {
   .bo-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .bo-stat {
+    padding: 14px;
+  }
+  .bo-stat strong {
+    font-size: 20px;
+  }
+  .bo-main > .bo-shortcuts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .bo-main > .bo-shortcuts .bo-shortcut {
+    padding: 14px;
+  }
+  .bo-main > .bo-shortcuts .bo-shortcut span {
+    display: none;
+  }
+}
+
+/* Panel: shortcuts first, then one bar per day of paid sales. */
+.bo-main > .bo-shortcuts {
+  margin-bottom: 18px;
+}
+.bo-week-chart {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.bo-week-chart li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  outline: none;
+}
+.bo-week-track {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  width: 100%;
+  height: 180px;
+  padding-top: 20px;
+  border-bottom: 1px solid var(--store-line);
+}
+.bo-week-bar {
+  width: min(48px, 60%);
+  border-radius: 4px 4px 0 0;
+  background: var(--store-brand);
+  transition: background 0.15s;
+}
+.bo-week-day {
+  font-size: 12px;
+  color: var(--store-muted);
+  white-space: nowrap;
+}
+.bo-week-tip {
+  position: absolute;
+  bottom: calc(100% - 8px);
+  z-index: 2;
+  display: none;
+  flex-direction: column;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--store-ink);
+  color: #fff;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.bo-week-chart li:hover .bo-week-tip,
+.bo-week-chart li:focus-visible .bo-week-tip {
+  display: flex;
+}
+.bo-week-chart li:hover .bo-week-bar,
+.bo-week-chart li:focus-visible .bo-week-bar {
+  background: var(--store-brand-strong, #0d3b82);
+}
+.bo-week-chart li:focus-visible .bo-week-day {
+  color: var(--store-ink);
+  font-weight: 700;
+}
+@media (max-width: 480px) {
+  .bo-week-chart {
+    gap: 4px;
+  }
+  .bo-week-track {
+    height: 120px;
+  }
+  .bo-week-day {
+    font-size: 10px;
+  }
+}
+.bo-week-value {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--store-ink);
+  white-space: nowrap;
+}
+
+/* Phones: status tabs in one scrollable row, dates side by side. */
+@media (max-width: 480px) {
+  .bo-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: -4px;
+    padding: 0 4px 4px;
+    scrollbar-width: none;
+  }
+  .bo-tabs button {
+    flex-shrink: 0;
+  }
+  .bo-filters-dates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bo-filters-dates > :first-child {
+    grid-column: 1 / -1;
+  }
+  .bo-main .data-table td:first-child {
+    white-space: nowrap;
+  }
+}
+
+.bo-filters-activity {
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+}
+.bo-secret {
+  display: inline-block;
+  padding: 10px 14px;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  background: var(--store-bg, #f5f6f8);
+  border: 1px dashed var(--store-line);
+  border-radius: 8px;
+  user-select: all;
+  word-break: break-all;
+}
+.bo-topbar-user small {
+  color: inherit;
+  opacity: 0.75;
+}
+@media (max-width: 860px) {
+  .bo-filters-activity {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 480px) {
+  .bo-filters-activity {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Desktop sidebar: hide/show, drag the edge to resize, full screen. */
+.bo-body {
+  position: relative;
+  grid-template-columns: var(--bo-sidebar-width, 232px) minmax(0, 1fr);
+}
+.bo-icon-button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  background: var(--bo-button);
+  color: var(--store-ink);
+  cursor: pointer;
+}
+.bo-icon-button:hover {
+  background: var(--bo-button-hover);
+}
+.bo-icon-button:focus-visible,
+.bo-sidebar-resizer:focus-visible {
+  outline: 2px solid var(--store-brand);
+  outline-offset: 2px;
+}
+.bo-sidebar-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--bo-sidebar-width, 232px);
+  z-index: 20;
+  width: 10px;
+  transform: translateX(-50%);
+  cursor: col-resize;
+  touch-action: none;
+}
+.bo-sidebar-resizer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 4px;
+  width: 2px;
+  background: transparent;
+  transition: background 0.15s;
+}
+.bo-sidebar-resizer:hover::after,
+.bo-body.is-resizing .bo-sidebar-resizer::after {
+  background: var(--store-brand);
+}
+.bo-body.is-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+@media (min-width: 861px) {
+  .bo-body.is-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bo-body.is-collapsed .bo-sidebar {
+    display: none;
+  }
+}
+@media (max-width: 860px) {
+  .bo-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bo-sidebar-toggle,
+  .bo-fullscreen-toggle,
+  .bo-sidebar-resizer {
+    display: none;
   }
 }

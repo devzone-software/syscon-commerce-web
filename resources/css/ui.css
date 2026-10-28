@@ -28,8 +28,15 @@
 }
 
 .table-wrap {
+  position: relative;
   width: 100%;
   overflow-x: auto;
+  /* Scroll shadows: a soft edge appears on the side where more columns are hidden. */
+  background:
+    linear-gradient(to right, #fff 30%, #fff0) left / 32px 100% no-repeat local,
+    linear-gradient(to left, #fff 30%, #fff0) right / 32px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, #00265d26, #00265d00) left / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, #00265d26, #00265d00) right / 12px 100% no-repeat scroll;
 }
 .data-table {
   width: 100%;
@@ -72,7 +79,7 @@
   white-space: nowrap;
 }
 .data-table tbody tr:hover {
-  background: #fafcfd;
+  background: #fafbfd;
 }
 
 .detail-list {
@@ -101,6 +108,20 @@
 }
 .detail-list code {
   font-size: 12px;
+}
+.payment-instructions {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--store-line);
+  border-radius: 10px;
+  background: var(--store-soft);
+  font-size: 14px;
+}
+.payment-instructions p {
+  margin: 6px 0 0;
+  line-height: 1.6;
+  white-space: pre-line;
+  color: var(--store-ink-soft);
 }
 
 .field {

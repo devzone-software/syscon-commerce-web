@@ -1,11 +1,16 @@
 <?php
 
 use App\Http\Controllers\Gateway\AuthGatewayController;
+use App\Http\Controllers\Gateway\CashGatewayController;
 use App\Http\Controllers\Gateway\CatalogGatewayController;
+use App\Http\Controllers\Gateway\InventoryGatewayController;
 use App\Http\Controllers\Gateway\InvoiceGatewayController;
 use App\Http\Controllers\Gateway\OrderGatewayController;
 use App\Http\Controllers\Gateway\PaymentGatewayController;
+use App\Http\Controllers\Gateway\ReportGatewayController;
+use App\Http\Controllers\Gateway\SaleGatewayController;
 use App\Http\Controllers\Gateway\SupplierGatewayController;
+use App\Http\Controllers\Gateway\UserGatewayController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('web-api')->group(function () {
@@ -13,22 +18,55 @@ Route::prefix('web-api')->group(function () {
     Route::get('/product/{id}', [CatalogGatewayController::class, 'product'])->whereUuid('id');
     Route::post('/register', [AuthGatewayController::class, 'register']);
     Route::post('/login', [AuthGatewayController::class, 'login']);
+    Route::post('/login/google', [AuthGatewayController::class, 'google']);
     Route::post('/logout', [AuthGatewayController::class, 'logout']);
     Route::get('/me', [AuthGatewayController::class, 'me']);
+    Route::get('/profile', [AuthGatewayController::class, 'profile']);
+    Route::post('/password', [AuthGatewayController::class, 'password'])->middleware('throttle:10,1');
+    Route::get('/delivery-options', [OrderGatewayController::class, 'deliveryOptions']);
+    Route::get('/lookup/ruc/{ruc}', [OrderGatewayController::class, 'ruc'])->where('ruc', '[0-9]{11}');
     Route::match(['get', 'post'], '/orders', [OrderGatewayController::class, 'orders']);
     Route::get('/orders/{id}', [OrderGatewayController::class, 'order'])->whereUuid('id');
+    Route::get('/orders/{id}/invoices', [OrderGatewayController::class, 'invoices'])->whereUuid('id');
+    Route::get('/orders/{id}/invoices/{invoice}/{format}', [OrderGatewayController::class, 'invoiceFile'])->whereUuid(['id', 'invoice'])->whereIn('format', ['pdf', 'xml', 'cdr']);
+    Route::get('/payment-methods', [PaymentGatewayController::class, 'methods']);
     Route::post('/payments', [PaymentGatewayController::class, 'pay']);
     Route::get('/payments/{id}', [PaymentGatewayController::class, 'payment'])->whereUuid('id');
     Route::post('/admin/products', [CatalogGatewayController::class, 'saveProduct']);
+    Route::get('/admin/orders', [OrderGatewayController::class, 'adminOrders']);
+    Route::get('/admin/orders/{id}', [OrderGatewayController::class, 'adminOrder'])->whereUuid('id');
+    Route::get('/admin/payments', [PaymentGatewayController::class, 'adminPayments']);
     Route::patch('/admin/orders/{id}/status', [OrderGatewayController::class, 'orderStatus'])->whereUuid('id');
+    Route::post('/admin/notifications/{id}/resend', [OrderGatewayController::class, 'resendNotification'])->whereUuid('id');
     Route::post('/admin/payments/{id}/confirm', [PaymentGatewayController::class, 'confirmPayment'])->whereUuid('id');
     Route::post('/admin/invoices', [InvoiceGatewayController::class, 'create']);
+    Route::match(['get', 'post'], '/admin/invoice-series', [InvoiceGatewayController::class, 'series']);
+    Route::patch('/admin/invoice-series/{id}', [InvoiceGatewayController::class, 'updateSeries'])->whereNumber('id');
     Route::get('/admin/invoices/{id}', [InvoiceGatewayController::class, 'show'])->whereUuid('id');
+    Route::patch('/admin/invoices/{id}', [InvoiceGatewayController::class, 'update'])->whereUuid('id');
     Route::post('/admin/invoices/{id}/submit', [InvoiceGatewayController::class, 'submit'])->whereUuid('id');
+    Route::post('/admin/invoices/{id}/reconcile', [InvoiceGatewayController::class, 'reconcile'])->whereUuid('id');
+    Route::post('/admin/invoices/{id}/void', [InvoiceGatewayController::class, 'void'])->whereUuid('id');
+    Route::post('/admin/invoices/{id}/void/check', [InvoiceGatewayController::class, 'checkVoid'])->whereUuid('id');
+    Route::get('/admin/invoices/{id}/{format}', [InvoiceGatewayController::class, 'file'])->whereUuid('id')->whereIn('format', ['pdf', 'xml', 'cdr']);
+    Route::post('/admin/sales', [SaleGatewayController::class, 'store']);
+    Route::get('/admin/cash/current', [CashGatewayController::class, 'current']);
+    Route::post('/admin/cash/open', [CashGatewayController::class, 'open']);
+    Route::post('/admin/cash/movements', [CashGatewayController::class, 'movement']);
+    Route::post('/admin/cash/close', [CashGatewayController::class, 'close']);
+    Route::get('/admin/cash/sessions', [CashGatewayController::class, 'sessions']);
+    Route::get('/admin/customers', [SaleGatewayController::class, 'customers']);
+    Route::get('/admin/reports/summary', [ReportGatewayController::class, 'summary']);
+    Route::get('/admin/reports/sales', [ReportGatewayController::class, 'sales']);
     Route::match(['get', 'post'], '/admin/suppliers', [SupplierGatewayController::class, 'suppliers']);
     Route::post('/admin/suppliers/{id}/run', [SupplierGatewayController::class, 'run'])->whereUuid('id');
     Route::get('/admin/supplier-jobs', [SupplierGatewayController::class, 'jobs']);
     Route::get('/admin/supplier-jobs/{id}/history', [SupplierGatewayController::class, 'history'])->whereUuid('id');
+    Route::match(['get', 'post'], '/admin/purchases', [InventoryGatewayController::class, 'purchases']);
+    Route::match(['get', 'post'], '/admin/internal-uses', [InventoryGatewayController::class, 'internalUses']);
+    Route::match(['get', 'post'], '/admin/users', [UserGatewayController::class, 'users']);
+    Route::post('/admin/users/{id}/{action}', [UserGatewayController::class, 'action'])->whereUuid('id')->whereIn('action', ['validate', 'suspend', 'reactivate', 'reset-password']);
+    Route::get('/admin/audit', [UserGatewayController::class, 'audit']);
 });
 
 Route::get('/{any?}', fn () => view('app'))->where('any', '^(?!web-api|up).*$');
