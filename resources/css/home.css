@@ -264,7 +264,7 @@ input:focus-visible {
   gap: 8px;
 }
 .store-nav a {
-  padding: 6px 16px;
+  padding: 10px 16px;
   border-radius: 4px;
   color: #434751;
   font-size: 13px;
@@ -279,10 +279,6 @@ input:focus-visible {
 .store-nav a.active {
   background: #dee8ff;
   color: #00265d;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 24px;
-  letter-spacing: 0;
 }
 .store-menu {
   border-top: 1px solid #e0e8f0;
@@ -769,10 +765,5 @@ input:focus-visible {
   .card-product-stock {
     top: 6px;
     bottom: auto;
-  }
-}
-@media (max-width: 700px) {
-  .store-search.store-search-catalog {
-    display: none;
   }
 }

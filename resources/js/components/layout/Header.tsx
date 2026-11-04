@@ -98,11 +98,7 @@ export function Header() {
       <div className="store-mainbar">
         <div className="container store-mainbar-row">
           <Brand />
-          <form
-            className={`store-search${location.pathname === '/catalogo' ? ' store-search-catalog' : ''}`}
-            role="search"
-            onSubmit={search}
-          >
+          <form className="store-search" role="search" onSubmit={search}>
             <img src={searchIcon} alt="" />
             <label className="visually-hidden" htmlFor="store-search-input">
               Buscar productos

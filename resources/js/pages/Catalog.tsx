@@ -21,7 +21,7 @@ import {
   type CatalogFilters,
 } from '../lib/catalog';
 import { api } from '../services/api';
-import { useData, ErrorBox, Loading, Empty } from '../ui';
+import { useData, ErrorBox, Empty } from '../ui';
 import '../../css/products.css';
 import '../../css/storefront.css';
 
@@ -57,6 +57,33 @@ function appliedFilters(filters: CatalogFilters): Chip[] {
     },
   ];
   return chips.filter((chip): chip is Chip => Boolean(chip));
+}
+
+function CatalogLoading({ size }: { size: number }) {
+  return (
+    <div className="catalog-body catalog-loading" role="status" aria-label="Cargando catálogo">
+      <span className="visually-hidden">Cargando productos…</span>
+      <div className="side-card catalog-loading-side" aria-hidden="true">
+        {Array.from({ length: 14 }, (_, index) => (
+          <div className="catalog-placeholder" key={index} />
+        ))}
+      </div>
+      <div className="catalog-main" aria-hidden="true">
+        <div className="catalog-bar catalog-loading-bar" />
+        <div className="catalog-cards">
+          {Array.from({ length: size }, (_, index) => (
+            <div className="catalog-card catalog-loading-card" key={index}>
+              <div className="catalog-card-media" />
+              <div className="catalog-placeholder" />
+              <div className="catalog-placeholder" />
+              <div className="catalog-placeholder" />
+              <div className="catalog-placeholder" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 /** Figma "Client / Productos": compact header with search, filter sidebar and 3-column grid. */
@@ -144,7 +171,14 @@ export function Catalog() {
         <div>
           <h1>
             Catálogo de Productos{' '}
-            {data && <span className="catalog-total">{count.format(data.length)} productos</span>}
+            {(data || loading) && (
+              <span
+                className={`catalog-total${loading ? ' is-loading' : ''}`}
+                aria-hidden={loading}
+              >
+                {data ? count.format(data.length) : '00'} productos
+              </span>
+            )}
           </h1>
           <p>Explora nuestro catálogo de tecnología con precios actualizados.</p>
         </div>
@@ -200,7 +234,7 @@ export function Catalog() {
       </div>
 
       {loading ? (
-        <Loading />
+        <CatalogLoading size={size} />
       ) : error ? (
         <ErrorBox message={error} retry={reload} />
       ) : !data?.length ? (

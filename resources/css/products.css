@@ -493,6 +493,39 @@
   gap: 24px;
   min-width: 0;
 }
+.catalog-total.is-loading {
+  visibility: hidden;
+}
+.catalog-placeholder {
+  height: 20px;
+  border-radius: 4px;
+  background: #e7eeff;
+}
+.catalog-loading-side {
+  min-height: 640px;
+  gap: 16px;
+}
+.catalog-loading-bar {
+  min-height: 60px;
+}
+.catalog-loading-card {
+  min-height: 460px;
+  gap: 16px;
+}
+@media (max-width: 700px) {
+  /* Keep the shared header height and use its search on mobile. */
+  .catalog-search {
+    display: none;
+  }
+}
+@media (max-width: 560px) {
+  .catalog-loading-card {
+    min-height: 300px;
+  }
+  .catalog-loading-bar {
+    min-height: 112px;
+  }
+}
 .catalog-bar {
   display: flex;
   align-items: center;
@@ -851,6 +884,9 @@
   }
 }
 @media (max-width: 860px) {
+  .catalog-loading-side {
+    display: none;
+  }
   .catalog-body {
     grid-template-columns: minmax(0, 1fr);
   }
