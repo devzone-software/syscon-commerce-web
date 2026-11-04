@@ -17,6 +17,7 @@ import {
   TruckIcon,
 } from '../icons';
 import '../../../css/account.css';
+import { PageMain } from '../layout/PageMain';
 
 /**
  * Customer portal shell from Figma "Client / Mi cuenta": sidebar with the profile card and the
@@ -131,7 +132,7 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           </Link>
           <img className="portal-logo" src={profile} alt="" />
         </header>
-        <main className="portal-content">{children}</main>
+        <PageMain className="portal-content">{children}</PageMain>
         <footer className="portal-footer">
           <span>
             © {new Date().getFullYear()} Grupo SYSCON S.A.C. Todos los derechos reservados.

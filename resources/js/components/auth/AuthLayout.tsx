@@ -1,6 +1,7 @@
-import { useLayoutEffect, type ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { Header } from '../layout/Header';
+import { PageMain } from '../layout/PageMain';
 import { ArrowLeftIcon, ShieldIcon } from '../icons';
 import { company } from '../layout/Header';
 import '../../../css/auth.css';
@@ -27,17 +28,10 @@ export function AuthLayout({
   children: ReactNode;
   below?: ReactNode;
 }) {
-  const { pathname } = useLocation();
-
-  // Reset before paint when opening an auth page or its confirmation screen.
-  useLayoutEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  }, [pathname, title]);
-
   return (
     <div className="auth-shell">
       <Header />
-      <main className="auth-main">
+      <PageMain className="auth-main" resetKey={title}>
         <div className="container">
           <div className="auth-card">
             <aside className="auth-panel">
@@ -62,7 +56,7 @@ export function AuthLayout({
           </div>
           {below}
         </div>
-      </main>
+      </PageMain>
       <footer className="auth-footer">
         <div className="container auth-footer-row">
           <span>
