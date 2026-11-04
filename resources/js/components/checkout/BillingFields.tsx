@@ -80,7 +80,7 @@ export function BillingFields({
           </label>
         ))}
       </div>
-      <div className="field-row">
+      <div className={`field-row${factura ? ' is-single' : ''}`}>
         {factura ? (
           <label className="field">
             RUC
