@@ -325,7 +325,7 @@ export function Auth({ register = false }: { register?: boolean }) {
         {google}
         <p className="auth-switch">
           ¿Aún no tienes una cuenta de cliente?{' '}
-          <Link to="/registro" state={location.state}>
+          <Link to="/registro" state={location.state} viewTransition>
             Crear cuenta corporativa o personal
           </Link>
         </p>
@@ -514,7 +514,7 @@ export function Auth({ register = false }: { register?: boolean }) {
       {google}
       <p className="auth-switch">
         ¿Ya tienes una cuenta registrada?{' '}
-        <Link to="/ingresar" state={location.state}>
+        <Link to="/ingresar" state={location.state} viewTransition>
           Iniciar sesión
         </Link>
       </p>
