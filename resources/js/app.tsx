@@ -105,7 +105,7 @@ function App() {
                     </RequireAuth>
                   }
                 />
-                {/* Sign in, sign up and recovery use their own slim header and footer. */}
+                {/* Authentication forms reuse the storefront header and footer. */}
                 <Route path="/ingresar" element={<Auth />} />
                 <Route path="/registro" element={<Auth register />} />
                 <Route path="/recuperar" element={<Recover />} />
