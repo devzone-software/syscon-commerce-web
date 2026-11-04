@@ -28,18 +28,20 @@ export function PageHero({
 
 /** Content band below the hero; `soft` alternates the light grey background. */
 export function PageSection({
+  id,
   title,
   soft = false,
   action,
   children,
 }: {
+  id?: string;
   title?: string;
   soft?: boolean;
   action?: ReactNode;
   children: ReactNode;
 }) {
   return (
-    <section className={`page-section${soft ? ' is-soft' : ''}`}>
+    <section id={id} className={`page-section${soft ? ' is-soft' : ''}`}>
       <div className="container">
         {(title || action) && (
           <div className="page-section-head">

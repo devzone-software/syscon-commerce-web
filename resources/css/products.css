@@ -1035,8 +1035,16 @@
   }
   .catalog-card-top,
   .catalog-card-label,
-  .catalog-card-meta,
   .catalog-card-view {
+    display: none;
+  }
+  .catalog-card-meta {
+    display: block;
+    font-size: 10px;
+    line-height: 14px;
+    overflow-wrap: anywhere;
+  }
+  .catalog-card-meta code {
     display: none;
   }
   .catalog-card-media {
