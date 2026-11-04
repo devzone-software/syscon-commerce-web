@@ -382,7 +382,7 @@ export function Categories() {
           ))}
         </ul>
         <div className="categories-callbar">
-          <img src={logo} alt="Grupo SYSCON" width={132} height={37} />
+          <img className="brand-image" src={logo} alt="Grupo SYSCON" width={132} height={37} />
           <span>
             Central de Atención Telefónica Corporativa:{' '}
             <a href={company.phoneHref}>{company.phone}</a>

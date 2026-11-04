@@ -33,7 +33,7 @@ export function AuthLayout({
       <header className="auth-header">
         <div className="container auth-header-row">
           <Link to="/" aria-label="Grupo SYSCON, ir al inicio">
-            <img src={logo} alt="" width={140} height={39} />
+            <img className="brand-image" src={logo} alt="" width={140} height={39} />
           </Link>
           <nav aria-label="Ayuda">
             <Link to="/" className="auth-back">

@@ -22,7 +22,7 @@ export const company = {
 export function Brand() {
   return (
     <Link to="/" className="brand" aria-label="Grupo SYSCON Tecnología Informática, ir al inicio">
-      <img src={logo} alt="" width={158} height={44} />
+      <img className="brand-image" src={logo} alt="" width={158} height={44} />
     </Link>
   );
 }
