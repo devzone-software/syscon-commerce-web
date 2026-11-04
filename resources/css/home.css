@@ -332,7 +332,7 @@ input:focus-visible {
   color: #0d3b82;
 }
 
-/* Footer · four link columns, contact data and the dark copyright bar */
+/* Footer · company description, three link groups and contact data */
 .store-footer {
   margin-top: 64px;
   background: #263143;
@@ -340,9 +340,13 @@ input:focus-visible {
 }
 .store-footer-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: 1.35fr 0.8fr 0.9fr 0.8fr 1.5fr;
+  align-items: start;
   gap: 32px;
   padding: 48px 0 32px;
+}
+.store-footer-grid > * {
+  min-width: 0;
 }
 .store-footer-brand {
   display: flex;
@@ -370,6 +374,7 @@ input:focus-visible {
   color: #2dbcfe;
 }
 .store-footer-about p {
+  max-width: 440px;
   margin: 12px 0 0;
   font-size: 12px;
   line-height: 19.5px;
@@ -388,7 +393,10 @@ input:focus-visible {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: 8px;
+}
+.store-footer nav h2 {
+  margin-bottom: 4px;
 }
 .store-footer nav a,
 .store-footer-contact {
@@ -410,12 +418,19 @@ input:focus-visible {
 }
 .store-footer-contact li {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
 }
+.store-footer-contact a,
+.store-footer-contact span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .store-footer-contact img {
+  flex-shrink: 0;
   width: 12px;
   height: 12px;
+  margin-top: 3px;
   object-fit: contain;
 }
 .store-footer-bottom {
@@ -631,6 +646,14 @@ input:focus-visible {
   .store-footer-about {
     grid-column: 1 / -1;
   }
+  .store-footer-contact-column {
+    grid-column: 1 / -1;
+  }
+  .store-footer-contact {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 32px;
+  }
 }
 @media (max-width: 900px) {
   .store-navbar,
@@ -674,6 +697,12 @@ input:focus-visible {
   .store-footer-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
+  }
+  .store-footer-contact-column {
+    grid-column: auto;
+  }
+  .store-footer-contact {
+    display: flex;
   }
   .card-product-price {
     font-size: 22px;

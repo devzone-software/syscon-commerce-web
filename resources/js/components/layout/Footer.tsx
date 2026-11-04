@@ -40,7 +40,7 @@ export function Footer() {
           <Link to="/registro">Crear cuenta</Link>
           <Link to="/cuenta">Mi cuenta</Link>
         </nav>
-        <div>
+        <div className="store-footer-contact-column">
           <h2>Contacto</h2>
           <ul className="store-footer-contact">
             <li>
@@ -59,7 +59,7 @@ export function Footer() {
             </li>
             <li>
               <img src={clockIcon} alt="" />
-              Lun - Sáb: 8:30 AM - 6:30 PM
+              <span>Lun - Sáb: 8:30 AM - 6:30 PM</span>
             </li>
           </ul>
         </div>
