@@ -127,9 +127,21 @@
 .catalog-applied {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
-  padding-top: 16px;
+  height: 54px;
+  padding-top: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+.catalog-applied > * {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.catalog-applied-empty {
+  font-size: 13px;
+  color: #434751;
 }
 .catalog-applied-label {
   display: inline-flex;

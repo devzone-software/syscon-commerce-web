@@ -174,26 +174,30 @@ export function Catalog() {
           <img src={clearIcon} alt="" /> Limpiar búsqueda
         </button>
       </form>
-      {chips.length > 0 && (
-        <div className="catalog-applied">
-          <span className="catalog-applied-label">
-            <img src={filterIcon} alt="" /> FILTROS APLICADOS:
-          </span>
-          {chips.map((chip) => (
-            <button
-              key={chip.label}
-              type="button"
-              onClick={() => update(Object.fromEntries(chip.keys.map((key) => [key, ''])))}
-              aria-label={`Quitar filtro ${chip.label}: ${chip.value}`}
-            >
-              {chip.label}: <strong>{chip.value}</strong> <img src={closeIcon} alt="" />
+      <div className="catalog-applied" role="group" aria-label="Filtros aplicados">
+        {chips.length > 0 ? (
+          <>
+            <span className="catalog-applied-label">
+              <img src={filterIcon} alt="" /> FILTROS APLICADOS:
+            </span>
+            {chips.map((chip) => (
+              <button
+                key={chip.label}
+                type="button"
+                onClick={() => update(Object.fromEntries(chip.keys.map((key) => [key, ''])))}
+                aria-label={`Quitar filtro ${chip.label}: ${chip.value}`}
+              >
+                {chip.label}: <strong>{chip.value}</strong> <img src={closeIcon} alt="" />
+              </button>
+            ))}
+            <button type="button" className="catalog-applied-clear" onClick={clear}>
+              Limpiar todos
             </button>
-          ))}
-          <button type="button" className="catalog-applied-clear" onClick={clear}>
-            Limpiar todos
-          </button>
-        </div>
-      )}
+          </>
+        ) : (
+          <span className="catalog-applied-empty">Sin filtros aplicados</span>
+        )}
+      </div>
 
       {loading ? (
         <Loading />
