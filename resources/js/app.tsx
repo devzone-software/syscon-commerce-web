@@ -105,7 +105,7 @@ function App() {
                     </RequireAuth>
                   }
                 />
-                {/* Authentication forms reuse the storefront header and footer. */}
+                {/* Authentication forms reuse the storefront header. */}
                 <Route path="/ingresar" element={<Auth />} />
                 <Route path="/registro" element={<Auth register />} />
                 <Route path="/recuperar" element={<Recover />} />
