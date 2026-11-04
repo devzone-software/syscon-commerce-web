@@ -6,6 +6,7 @@ import { PageHero, PageSection } from '../components/layout/PageHero';
 import { useCartReview } from '../hooks/useCartReview';
 import { useShop } from '../state';
 import { Empty } from '../ui';
+import { AccountLayout } from '../components/account/AccountLayout';
 
 const hero = (
   <PageHero
@@ -15,15 +16,33 @@ const hero = (
   />
 );
 
-export function Cart() {
+export function AccountCart() {
+  return (
+    <AccountLayout title="Mi carrito">
+      <div className="portal-cart">
+        <Cart account />
+      </div>
+    </AccountLayout>
+  );
+}
+
+export function Cart({ account = false }: { account?: boolean }) {
   const { cart, setQuantity, clear } = useShop();
   const { issues, checking, error } = useCartReview();
   const [confirmClear, setConfirmClear] = useState(false);
+  const heading = account ? (
+    <header className="portal-card portal-cart-heading">
+      <h1>Mi carrito</h1>
+      <p>Revisa tus productos antes de continuar al pago.</p>
+    </header>
+  ) : (
+    hero
+  );
 
   if (!cart.length)
     return (
       <>
-        {hero}
+        {heading}
         <PageSection>
           <Empty
             title="Tu carrito está vacío"
@@ -40,7 +59,7 @@ export function Cart() {
 
   return (
     <>
-      {hero}
+      {heading}
       <PageSection
         title="Productos en tu carrito"
         action={

@@ -249,6 +249,35 @@
   gap: 32px;
   padding: 24px;
 }
+.portal-cart {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+.portal-cart-heading h1 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  color: #00265d;
+}
+.portal-cart-heading p {
+  margin: 0;
+  font-size: 14px;
+  color: #59616c;
+}
+.portal-cart > .page-section {
+  border-radius: 8px;
+  box-shadow: 0 1px 1px #0000000d;
+}
+.portal-cart > .page-section > .container {
+  width: 100%;
+  padding: 24px;
+}
+@media (max-width: 640px) {
+  .portal-cart > .page-section > .container {
+    padding: 16px;
+  }
+}
 .portal-footer {
   display: flex;
   align-items: center;

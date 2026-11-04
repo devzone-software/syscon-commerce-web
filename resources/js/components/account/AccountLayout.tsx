@@ -67,9 +67,9 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           <NavLink to="/cuenta/pedidos">
             <BoxIcon size={18} /> Mis pedidos
           </NavLink>
-          <Link to="/carrito">
+          <NavLink to="/cuenta/carrito">
             <CartIcon size={18} /> Mi carrito
-          </Link>
+          </NavLink>
           <Link to="/ofertas">
             <TruckIcon size={18} /> Selección de productos
           </Link>
@@ -120,7 +120,11 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           <Link className="portal-store" to="/">
             <StoreIcon size={16} /> Ir a la tienda
           </Link>
-          <Link className="portal-icon" to="/carrito" aria-label={`Carrito con ${count} productos`}>
+          <Link
+            className="portal-icon"
+            to="/cuenta/carrito"
+            aria-label={`Carrito con ${count} productos`}
+          >
             <CartIcon size={20} />
             {count > 0 && <span className="portal-dot" />}
           </Link>

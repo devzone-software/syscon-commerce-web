@@ -14,6 +14,9 @@ const ProductPage = lazy(() =>
   import('./pages/ProductPage').then((module) => ({ default: module.ProductPage })),
 );
 const Cart = lazy(() => import('./pages/Cart').then((module) => ({ default: module.Cart })));
+const AccountCart = lazy(() =>
+  import('./pages/Cart').then((module) => ({ default: module.AccountCart })),
+);
 const Auth = lazy(() => import('./pages/Auth').then((module) => ({ default: module.Auth })));
 const Checkout = lazy(() =>
   import('./pages/Checkout').then((module) => ({ default: module.Checkout })),
@@ -115,6 +118,14 @@ function App() {
                   element={
                     <RequireAuth>
                       <Account />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/cuenta/carrito"
+                  element={
+                    <RequireAuth>
+                      <AccountCart />
                     </RequireAuth>
                   }
                 />
