@@ -5,12 +5,11 @@ import clearIcon from '../../images/catalog/clear.svg';
 import closeIcon from '../../images/catalog/close.svg';
 import filterIcon from '../../images/catalog/filter.svg';
 import homeIcon from '../../images/catalog/home.svg';
-import invoiceIcon from '../../images/catalog/invoice.svg';
 import searchButtonIcon from '../../images/catalog/search-button.svg';
 import searchIcon from '../../images/catalog/search.svg';
 import { CatalogCard } from '../components/catalog/CatalogCard';
 import { CatalogSidebar } from '../components/catalog/CatalogSidebar';
-import { ChatIcon, SearchIcon, TruckIcon } from '../components/icons';
+import { ChatIcon, SearchIcon } from '../components/icons';
 import {
   catalogParams,
   filterProducts,
@@ -148,21 +147,6 @@ export function Catalog() {
             {data && <span className="catalog-total">{count.format(data.length)} productos</span>}
           </h1>
           <p>Explora nuestro catálogo de tecnología con precios actualizados.</p>
-        </div>
-        <div className="catalog-perks">
-          <span>
-            <img src={invoiceIcon} alt="" />
-            <span>
-              <small>FACTURACIÓN</small>RUC 20 con IGV
-            </span>
-          </span>
-          <i aria-hidden="true" />
-          <span>
-            <TruckIcon size={16} />
-            <span>
-              <small>ENTREGA</small>Retiro o envío a domicilio
-            </span>
-          </span>
         </div>
       </div>
       <form className="catalog-search" role="search" onSubmit={search}>
