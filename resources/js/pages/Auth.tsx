@@ -16,7 +16,7 @@ import {
   TruckIcon,
   UserIcon,
 } from '../components/icons';
-import { MIN_PASSWORD, passwordChecks, safeRedirect } from '../lib/auth';
+import { loginDestination, MIN_PASSWORD, passwordChecks, safeRedirect } from '../lib/auth';
 import { api } from '../services/api';
 import { useShop } from '../state';
 import type { DocumentType, SignUp } from '../types';
@@ -194,7 +194,8 @@ export function Auth({ register = false }: { register?: boolean }) {
   const location = useLocation();
   const { reloadUser } = useShop();
   // Page requested before RequireAuth sent the visitor here, e.g. the checkout.
-  const from = safeRedirect((location.state as { from?: unknown } | null)?.from);
+  const requestedFrom = (location.state as { from?: unknown } | null)?.from;
+  const from = safeRedirect(requestedFrom);
   const [form, setForm] = useState<SignUp>(emptySignUp);
   const [audience, setAudience] = useState<'empresa' | 'personal'>(
     register ? 'personal' : 'empresa',
@@ -212,10 +213,10 @@ export function Auth({ register = false }: { register?: boolean }) {
   // Confirm the new session before leaving: reloadUser() alone swallows errors, which
   // would send the visitor straight back to this form without explanation.
   const finish = async (isNew: boolean) => {
-    await api.me();
+    const signedInUser = await api.me();
     await reloadUser();
     if (isNew) setCreated(true);
-    else navigate(from, { replace: true });
+    else navigate(loginDestination(signedInUser, requestedFrom), { replace: true });
   };
   const run = async (action: () => Promise<void>) => {
     setError('');

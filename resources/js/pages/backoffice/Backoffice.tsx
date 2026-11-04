@@ -291,7 +291,7 @@ export function Backoffice() {
             Ver tienda
           </Link>
           <Link to="/cuenta" className="link-button">
-            Mi cuenta
+            Área de cliente
           </Link>
           <button type="button" className="link-button" onClick={signOut}>
             Salir

@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { accountHome, can, canUseBackoffice } from '../../lib/auth';
+import { useShop } from '../../state';
 import chipIcon from '../../../images/footer/chip.svg';
 import clockIcon from '../../../images/footer/clock.svg';
 import mailIcon from '../../../images/footer/mail.svg';
@@ -7,6 +9,9 @@ import whatsappIcon from '../../../images/footer/whatsapp.svg';
 import { company } from './Header';
 
 export function Footer() {
+  const { user } = useShop();
+  const staff = canUseBackoffice(user);
+  const managesOrders = can(user, 'orders:manage');
   return (
     <footer className="store-footer">
       <div className="container store-footer-grid">
@@ -32,13 +37,15 @@ export function Footer() {
           <h2>Ayuda</h2>
           <Link to="/contacto">Contacto comercial</Link>
           <Link to="/contacto">Soporte técnico</Link>
-          <Link to="/cuenta/pedidos">Estado del pedido</Link>
+          <Link to={managesOrders ? '/admin/pedidos' : '/cuenta/pedidos'}>
+            {managesOrders ? 'Gestión de pedidos' : 'Estado del pedido'}
+          </Link>
         </nav>
         <nav aria-label="Empresa">
           <h2>Empresa</h2>
           <Link to="/nosotros">Nosotros</Link>
           <Link to="/registro">Crear cuenta</Link>
-          <Link to="/cuenta">Mi cuenta</Link>
+          <Link to={accountHome(user)}>{staff ? 'Administración' : 'Mi cuenta'}</Link>
         </nav>
         <div className="store-footer-contact-column">
           <h2>Contacto</h2>

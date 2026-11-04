@@ -40,6 +40,16 @@ export const can = (user: User | null, permission: Permission) =>
 export const canUseBackoffice = (user: User | null) =>
   Object.values(permissions).some((permission) => can(user, permission));
 
+/** Role chooses the landing page; permissions still control administrative access. */
+export const accountHome = (user: User | null) =>
+  user?.roles.some((role) => role === 'ROLE_ADMIN' || role === 'ROLE_SUPERADMIN') ||
+  canUseBackoffice(user)
+    ? '/admin'
+    : '/cuenta';
+
+export const loginDestination = (user: User, requested?: unknown) =>
+  safeRedirect(requested, accountHome(user));
+
 /** Only same-site paths are accepted as post-login destinations. */
 export const safeRedirect = (value: unknown, fallback = '/cuenta') =>
   typeof value === 'string' && /^\/(?![/\\])/.test(value) ? value : fallback;

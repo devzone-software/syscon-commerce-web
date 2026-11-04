@@ -116,9 +116,14 @@ export function Header() {
             <nav className="store-account" aria-label="Cuenta">
               {user ? (
                 <>
-                  <Link to="/cuenta">Mi cuenta</Link>
-                  <Link to="/cuenta/pedidos">Mis compras</Link>
-                  {staff && <Link to="/admin">Backoffice</Link>}
+                  {staff ? (
+                    <Link to="/admin">Administración</Link>
+                  ) : (
+                    <>
+                      <Link to="/cuenta">Mi cuenta</Link>
+                      <Link to="/cuenta/pedidos">Mis compras</Link>
+                    </>
+                  )}
                   <button type="button" onClick={signOut}>
                     Salir
                   </button>
@@ -182,11 +187,16 @@ export function Header() {
             {user ? (
               <>
                 <span className="store-menu-user">{user.email}</span>
-                <NavLink to="/cuenta" end>
-                  Mi cuenta
-                </NavLink>
-                <NavLink to="/cuenta/pedidos">Mis compras</NavLink>
-                {staff && <NavLink to="/admin">Backoffice</NavLink>}
+                {staff ? (
+                  <NavLink to="/admin">Administración</NavLink>
+                ) : (
+                  <>
+                    <NavLink to="/cuenta" end>
+                      Mi cuenta
+                    </NavLink>
+                    <NavLink to="/cuenta/pedidos">Mis compras</NavLink>
+                  </>
+                )}
                 <button type="button" onClick={signOut}>
                   Salir
                 </button>
