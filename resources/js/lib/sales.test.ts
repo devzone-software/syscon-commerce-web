@@ -53,6 +53,8 @@ describe('gateway return', () => {
   it('only confirms when the backend reports the order as paid', () => {
     expect(gatewayReturnNotice('PAID').tone).toBe('success');
     expect(gatewayReturnNotice('PAYMENT_PENDING').tone).toBe('info');
+    expect(gatewayReturnNotice('EXPIRED').tone).toBe('info');
+    expect(gatewayReturnNotice('CANCELLED').tone).toBe('info');
     expect(gatewayReturnNotice(null).text).toMatch(/intentar de nuevo/);
     expect(paymentMethodLabel('SANDBOX')).toMatch(/prueba/);
     expect(paymentMethodLabel('MERCADOPAGO')).toBe('Mercado Pago');

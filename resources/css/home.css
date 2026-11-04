@@ -738,3 +738,8 @@ input:focus-visible {
     bottom: auto;
   }
 }
+@media (max-width: 700px) {
+  .store-search.store-search-catalog {
+    display: none;
+  }
+}

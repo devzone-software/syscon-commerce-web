@@ -38,8 +38,13 @@ export function gatewayReturnNotice(orderStatus: string | null): {
   tone: 'success' | 'info';
   text: string;
 } {
-  if (orderStatus && orderStatus !== 'PAYMENT_PENDING')
+  if (orderStatus && ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'].includes(orderStatus))
     return { tone: 'success', text: 'Pago confirmado. Ya estamos preparando tu pedido.' };
+  if (orderStatus === 'CANCELLED' || orderStatus === 'EXPIRED')
+    return {
+      tone: 'info',
+      text: 'Este pedido ya no está vigente. Si se realizó un cobro, contacta al equipo para revisarlo antes de volver a pagar.',
+    };
   return {
     tone: 'info',
     text: 'Aún no tenemos la confirmación del pago. Si la pasarela lo rechazó, puedes intentar de nuevo; si lo aprobó, se reflejará en unos instantes.',

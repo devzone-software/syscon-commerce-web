@@ -73,7 +73,7 @@ export function AccountLayout({ title, children }: { title: string; children: Re
             <CartIcon size={18} /> Mi carrito
           </Link>
           <Link to="/ofertas">
-            <TruckIcon size={18} /> Ofertas vigentes
+            <TruckIcon size={18} /> Selección de productos
           </Link>
           <p>Beneficios y ayuda</p>
           <Link to="/contacto">
@@ -114,7 +114,7 @@ export function AccountLayout({ title, children }: { title: string; children: Re
             <input
               id="portal-search"
               type="search"
-              placeholder="Buscar productos o ayuda..."
+              placeholder="Buscar productos..."
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />

@@ -20,6 +20,7 @@ import { StatusBadge } from '../components/shared/StatusBadge';
 import { displayName, roleLabel } from '../lib/auth';
 import { accountSummary, orderProgress, orderStatusLabels, shortId } from '../lib/orders';
 import { deliveryMethodLabels } from '../lib/delivery';
+import { paymentMethodLabel } from '../lib/sales';
 import { api } from '../services/api';
 import { money, useShop } from '../state';
 import type { Order } from '../types';
@@ -164,7 +165,11 @@ export function Account() {
                 </div>
                 <div>
                   <dt>Método de pago</dt>
-                  <dd>Pago manual</dd>
+                  <dd>
+                    {current.paymentMethods?.length
+                      ? current.paymentMethods.map(paymentMethodLabel).join(', ')
+                      : 'Por confirmar'}
+                  </dd>
                 </div>
                 <div>
                   <dt>Unidades</dt>
@@ -253,7 +258,7 @@ export function Account() {
                 <TagIcon size={18} />
               </i>
               <span>
-                <strong>Catálogo de ofertas</strong>Los precios más bajos del catálogo
+                <strong>Selección de productos</strong>Los precios más bajos del catálogo
               </span>
             </Link>
           </li>

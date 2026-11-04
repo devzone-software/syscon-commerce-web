@@ -26,7 +26,7 @@ export function Footer() {
           <h2>Tienda</h2>
           <Link to="/catalogo">Productos</Link>
           <Link to="/categorias">Categorías</Link>
-          <Link to="/ofertas">Ofertas</Link>
+          <Link to="/ofertas">Selección de productos</Link>
         </nav>
         <nav aria-label="Ayuda">
           <h2>Ayuda</h2>

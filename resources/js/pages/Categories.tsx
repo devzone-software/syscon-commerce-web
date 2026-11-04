@@ -27,7 +27,7 @@ const trust = [
   {
     icon: trustLockIcon,
     title: 'Compra Segura',
-    text: 'Pagos verificados por nuestro equipo y facturación electrónica válida para SUNAT.',
+    text: 'Pagos verificados por nuestro equipo y comprobante según los datos de tu pedido.',
   },
   {
     icon: trustBoltIcon,
@@ -41,8 +41,8 @@ const trust = [
   },
   {
     icon: trustShieldIcon,
-    title: 'Garantía Oficial',
-    text: 'Productos originales con respaldo directo de cada fabricante.',
+    title: 'Garantía por producto',
+    text: 'Consulta las condiciones y el respaldo de cada producto.',
   },
 ];
 const gradients = ['is-navy', 'is-teal', 'is-green'];
@@ -193,7 +193,7 @@ export function Categories() {
                   <h2>Categorías Principales</h2>
                 </div>
                 <p>
-                  Hardware certificado con garantía de fábrica y software comercial con precios
+                  Hardware y software: consulta las características, condiciones y precios
                   actualizados.
                 </p>
               </div>

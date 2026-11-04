@@ -42,7 +42,7 @@ const trust = [
   {
     icon: trustLockIcon,
     title: 'Compra 100% Segura',
-    text: 'Pagos verificados por nuestro equipo y factura electrónica autorizada por SUNAT.',
+    text: 'Pagos verificados por nuestro equipo y comprobante según los datos de tu pedido.',
   },
   {
     icon: trustBoltIcon,
@@ -52,16 +52,16 @@ const trust = [
   {
     icon: trustSupportIcon,
     title: 'Soporte Técnico IT',
-    text: 'Asesoría de instalación y configuración guiada por ingenieros certificados.',
+    text: 'Asesoría de instalación y configuración guiada por nuestro equipo técnico.',
   },
   {
     icon: trustShieldIcon,
-    title: 'Garantía Oficial',
-    text: 'Productos originales con respaldo directo del fabricante.',
+    title: 'Garantía por producto',
+    text: 'Consulta las condiciones y el respaldo de cada producto.',
   },
 ];
 
-/** Offer card of the "Ofertas Destacadas del Mes" row and the paged grid. */
+/** Offer card of the "Productos de menor precio" row and the paged grid. */
 function OfferCard({ product, tag }: { product: Product; tag?: string }) {
   const add = useConfirmAdd();
   const url = `/producto/${product.id}`;
@@ -154,7 +154,7 @@ export function Offers() {
               <img src={homeIcon} alt="" /> Inicio
             </Link>
             <span aria-hidden="true">›</span>
-            <span aria-current="page">Ofertas Especiales</span>
+            <span aria-current="page">Selección de productos</span>
           </nav>
           <span className="categories-crumb-tag is-teal">
             <i aria-hidden="true" /> PRECIOS DEL CATÁLOGO
@@ -166,16 +166,16 @@ export function Offers() {
         <section className="offers-hero" aria-labelledby="offers-title">
           <div>
             <span className="offers-hero-pill">
-              <BoltIcon size={13} /> PROMOCIONES ACTIVAS // PRECIOS MÁS BAJOS
+              <BoltIcon size={13} /> SELECCIÓN POR PRECIO // CATÁLOGO ACTUAL
             </span>
-            <h1 id="offers-title">Ofertas Especiales y Mejores Precios Corporativos</h1>
+            <h1 id="offers-title">Productos seleccionados por precio</h1>
             <p>
-              Los productos con los precios más bajos del catálogo, con facturación electrónica
-              SUNAT con RUC 20.
+              Productos disponibles ordenados por precio. Esta selección no representa descuentos ni
+              campañas con vencimiento.
             </p>
             <div className="offers-hero-actions">
               <a href="#ofertas" className="is-cyan">
-                <BoltIcon size={15} /> Ver ofertas destacadas
+                <BoltIcon size={15} /> Ver productos seleccionados
               </a>
               <Link to="/catalogo">
                 <GridIcon size={15} /> Explorar catálogo completo
@@ -187,10 +187,10 @@ export function Offers() {
             <figcaption>
               <ShieldIcon size={18} />
               <span>
-                <strong>Garantía SYSCON Oficial</strong>
-                Productos originales con respaldo del fabricante
+                <strong>Consulta las condiciones de garantía</strong>
+                Consulta el respaldo y las condiciones de cada producto
               </span>
-              <em>100% Legal</em>
+              <em>Asesoría SYSCON</em>
             </figcaption>
           </figure>
         </section>
@@ -201,7 +201,7 @@ export function Offers() {
           <ErrorBox message={error} retry={reload} />
         ) : !offers.length ? (
           <Empty
-            title="Sin ofertas por ahora"
+            title="Sin productos disponibles por ahora"
             text="Vuelve pronto: aquí verás los productos con mejor precio del catálogo."
           />
         ) : (
@@ -250,7 +250,7 @@ export function Offers() {
                 aria-pressed={!category}
                 onClick={() => choose(setCategory)('')}
               >
-                Todas las ofertas <small>{offers.length}</small>
+                Todos los productos <small>{offers.length}</small>
               </button>
               {categories.map((option) => (
                 <button
@@ -268,7 +268,7 @@ export function Offers() {
             <section id="ofertas" className="offers-block" aria-labelledby="offers-month">
               <div className="offers-heading">
                 <h2 id="offers-month">
-                  Ofertas Destacadas del Mes <span>MÁS AHORRO</span>
+                  Productos de menor precio <span>SELECCIÓN POR PRECIO</span>
                 </h2>
                 <p>Los cuatro precios más bajos del catálogo</p>
               </div>
@@ -283,7 +283,7 @@ export function Offers() {
               </div>
             </section>
 
-            <section className="offers-filters" aria-label="Filtros de ofertas">
+            <section className="offers-filters" aria-label="Filtros de productos">
               <div className="offers-filters-row">
                 <label>
                   Rango de Precio
@@ -321,7 +321,7 @@ export function Offers() {
                   {filtered.length
                     ? `${(current.page - 1) * PAGE_SIZE + 1} - ${(current.page - 1) * PAGE_SIZE + current.items.length}`
                     : '0'}{' '}
-                  de {filtered.length} ofertas
+                  de {filtered.length} productos
                 </p>
               </div>
               {chips.length > 0 && (
@@ -356,7 +356,7 @@ export function Offers() {
               </div>
             ) : (
               <Empty
-                title="Sin ofertas con estos filtros"
+                title="Sin productos con estos filtros"
                 text="Prueba con otro rango de precio o marca."
               />
             )}
@@ -368,7 +368,7 @@ export function Offers() {
                   {filtered.length ? (current.page - 1) * PAGE_SIZE + 1 : 0} -{' '}
                   {(current.page - 1) * PAGE_SIZE + current.items.length}
                 </strong>{' '}
-                de <strong>{filtered.length}</strong> ofertas vigentes
+                de <strong>{filtered.length}</strong> productos disponibles
               </p>
               <div>
                 <button
@@ -412,7 +412,7 @@ export function Offers() {
           </span>
           <div>
             <h2 id="offers-b2b-title">
-              ¿Buscas descuentos corporativos por volumen o licencias en lote?
+              ¿Necesitas una cotización por volumen o licencias en lote?
             </h2>
             <p>
               Atendemos cotizaciones directas para empresas, colegios, universidades y entidades del

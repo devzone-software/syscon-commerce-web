@@ -31,7 +31,7 @@ const mainLinks = [
   { to: '/', label: 'Inicio', end: true },
   { to: '/catalogo', label: 'Productos' },
   { to: '/categorias', label: 'Categorías' },
-  { to: '/ofertas', label: 'Ofertas' },
+  { to: '/ofertas', label: 'Selección' },
   { to: '/nosotros', label: 'Nosotros' },
   { to: '/contacto', label: 'Contacto' },
 ];
@@ -76,11 +76,11 @@ export function Header() {
           <ul className="store-topbar-list">
             <li>
               <img src={truckIcon} alt="" />
-              Envíos inmediatos a todo el país
+              Consulta las opciones de entrega
             </li>
             <li>
               <img src={badgeIcon} alt="" />
-              Licencias 100% Originales &amp; Soporte Certificado
+              Asesoría en productos y licencias
             </li>
           </ul>
           <ul className="store-topbar-list">
@@ -98,7 +98,11 @@ export function Header() {
       <div className="store-mainbar">
         <div className="container store-mainbar-row">
           <Brand />
-          <form className="store-search" role="search" onSubmit={search}>
+          <form
+            className={`store-search${location.pathname === '/catalogo' ? ' store-search-catalog' : ''}`}
+            role="search"
+            onSubmit={search}
+          >
             <img src={searchIcon} alt="" />
             <label className="visually-hidden" htmlFor="store-search-input">
               Buscar productos

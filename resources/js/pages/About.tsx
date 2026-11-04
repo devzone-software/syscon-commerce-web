@@ -90,18 +90,18 @@ const values = [
 const reasons = [
   {
     icon: <ShieldIcon size={18} />,
-    title: 'Productos 100% Confiables & Certificados',
-    text: 'Productos originales con respaldo directo de cada fabricante.',
+    title: 'Información y asesoría por producto',
+    text: 'Consulta las condiciones y el respaldo de cada producto.',
   },
   {
     icon: <ReceiptIcon size={18} />,
     title: 'Facturación Electrónica',
-    text: 'Comprobantes autorizados por SUNAT con RUC 20 o Boleta para deducción de gastos.',
+    text: 'Elige boleta o factura y registra los datos del comprobante al hacer tu pedido.',
   },
   {
     icon: <TruckIcon size={18} />,
-    title: 'Envíos a Todo el Perú',
-    text: 'Despachos coordinados a nivel nacional con seguimiento de cada pedido.',
+    title: 'Opciones de entrega',
+    text: 'Consulta las modalidades habilitadas en el checkout y sigue tu pedido desde tu cuenta.',
   },
   {
     icon: <TagIcon size={18} />,
@@ -157,9 +157,9 @@ export function About() {
     },
     {
       icon: <BoxIcon size={22} />,
-      tag: 'Garantía',
-      value: '100%',
-      label: 'Productos originales con garantía de fábrica',
+      tag: 'Asesoría',
+      value: 'Consulta',
+      label: 'Condiciones y respaldo por producto',
     },
     {
       icon: <GridIcon size={22} />,
@@ -243,7 +243,7 @@ export function About() {
             </ul>
             <div className="about-brands-box">
               <span>
-                <small>Garantía Incondicional</small>
+                <small>Condiciones por producto</small>
                 Trazabilidad Total
               </span>
               <BoxIcon size={24} />
@@ -259,8 +259,8 @@ export function About() {
             </p>
             <p>
               Nacimos con el propósito de erradicar la incertidumbre en la adquisición de
-              tecnología, brindando a cada cliente asesoramiento técnico honesto, facturación
-              electrónica autorizada por SUNAT y soporte postventa continuo con ingenieros
+              tecnología, brindando a cada cliente asesoramiento técnico honesto, facturación según
+              los datos del pedido y atención postventa con nuestro equipo de profesionales
               especializados.
             </p>
             <p>
@@ -425,8 +425,8 @@ export function About() {
             <p className="about-eyebrow is-light">GARANTÍA CORPORATIVA SYSCON</p>
             <h2>Tu confianza es nuestra prioridad número uno</h2>
             <p>
-              Operamos bajo normativas de seguridad, entrega certificada y cumplimiento tributario
-              ante los organismos reguladores peruanos.
+              Revisa las condiciones del producto y las opciones de entrega y pago antes de
+              confirmar tu pedido.
             </p>
           </div>
           <ul>

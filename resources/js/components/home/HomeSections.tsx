@@ -22,10 +22,14 @@ import { ChevronLeftIcon, ChevronRightIcon } from '../icons';
 import '../../../css/storefront.css';
 
 const trust = [
-  { icon: trustLockIcon, title: 'Compra segura', text: 'Pagos protegidos y certificados' },
+  { icon: trustLockIcon, title: 'Compra segura', text: 'Medios de pago informados al comprar' },
   { icon: trustBoltIcon, title: 'Entrega rápida', text: 'Procesamos rápidamente tus pedidos' },
   { icon: trustSupportIcon, title: 'Soporte técnico', text: 'Atención especializada IT' },
-  { icon: trustShieldIcon, title: 'Garantía oficial', text: 'Productos 100% confiables' },
+  {
+    icon: trustShieldIcon,
+    title: 'Garantía oficial',
+    text: 'Consulta las condiciones por producto',
+  },
 ];
 
 export function TrustStrip() {
@@ -61,14 +65,14 @@ const heroSlides: {
     title: 'Soluciones de Cómputo, Servidores y Software Original para Empresas y Profesionales',
     text: 'Distribuidor oficial de licencias digitales, hardware para estaciones de trabajo, componentes de alto rendimiento y seguridad informática empresarial.',
     primary: { to: '/catalogo', label: 'Ver productos', icon: heroBagIcon },
-    secondary: { to: '/ofertas', label: 'Ver ofertas', icon: heroFireIcon },
+    secondary: { to: '/ofertas', label: 'Ver selección', icon: heroFireIcon },
   },
   {
     tone: 'is-offers',
-    label: 'Ofertas de temporada',
+    label: 'Selección por precio',
     title: 'Los precios más bajos del catálogo en hardware y software',
-    text: 'Laptops, almacenamiento, redes y licencias originales con garantía oficial y factura electrónica.',
-    primary: { to: '/ofertas', label: 'Ver ofertas', icon: heroFireIcon },
+    text: 'Laptops, almacenamiento, redes y licencias: consulta las condiciones de cada producto antes de comprar.',
+    primary: { to: '/ofertas', label: 'Ver selección', icon: heroFireIcon },
     secondary: { to: '/categorias', label: 'Explorar categorías' },
   },
   {
@@ -82,8 +86,8 @@ const heroSlides: {
   {
     tone: 'is-payment',
     label: 'Compra en línea',
-    title: 'Paga con Mercado Pago o por transferencia',
-    text: 'Retira en tienda o recibe tu pedido en casa, y sigue cada paso desde Mis compras.',
+    title: 'Consulta los medios de pago disponibles',
+    text: 'Elige una modalidad de entrega habilitada y sigue tu pedido desde Mis compras.',
     primary: { to: '/catalogo', label: 'Comprar ahora', icon: heroBagIcon },
     secondary: { to: '/cuenta/pedidos', label: 'Mis compras' },
   },
@@ -160,13 +164,13 @@ export function HomeHero() {
               </div>
               <ul className="home-hero-badges">
                 <li>
-                  <img src={heroVerifiedIcon} alt="" /> Garantía Oficial Certificada
+                  <img src={heroVerifiedIcon} alt="" /> Consulta las condiciones de garantía
                 </li>
                 <li>
-                  <img src={heroReceiptIcon} alt="" /> Facturación electrónica inmediata
+                  <img src={heroReceiptIcon} alt="" /> Boleta o factura según tu pedido
                 </li>
                 <li>
-                  <img src={heroTruckIcon} alt="" /> Envíos express a todo el país
+                  <img src={heroTruckIcon} alt="" /> Entrega según opciones del checkout
                 </li>
               </ul>
             </div>
@@ -241,7 +245,7 @@ export function FeaturedProducts({ products }: { products: Product[] }) {
           <h2 id="home-featured">Productos destacados</h2>
         </div>
         <Link className="section-pill" to="/ofertas">
-          Ofertas exclusivas por tiempo limitado
+          Explorar productos seleccionados
         </Link>
       </div>
       <div className="featured-grid">
@@ -257,14 +261,14 @@ export function PromoBanner() {
   return (
     <section className="promo-banner" aria-labelledby="home-promo">
       <div>
-        <span className="promo-banner-tag">Ofertas de temporada</span>
+        <span className="promo-banner-tag">Selección por precio</span>
         <h2 id="home-promo">Precios especiales en Seguridad &amp; Almacenamiento</h2>
         <p>
           Equipa a tu empresa con soluciones de ciberseguridad y discos de alta capacidad para
           servidores y backups seguros.
         </p>
         <Link className="promo-banner-cta" to="/ofertas">
-          Ver ofertas <img src={promoArrowIcon} alt="" />
+          Ver selección <img src={promoArrowIcon} alt="" />
         </Link>
       </div>
       <img className="promo-banner-image" src={promoImage} alt="" width={320} height={192} />
@@ -283,7 +287,7 @@ export function B2BBanner() {
           <h2 id="home-b2b">¿Necesitas cotización corporativa por volumen?</h2>
           <p>
             Emitimos Facturas electrónicas con RUC, contratos de licenciamiento corporativo (CSP /
-            Open) y descuentos especiales para instituciones públicas y privadas.
+            Open) y condiciones para compras de instituciones públicas y privadas.
           </p>
         </div>
       </div>
