@@ -20,9 +20,14 @@ describe('ProductImage', () => {
     expect(html).toContain('alt="Equipo &lt;seguro&gt;"');
     expect(html).toContain('loading="lazy"');
   });
-  it('renders a fallback when the catalog has no image', () => {
-    expect(
-      renderToStaticMarkup(<ProductImage product={{ ...product, imageUrl: null }} />),
-    ).toContain('SYSCON');
+  it('renders the category icon and the brand when the catalog has no image', () => {
+    const html = renderToStaticMarkup(
+      <ProductImage
+        product={{ ...product, imageUrl: null, category: 'Switches', brand: 'TP-Link' }}
+      />,
+    );
+    expect(html).toContain('class="image-fallback"');
+    expect(html).toContain('<small>TP-Link</small>');
+    expect(html).not.toContain('Equipo');
   });
 });

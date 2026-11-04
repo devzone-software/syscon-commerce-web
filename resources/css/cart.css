@@ -1,11 +1,4 @@
 /* Cart and order summary (the summary is reused by checkout). */
-.cart-heading {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
 .cart-clear-confirm {
   display: flex;
   align-items: center;
@@ -40,7 +33,7 @@
   display: grid;
   place-items: center;
   border-radius: 10px;
-  background: #f2f7f9;
+  background: #f2f4f9;
   overflow: hidden;
 }
 .cart-line-media img {
@@ -48,6 +41,9 @@
   height: 100%;
   object-fit: contain;
   padding: 8px;
+}
+.cart-line-media .image-fallback small {
+  display: none;
 }
 .cart-line-media .image-fallback {
   font-size: 9px;
@@ -59,7 +55,7 @@
   min-width: 0;
 }
 .cart-line-name {
-  font: 700 15px/1.4 Manrope, sans-serif;
+  font: 700 15px/1.4 Inter, sans-serif;
   color: var(--store-ink);
   overflow-wrap: anywhere;
 }

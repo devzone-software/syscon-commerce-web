@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { Product } from '../types';
-import { filterProducts, groupProducts, paginate, pickFeatured, readFilters } from './catalog';
+import {
+  filterProducts,
+  groupProducts,
+  pageNumbers,
+  paginate,
+  pickFeatured,
+  readFilters,
+} from './catalog';
 
 const product = (id: string, patch: Partial<Product> = {}): Product => ({
   id,
@@ -28,6 +35,8 @@ describe('catalog filters', () => {
       category: '',
       brand: '',
       onlyAvailable: false,
+      minPrice: null,
+      maxPrice: null,
       sort: 'relevancia',
     });
     expect(readFilters(new URLSearchParams('orden=otro&disponible=1')).onlyAvailable).toBe(true);
@@ -37,6 +46,14 @@ describe('catalog filters', () => {
     expect(filterProducts(catalog, { ...base, query: 'camara' }).map((p) => p.id)).toEqual(['1']);
     expect(filterProducts(catalog, { ...base, query: 'tp-link redes' })).toHaveLength(2);
     expect(filterProducts(catalog, { ...base, query: 'sku-3' }).map((p) => p.id)).toEqual(['3']);
+  });
+  it('filters by price range and ignores invalid bounds', () => {
+    const range = readFilters(new URLSearchParams('desde=100&hasta=200'));
+    expect(filterProducts(catalog, range).map((p) => p.id)).toEqual(['2']);
+    expect(readFilters(new URLSearchParams('desde=abc&hasta=-5'))).toMatchObject({
+      minPrice: null,
+      maxPrice: null,
+    });
   });
   it('combines category, brand and availability', () => {
     const filters = { ...base, category: 'Redes', brand: 'TP-Link', onlyAvailable: true };
@@ -67,5 +84,14 @@ describe('catalog summary', () => {
       { name: 'Seguridad', count: 1 },
     ]);
     expect(pickFeatured(catalog, 8).map((p) => p.id)).toEqual(['1', '3']);
+  });
+});
+
+describe('catalog pagination', () => {
+  it('lists every page when there are few and adds gaps otherwise', () => {
+    expect(pageNumbers(1, 3)).toEqual([1, 2, 3]);
+    expect(pageNumbers(1, 12)).toEqual([1, 2, 3, 4, 5, null, 12]);
+    expect(pageNumbers(6, 12)).toEqual([1, null, 5, 6, 7, null, 12]);
+    expect(pageNumbers(12, 12)).toEqual([1, null, 8, 9, 10, 11, 12]);
   });
 });
