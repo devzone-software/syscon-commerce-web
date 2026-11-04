@@ -83,9 +83,8 @@ export function ProductForm({
     >
       <h2 id="product-form-title">{editing ? `Editar ${initial.name}` : 'Nuevo producto'}</h2>
       <p className="notice">
-        El backend guarda por SKU: si el SKU ya existe, el producto se actualiza. El stock que
-        ingreses <strong>reemplaza</strong> al actual; todavía no se registran movimientos de
-        inventario.
+        El SKU identifica al producto. El stock físico incluye las unidades reservadas; no puede ser
+        inferior a esas reservas. Para entradas y retiros, usa Compras o Uso interno.
       </p>
       {error && <ErrorBox message={error} />}
       <div className="field-row">
@@ -133,9 +132,9 @@ export function ProductForm({
         </Field>
         <Field
           id="product-stock"
-          label="Stock"
+          label="Stock físico"
           error={errors.stock}
-          hint="Reemplaza el stock actual."
+          hint="Unidades físicas totales, incluidas las reservadas por pedidos."
         >
           <input
             id="product-stock"
@@ -151,6 +150,24 @@ export function ProductForm({
           />
         </Field>
       </div>
+      {(['description', 'specifications'] as const).map((field) => (
+        <Field
+          key={field}
+          id={`product-${field}`}
+          label={field === 'description' ? 'Descripción' : 'Características técnicas'}
+          error={errors[field]}
+        >
+          <textarea
+            id={`product-${field}`}
+            value={form[field] ?? ''}
+            onChange={(e) => set({ [field]: e.target.value })}
+            rows={4}
+            maxLength={5000}
+            aria-invalid={Boolean(errors[field])}
+            aria-describedby={describedBy(field)}
+          />
+        </Field>
+      ))}
       <div className="field-row">
         <Field id="product-category" label="Categoría" error={errors.category}>
           <input

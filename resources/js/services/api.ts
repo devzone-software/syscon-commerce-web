@@ -1,5 +1,6 @@
 import type {
   AdminOrder,
+  AdminProduct,
   AdminOrderList,
   AdminPage,
   AdminPayment,
@@ -102,6 +103,7 @@ export type OrderFilters = {
 export type PaymentFilters = { status?: string; q?: string; page?: number };
 export const api = {
   products: () => request<Product[]>('/catalog/products'),
+  adminProducts: () => request<AdminProduct[]>('/admin/products'),
   categories: () => request<string[]>('/catalog/categories'),
   brands: () => request<string[]>('/catalog/brands'),
   product: (id: string) => request<Product>(`/product/${encodeURIComponent(id)}`),

@@ -33,6 +33,7 @@ Route::prefix('web-api')->group(function () {
     Route::post('/payments', [PaymentGatewayController::class, 'pay']);
     Route::get('/payments/{id}', [PaymentGatewayController::class, 'payment'])->whereUuid('id');
     Route::post('/admin/products', [CatalogGatewayController::class, 'saveProduct']);
+    Route::get('/admin/products', [CatalogGatewayController::class, 'administrative']);
     Route::get('/admin/orders', [OrderGatewayController::class, 'adminOrders']);
     Route::get('/admin/orders/{id}', [OrderGatewayController::class, 'adminOrder'])->whereUuid('id');
     Route::get('/admin/payments', [PaymentGatewayController::class, 'adminPayments']);

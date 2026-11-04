@@ -146,7 +146,7 @@ function InternalUseForm({ products, onSaved }: { products: Product[]; onSaved: 
 }
 
 export function InternalUseAdmin() {
-  const products = useData(api.products);
+  const products = useData(api.adminProducts);
   const [page, setPage] = useState(1);
   const { data, loading, error, reload } = useData(() => api.internalUses(page), [page]);
 

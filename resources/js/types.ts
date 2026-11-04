@@ -8,7 +8,10 @@ export type Product = {
   category: string | null;
   brand: string | null;
   active: boolean;
+  description?: string | null;
+  specifications?: string | null;
 };
+export type AdminProduct = Product & { physicalStock: number; reservedStock: number };
 /** Billing data chosen at checkout; the order keeps it as a copy (SUNAT catalogs 01 and 06). */
 export type Billing = {
   type: '01' | '03';
@@ -54,6 +57,8 @@ export type Order = {
   customerId?: string;
   /** WEB (online checkout) or STORE (direct sale by staff). */
   channel?: 'WEB' | 'STORE';
+  /** Methods of payments actually approved for this order. Empty while unpaid. */
+  paymentMethods?: string[];
   /** Null for orders created before billing data was captured. */
   billing?: Billing | null;
   /** Null for orders created before the delivery method was captured. */

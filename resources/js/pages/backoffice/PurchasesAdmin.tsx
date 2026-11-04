@@ -214,7 +214,7 @@ function PurchaseForm({ products, onSaved }: { products: Product[]; onSaved: () 
 }
 
 export function PurchasesAdmin() {
-  const products = useData(api.products);
+  const products = useData(api.adminProducts);
   const [page, setPage] = useState(1);
   const { data, loading, error, reload } = useData(() => api.purchases(page), [page]);
   const [open, setOpen] = useState('');

@@ -14,7 +14,7 @@ import '../../css/storefront.css';
 
 const perks = [
   { icon: <ReceiptIcon size={18} />, text: 'Boleta o factura electrónica con tu compra' },
-  { icon: <ShieldIcon size={18} />, text: 'Garantía oficial del fabricante' },
+  { icon: <ShieldIcon size={18} />, text: 'Consulta las condiciones de garantía por producto' },
   { icon: <TruckIcon size={18} />, text: 'Recojo en tienda o envío coordinado' },
   { icon: <HeadsetIcon size={18} />, text: 'Asesoría técnica antes y después de comprar' },
 ];
@@ -42,7 +42,7 @@ export function ProductPage() {
         <Loading />
       </div>
     );
-  if (error || !data)
+  if (error || !data || !data.active)
     return (
       <div className="container page">
         <Empty
@@ -139,7 +139,17 @@ export function ProductPage() {
           </div>
         </div>
       </section>
-      <PageSection title="Especificaciones y descripción">
+      <PageSection title="Información del producto">
+        {data.description && <p className="product-description">{data.description}</p>}
+        {data.specifications && (
+          <section aria-label="Características técnicas">
+            <h3>Características técnicas</h3>
+            <p className="product-description">{data.specifications}</p>
+          </section>
+        )}
+        {!data.description && !data.specifications && (
+          <p>Consulta con nuestro equipo las características técnicas antes de comprar.</p>
+        )}
         <InfoRows
           rows={[
             { label: 'Marca', value: data.brand ?? '—' },

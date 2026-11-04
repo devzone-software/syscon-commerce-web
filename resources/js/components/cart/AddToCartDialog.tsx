@@ -152,15 +152,17 @@ function AddToCartDialog({ request, onClose }: { request: Request; onClose: () =
           </dl>
         ) : (
           <p className="notice" role="status">
-            {product.stock < 1
-              ? 'Este producto está agotado por ahora.'
-              : 'Alcanzaste la cantidad máxima disponible para este producto.'}
+            {!product.active
+              ? 'Este producto ya no está disponible.'
+              : product.stock < 1
+                ? 'Este producto está agotado por ahora.'
+                : 'Alcanzaste la cantidad máxima disponible para este producto.'}
           </p>
         )}
 
         <ul className="add-dialog-notes">
           <li>
-            <ShieldIcon size={14} /> Producto original con garantía del fabricante
+            <ShieldIcon size={14} /> Consulta las condiciones de garantía del producto
           </li>
           <li>
             <TruckIcon size={14} /> Retiro en tienda o envío a domicilio · el precio y la

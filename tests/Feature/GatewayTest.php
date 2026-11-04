@@ -34,6 +34,19 @@ class GatewayTest extends TestCase
         Http::assertSentCount(1);
     }
 
+    public function test_administrative_catalog_requires_permission_and_keeps_physical_stock(): void
+    {
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            'java.test/api/catalog/admin/products' => Http::response(['success' => true, 'data' => [['sku' => 'R1', 'stock' => 7, 'physicalStock' => 10, 'reservedStock' => 3, 'active' => false]]], 200),
+        ]);
+        $this->getJson('/web-api/admin/products')->assertUnauthorized();
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_CUSTOMER']), 'refresh' => 'refresh-secret']])
+            ->getJson('/web-api/admin/products')->assertForbidden();
+        $this->withSession(['syscon' => ['access' => $this->token(['ROLE_ADMIN', 'catalog:write']), 'refresh' => 'refresh-secret']])
+            ->getJson('/web-api/admin/products')->assertOk()->assertJsonPath('data.0.physicalStock', 10)->assertJsonPath('data.0.reservedStock', 3)->assertJsonPath('data.0.active', false);
+    }
+
     public function test_login_keeps_tokens_on_server_and_me_returns_identity(): void
     {
         $token = $this->token();

@@ -136,3 +136,8 @@
     flex-basis: 100%;
   }
 }
+/* Preserve line breaks in the technical details entered by the catalog team. */
+.product-description {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
