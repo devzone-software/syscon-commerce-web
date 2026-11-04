@@ -41,11 +41,8 @@ export function AccountLayout({ title, children }: { title: string; children: Re
   return (
     <div className={`portal${open ? ' is-menu-open' : ''}`}>
       <aside className="portal-sidebar" aria-label="Mi cuenta">
-        <Link to="/" className="portal-brand">
-          <span className="portal-brand-mark">S</span>
-          <span>
-            SYSCON<small>MI CUENTA</small>
-          </span>
+        <Link to="/" className="portal-brand" aria-label="Grupo SYSCON, ir al inicio">
+          <img className="brand-image" src={logo} alt="" width={180} height={50} />
         </Link>
         {user && (
           <div className="portal-user">
