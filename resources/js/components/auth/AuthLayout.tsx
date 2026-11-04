@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { useLayoutEffect, type ReactNode } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import logo from '../../../images/header/logo-grupo-syscon.jpg';
 import { company } from '../layout/Header';
 import { ArrowLeftIcon, PhoneIcon, ShieldIcon } from '../icons';
@@ -28,6 +28,13 @@ export function AuthLayout({
   children: ReactNode;
   below?: ReactNode;
 }) {
+  const { pathname } = useLocation();
+
+  // Reset before paint when opening an auth page or its confirmation screen.
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [pathname, title]);
+
   return (
     <div className="auth-shell">
       <header className="auth-header">
