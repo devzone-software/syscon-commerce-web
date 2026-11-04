@@ -25,6 +25,7 @@ import type { Product } from '../types';
 import { useData, ErrorBox, Loading, Empty } from '../ui';
 import '../../css/offers.css';
 import '../../css/categories.css';
+import { useAccountPath } from '../hooks/useAccountPath';
 
 const PAGE_SIZE = 8;
 const priceRanges = [
@@ -100,6 +101,7 @@ function OfferCard({ product, tag }: { product: Product; tag?: string }) {
 
 /** Figma "Client / Ofertas": the cheapest products in stock, as the backend has no promotions. */
 export function Offers() {
+  const accountPath = useAccountPath();
   const { data, loading, error, reload } = useData(api.products);
   const add = useConfirmAdd();
   const [category, setCategory] = useState('');
@@ -150,8 +152,9 @@ export function Offers() {
       <div className="categories-crumb">
         <div className="container">
           <nav aria-label="Ruta de navegación">
-            <Link to="/">
-              <img src={homeIcon} alt="" /> Inicio
+            <Link to={accountPath('/')}>
+              <img src={homeIcon} alt="" />{' '}
+              {accountPath('/') === '/cuenta' ? 'Mi cuenta' : 'Inicio'}
             </Link>
             <span aria-hidden="true">›</span>
             <span aria-current="page">Selección de productos</span>
@@ -419,7 +422,7 @@ export function Offers() {
               Estado con facturación electrónica SUNAT.
             </p>
           </div>
-          <Link to="/contacto">
+          <Link to={accountPath('/contacto')}>
             <ReceiptIcon size={16} /> Solicitar Cotización Corporativa
           </Link>
         </section>

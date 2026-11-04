@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useAccountPath } from '../hooks/useAccountPath';
 import team from '../../images/about/team.jpg';
 import homeIcon from '../../images/catalog/home.svg';
 import {
@@ -145,6 +146,7 @@ const steps = [
 
 /** Figma "Client / Nosotros". Figures come from the live catalog instead of fixed marketing numbers. */
 export function About() {
+  const accountPath = useAccountPath();
   const { data } = useData(api.products);
   const products = data ?? [];
   const brands = groupProducts(products, 'brand');
@@ -178,8 +180,8 @@ export function About() {
   return (
     <div className="about-page">
       <div className="about-crumb container">
-        <Link to="/">
-          <img src={homeIcon} alt="" /> Inicio
+        <Link to={accountPath('/')}>
+          <img src={homeIcon} alt="" /> {accountPath('/') === '/cuenta' ? 'Mi cuenta' : 'Inicio'}
         </Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">Nosotros</span>
@@ -199,7 +201,7 @@ export function About() {
             <a href="#historia" className="is-primary">
               Conocer nuestra historia ↓
             </a>
-            <Link to="/contacto">
+            <Link to={accountPath('/contacto')}>
               <HeadsetIcon size={15} /> Contactar a un Asesor
             </Link>
           </div>
@@ -469,7 +471,7 @@ export function About() {
               <Link to="/catalogo" className="is-primary">
                 <StoreIcon size={16} /> Explorar Catálogo de Productos
               </Link>
-              <Link to="/contacto">
+              <Link to={accountPath('/contacto')}>
                 <MailIcon size={16} /> Contactar a un Asesor Comercial
               </Link>
             </div>

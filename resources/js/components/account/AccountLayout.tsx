@@ -70,16 +70,16 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           <NavLink to="/cuenta/carrito">
             <CartIcon size={18} /> Mi carrito
           </NavLink>
-          <Link to="/ofertas">
+          <NavLink to="/cuenta/seleccion">
             <TruckIcon size={18} /> Selección de productos
-          </Link>
+          </NavLink>
           <p>Beneficios y ayuda</p>
-          <Link to="/contacto">
+          <NavLink to="/cuenta/soporte">
             <ChatIcon size={18} /> Soporte y contacto
-          </Link>
-          <Link to="/nosotros">
+          </NavLink>
+          <NavLink to="/cuenta/nosotros">
             <HelpIcon size={18} /> Sobre SYSCON
-          </Link>
+          </NavLink>
           {canUseBackoffice(user) && (
             <Link to="/admin">
               <StoreIcon size={18} /> Backoffice
@@ -128,7 +128,7 @@ export function AccountLayout({ title, children }: { title: string; children: Re
             <CartIcon size={20} />
             {count > 0 && <span className="portal-dot" />}
           </Link>
-          <Link className="portal-icon" to="/contacto" aria-label="Ayuda">
+          <Link className="portal-icon" to="/cuenta/soporte" aria-label="Ayuda">
             <HelpIcon size={20} />
           </Link>
           <img
@@ -145,9 +145,9 @@ export function AccountLayout({ title, children }: { title: string; children: Re
             © {new Date().getFullYear()} Grupo SYSCON S.A.C. Todos los derechos reservados.
           </span>
           <nav aria-label="Enlaces">
-            <Link to="/contacto">Centro de ayuda</Link>
-            <Link to="/nosotros">Nosotros</Link>
-            <Link to="/contacto">Contacto</Link>
+            <Link to="/cuenta/soporte">Centro de ayuda</Link>
+            <Link to="/cuenta/nosotros">Nosotros</Link>
+            <Link to="/cuenta/soporte">Contacto</Link>
           </nav>
         </footer>
       </div>

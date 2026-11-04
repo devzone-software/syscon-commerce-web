@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { StateProvider, useShop } from './state';
 import { AddToCartProvider } from './components/cart/AddToCartDialog';
 import { Layout, Loading, RequireAuth } from './ui';
+import { AccountLayout } from './components/account/AccountLayout';
 import '../css/app.css';
 
 const Home = lazy(() => import('./pages/Home').then((module) => ({ default: module.Home })));
@@ -113,6 +114,23 @@ function App() {
                 <Route path="/registro" element={<Auth register />} />
                 <Route path="/recuperar" element={<Recover />} />
                 {/* The customer portal has its own sidebar layout (Figma "Client / Mi cuenta"). */}
+                {[
+                  { path: '/cuenta/seleccion', title: 'Selección de productos', page: <Offers /> },
+                  { path: '/cuenta/soporte', title: 'Soporte y contacto', page: <Contact /> },
+                  { path: '/cuenta/nosotros', title: 'Sobre SYSCON', page: <About /> },
+                ].map(({ path, title, page }) => (
+                  <Route
+                    key={path}
+                    path={path}
+                    element={
+                      <RequireAuth>
+                        <AccountLayout title={title}>
+                          <div className="portal-page">{page}</div>
+                        </AccountLayout>
+                      </RequireAuth>
+                    }
+                  />
+                ))}
                 <Route
                   path="/cuenta"
                   element={

@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { useAccountPath } from '../hooks/useAccountPath';
 import homeIcon from '../../images/catalog/home.svg';
 import {
   ArrowRightIcon,
@@ -63,6 +64,7 @@ const faqs = [
 
 /** Figma "Client / Contacto". The form opens the visitor's email client: the API has no inbox. */
 export function Contact() {
+  const accountPath = useAccountPath();
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -101,8 +103,8 @@ export function Contact() {
     <div className="contact-page">
       <div className="container contact-crumb">
         <nav aria-label="Ruta de navegación">
-          <Link to="/">
-            <img src={homeIcon} alt="" /> Inicio
+          <Link to={accountPath('/')}>
+            <img src={homeIcon} alt="" /> {accountPath('/') === '/cuenta' ? 'Mi cuenta' : 'Inicio'}
           </Link>
           <span aria-hidden="true">/</span>
           <span aria-current="page">Contacto</span>

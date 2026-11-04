@@ -138,6 +138,19 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  container: portal-main / inline-size;
+}
+@container portal-main (max-width: 1050px) {
+  .portal-main .portal-topbar {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  .portal-main .portal-search {
+    order: 5;
+    flex-basis: 100%;
+    max-width: none;
+  }
 }
 .portal-topbar {
   position: sticky;
@@ -288,6 +301,70 @@
   background: #fff;
   font-size: 11px;
   color: #434751;
+}
+.portal-page {
+  min-width: 0;
+  container: portal-page / inline-size;
+}
+.portal-page .container {
+  width: 100%;
+  max-width: none;
+}
+/* These shared store pages adapt to the space left by the account sidebar. */
+@container portal-page (max-width: 1100px) {
+  .portal-page .offers-hero,
+  .portal-page .about-cta,
+  .portal-page .contact-hero,
+  .portal-page .contact-whatsapp,
+  .portal-page .contact-commitment {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .portal-page .offers-hero figure {
+    flex-basis: auto;
+  }
+  .portal-page .offers-spotlight-body,
+  .portal-page .about-hero,
+  .portal-page .about-identity,
+  .portal-page .about-trust .container,
+  .portal-page .contact-main,
+  .portal-page .contact-location {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .portal-page .offers-grid,
+  .portal-page .offers-ending ul,
+  .portal-page .offers-trust ul,
+  .portal-page .offers-filters-row,
+  .portal-page .about-stats,
+  .portal-page .about-steps,
+  .portal-page .about-timeline,
+  .portal-page .about-values,
+  .portal-page .about-reasons,
+  .portal-page .contact-channels,
+  .portal-page .contact-areas ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .portal-page .offers-filters-row p {
+    justify-self: start;
+  }
+}
+@container portal-page (max-width: 640px) {
+  .portal-page .offers-grid,
+  .portal-page .offers-ending ul,
+  .portal-page .offers-trust ul,
+  .portal-page .offers-filters-row,
+  .portal-page .about-stats,
+  .portal-page .about-steps,
+  .portal-page .about-timeline,
+  .portal-page .about-values,
+  .portal-page .about-reasons,
+  .portal-page .about-purpose,
+  .portal-page .about-trust ul,
+  .portal-page .contact-channels,
+  .portal-page .contact-areas ul,
+  .portal-page .contact-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .portal-footer nav {
   display: flex;

@@ -290,6 +290,9 @@ export function Backoffice() {
           <Link to="/" className="link-button">
             Ver tienda
           </Link>
+          <Link to="/cuenta" className="link-button">
+            Mi cuenta
+          </Link>
           <button type="button" className="link-button" onClick={signOut}>
             Salir
           </button>

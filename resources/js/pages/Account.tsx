@@ -191,7 +191,7 @@ export function Account() {
               </ul>
               <OrderTimeline status={current.status} />
               <div className="portal-actions">
-                <Link className="portal-btn is-soft" to="/contacto">
+                <Link className="portal-btn is-soft" to="/cuenta/soporte">
                   <HeadsetIcon size={16} /> Consultar a soporte
                 </Link>
                 <Link className="portal-btn" to={`/pedido/${current.id}`}>
@@ -228,7 +228,7 @@ export function Account() {
                 <h2 id="portal-support-title">
                   <ShieldIcon size={18} /> Soporte y Asistencia
                 </h2>
-                <Link className="portal-box is-link" to="/contacto">
+                <Link className="portal-box is-link" to="/cuenta/soporte">
                   <ChatIcon size={18} />
                   <span>
                     <strong>Contactar a soporte</strong>Para garantías o dudas técnicas
@@ -253,7 +253,7 @@ export function Account() {
         </p>
         <ul className="portal-ops">
           <li>
-            <Link to="/ofertas">
+            <Link to="/cuenta/seleccion">
               <i className="is-navy">
                 <TagIcon size={18} />
               </i>
@@ -283,7 +283,7 @@ export function Account() {
             </Link>
           </li>
           <li>
-            <Link to="/contacto">
+            <Link to="/cuenta/soporte">
               <i className="is-dark">
                 <ShieldIcon size={18} />
               </i>
