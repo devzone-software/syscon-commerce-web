@@ -1,6 +1,6 @@
 import { useState, type FormEvent, type ReactNode } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import profile from '../../../images/header/profile-sc.jpg';
+import logo from '../../../images/header/logo-grupo-syscon.jpg';
 import { canUseBackoffice, displayName, initials, roleLabel } from '../../lib/auth';
 import { useShop } from '../../state';
 import {
@@ -130,7 +130,13 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           <Link className="portal-icon" to="/contacto" aria-label="Ayuda">
             <HelpIcon size={20} />
           </Link>
-          <img className="portal-logo" src={profile} alt="" />
+          <img
+            className="portal-logo brand-image"
+            src={logo}
+            alt="Grupo SYSCON"
+            width={112}
+            height={32}
+          />
         </header>
         <PageMain className="portal-content">{children}</PageMain>
         <footer className="portal-footer">

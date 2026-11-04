@@ -257,11 +257,10 @@
   background: #b42318;
 }
 .portal-logo {
-  width: 32px;
+  flex-shrink: 0;
+  width: 112px;
   height: 32px;
-  border-radius: 12px;
-  object-fit: cover;
-  object-position: 49% 50%;
+  object-fit: contain;
 }
 .portal-content {
   flex: 1;
