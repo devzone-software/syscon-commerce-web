@@ -343,7 +343,7 @@ input:focus-visible {
   grid-template-columns: 1.35fr 0.8fr 0.9fr 0.8fr 1.5fr;
   align-items: start;
   gap: 32px;
-  padding: 48px 0 32px;
+  padding: 40px 0;
 }
 .store-footer-grid > * {
   min-width: 0;
@@ -377,14 +377,15 @@ input:focus-visible {
   max-width: 440px;
   margin: 12px 0 0;
   font-size: 12px;
-  line-height: 19.5px;
+  line-height: 20px;
   color: #ecf1ffcc;
 }
 .store-footer h2 {
+  min-height: 38px;
   margin: 0 0 12px;
   font-size: 13px;
   font-weight: 600;
-  line-height: 16px;
+  line-height: 24px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #fff;
@@ -401,7 +402,7 @@ input:focus-visible {
 .store-footer nav a,
 .store-footer-contact {
   font-size: 12px;
-  line-height: 18px;
+  line-height: 20px;
 }
 .store-footer nav a:hover,
 .store-footer-contact a:hover {
@@ -430,7 +431,7 @@ input:focus-visible {
   flex-shrink: 0;
   width: 12px;
   height: 12px;
-  margin-top: 3px;
+  margin-top: 4px;
   object-fit: contain;
 }
 .store-footer-bottom {
@@ -642,6 +643,9 @@ input:focus-visible {
   }
   .store-footer-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .store-footer h2 {
+    min-height: 0;
   }
   .store-footer-about {
     grid-column: 1 / -1;
