@@ -136,3 +136,66 @@
     flex-basis: 100%;
   }
 }
+/* Preserve line breaks in the technical details entered by the catalog team. */
+.product-description {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.product-info-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--store-brand);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.product-price-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--store-muted);
+}
+.product-detail-stock {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.product-detail-stock i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+#product-information {
+  scroll-margin-top: 200px;
+}
+.product-specifications {
+  width: 100%;
+  margin-bottom: 24px;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 22px;
+  table-layout: fixed;
+}
+.product-specifications th,
+.product-specifications td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--store-line);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.product-specifications th {
+  width: 35%;
+  color: var(--store-brand);
+  font-weight: 600;
+}
+.product-specifications tr:nth-child(odd) {
+  background: var(--store-soft);
+}
+.product-information-empty a {
+  color: var(--store-brand);
+  text-decoration: underline;
+}

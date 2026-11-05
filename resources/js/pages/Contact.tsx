@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { useAccountPath } from '../hooks/useAccountPath';
 import homeIcon from '../../images/catalog/home.svg';
 import {
   ArrowRightIcon,
@@ -36,12 +37,12 @@ const subjects = [
 
 const faqs = [
   {
-    q: '¿Cómo puedo realizar una compra y solicitar factura electrónica con RUC 20?',
-    a: 'Agrega los productos al carrito, inicia sesión y confirma tu pedido en el checkout. Indica a tu asesor el RUC para emitir la factura electrónica cuando se confirme el pago.',
+    q: '¿Cómo puedo comprar y solicitar una factura con mi RUC?',
+    a: 'Agrega los productos al carrito e inicia sesión. En el checkout elige Factura, ingresa tu RUC, razón social y dirección fiscal, revisa los datos y confirma el pedido. Los datos quedan guardados para emitir el comprobante.',
   },
   {
     q: '¿Qué métodos de pago aceptan en la tienda virtual?',
-    a: 'Trabajamos con pago manual: transferencia bancaria o pago coordinado con un asesor. Al crear el pedido se registra la solicitud y un asesor confirma el pago tras verificarlo.',
+    a: 'El checkout muestra los medios habilitados: pago manual y, cuando está disponible, pago en línea. Un asesor verifica los pagos manuales; la pasarela confirma los pagos en línea.',
   },
   {
     q: '¿Cómo y en cuánto tiempo recibo mi producto?',
@@ -49,7 +50,7 @@ const faqs = [
   },
   {
     q: '¿Cómo solicito soporte técnico para la activación o instalación de mi producto?',
-    a: 'Escríbenos por WhatsApp, llámanos a la central o envía el formulario de esta página indicando tu número de pedido.',
+    a: 'Llámanos a la central o prepara un correo con el formulario de esta página indicando tu número de pedido.',
   },
   {
     q: '¿Cómo consulto el estado de mi pedido?',
@@ -63,6 +64,7 @@ const faqs = [
 
 /** Figma "Client / Contacto". The form opens the visitor's email client: the API has no inbox. */
 export function Contact() {
+  const accountPath = useAccountPath();
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -101,8 +103,8 @@ export function Contact() {
     <div className="contact-page">
       <div className="container contact-crumb">
         <nav aria-label="Ruta de navegación">
-          <Link to="/">
-            <img src={homeIcon} alt="" /> Inicio
+          <Link to={accountPath('/')}>
+            <img src={homeIcon} alt="" /> {accountPath('/') === '/cuenta' ? 'Mi cuenta' : 'Inicio'}
           </Link>
           <span aria-hidden="true">/</span>
           <span aria-current="page">Contacto</span>
@@ -131,7 +133,7 @@ export function Contact() {
             <li>
               <ShieldIcon size={20} />
               <span>
-                <strong>Atención Certificada</strong>Ingenieros e IT Sales Specialists
+                <strong>Atención al cliente</strong>Consultas comerciales y técnicas
               </span>
             </li>
             <li>
@@ -150,9 +152,7 @@ export function Contact() {
             </i>
             <p className="contact-eyebrow">LÍNEA DIRECTA 1-TO-1</p>
             <h2>WhatsApp Oficial</h2>
-            <p>
-              Escríbenos directamente para recibir atención inmediata y cotizaciones al instante.
-            </p>
+            <p>Escríbenos para consultar disponibilidad y solicitar una cotización.</p>
             <code>{whatsapp.label}</code>
             <a href={whatsapp.href} target="_blank" rel="noreferrer" className="is-green">
               <ChatIcon size={16} /> Hablar por WhatsApp
@@ -186,10 +186,9 @@ export function Contact() {
             <i className="is-indigo">
               <HeadsetIcon size={22} />
             </i>
-            <p className="contact-eyebrow">HELP DESK &amp; CERTIFICACIÓN</p>
-            <h2>Mesa de Ayuda IT</h2>
+            <p className="contact-eyebrow">AYUDA SOBRE TUS PRODUCTOS</p>
+            <h2>Soporte técnico</h2>
             <p>¿Asistencia técnica para activación o instalación de tus productos?</p>
-            <code className="is-green">Respuesta técnica garantizada</code>
             <a href="#formulario" className="is-teal">
               <ReceiptIcon size={16} /> Solicitar soporte
             </a>
@@ -304,7 +303,7 @@ export function Contact() {
               )}
               <div className="contact-submit">
                 <button type="submit">
-                  Enviar mensaje <ArrowRightIcon size={16} />
+                  Preparar correo <ArrowRightIcon size={16} />
                 </button>
                 <span>
                   <LockIcon size={13} /> Se abrirá tu correo con el mensaje listo
@@ -499,7 +498,7 @@ export function Contact() {
         <section className="contact-whatsapp" aria-labelledby="contact-whatsapp-title">
           <div>
             <span>
-              <ShieldIcon size={12} /> Respuesta Inmediata
+              <ShieldIcon size={12} /> Consulta directa
             </span>
             <h2 id="contact-whatsapp-title">
               ¿Necesitas una respuesta inmediata o cotización urgente?
@@ -550,11 +549,11 @@ export function Contact() {
           <ul>
             <li>
               <HeadsetIcon size={20} />
-              <strong>Soporte Remoto</strong>Sin costo adicional
+              <strong>Soporte técnico</strong>Consulta las condiciones de atención
             </li>
             <li>
               <CheckIcon size={20} />
-              <strong>Garantía Escrita</strong>Oficial de fábrica
+              <strong>Garantía del producto</strong>Consulta las condiciones aplicables
             </li>
             <li>
               <TruckIcon size={20} />

@@ -141,6 +141,9 @@
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px;
 }
+.field-row.is-single {
+  grid-template-columns: minmax(0, 1fr);
+}
 .form-stack {
   display: flex;
   flex-direction: column;

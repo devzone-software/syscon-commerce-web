@@ -7,6 +7,7 @@ import cartAddIcon from '../images/home/cart-add.svg';
 import { ProductImage } from './components/ProductImage';
 import { Footer } from './components/layout/Footer';
 import { Header } from './components/layout/Header';
+import { PageMain } from './components/layout/PageMain';
 
 export function useData<T>(load: () => Promise<T>, deps: unknown[] = []) {
   const [data, setData] = useState<T | null>(null);
@@ -113,7 +114,7 @@ export function Layout({ children }: { children: ReactNode }) {
   return (
     <>
       <Header />
-      <main>{children}</main>
+      <PageMain>{children}</PageMain>
       <Footer />
     </>
   );

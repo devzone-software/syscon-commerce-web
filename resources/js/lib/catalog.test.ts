@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { Product } from '../types';
 import {
   filterProducts,
+  catalogSearchQuery,
   groupProducts,
   pageNumbers,
   paginate,
@@ -29,6 +30,17 @@ const catalog = [
 const base = readFilters(new URLSearchParams());
 
 describe('catalog filters', () => {
+  it('preserves category, availability and sorting when searching, and resets the page', () => {
+    const query = catalogSearchQuery(
+      '?categoria=Redes&disponible=1&orden=precio-asc&pagina=3',
+      ' cable ',
+    );
+    expect(query).toBe('?categoria=Redes&disponible=1&orden=precio-asc&q=cable');
+  });
+  it('clears only the search and page while keeping other filters', () => {
+    expect(catalogSearchQuery('?q=cable&marca=MarcaA&pagina=2', '  ')).toBe('?marca=MarcaA');
+    expect(catalogSearchQuery('?q=cable&pagina=2', '')).toBe('');
+  });
   it('reads defaults and ignores unknown sort values', () => {
     expect(base).toEqual({
       query: '',

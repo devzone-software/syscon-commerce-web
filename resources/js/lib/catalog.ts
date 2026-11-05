@@ -83,6 +83,17 @@ export function readFilters(params: URLSearchParams): CatalogFilters {
   };
 }
 
+/** Search changes reset pagination while preserving the user's other filters. */
+export function catalogSearchQuery(search: string, query: string): string {
+  const params = new URLSearchParams(search);
+  const value = query.trim();
+  if (value) params.set(catalogParams.query, value);
+  else params.delete(catalogParams.query);
+  params.delete(catalogParams.page);
+  const result = params.toString();
+  return result ? `?${result}` : '';
+}
+
 /** Lowercases and removes accents so "camara" also finds "Cámara". */
 export const normalize = (text: string) =>
   text

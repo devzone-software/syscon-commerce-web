@@ -8,6 +8,7 @@ import phoneIcon from '../../../images/header/phone.svg';
 import searchIcon from '../../../images/header/search.svg';
 import truckIcon from '../../../images/header/truck.svg';
 import { cartTotal } from '../../lib/cart';
+import { catalogSearchQuery } from '../../lib/catalog';
 import { canUseBackoffice } from '../../lib/auth';
 import { money, useShop } from '../../state';
 import { CloseIcon, MenuIcon } from '../icons';
@@ -22,7 +23,7 @@ export const company = {
 export function Brand() {
   return (
     <Link to="/" className="brand" aria-label="Grupo SYSCON Tecnología Informática, ir al inicio">
-      <img src={logo} alt="" width={158} height={44} />
+      <img className="brand-image" src={logo} alt="" width={158} height={44} />
     </Link>
   );
 }
@@ -31,7 +32,6 @@ const mainLinks = [
   { to: '/', label: 'Inicio', end: true },
   { to: '/catalogo', label: 'Productos' },
   { to: '/categorias', label: 'Categorías' },
-  { to: '/ofertas', label: 'Ofertas' },
   { to: '/nosotros', label: 'Nosotros' },
   { to: '/contacto', label: 'Contacto' },
 ];
@@ -61,8 +61,10 @@ export function Header() {
 
   const search = (event: FormEvent) => {
     event.preventDefault();
-    const value = query.trim();
-    navigate(value ? `/catalogo?q=${encodeURIComponent(value)}` : '/catalogo');
+    navigate({
+      pathname: '/catalogo',
+      search: catalogSearchQuery(location.pathname === '/catalogo' ? location.search : '', query),
+    });
   };
   const signOut = async () => {
     await logout();
@@ -76,11 +78,11 @@ export function Header() {
           <ul className="store-topbar-list">
             <li>
               <img src={truckIcon} alt="" />
-              Envíos inmediatos a todo el país
+              Consulta las opciones de entrega
             </li>
             <li>
               <img src={badgeIcon} alt="" />
-              Licencias 100% Originales &amp; Soporte Certificado
+              Asesoría en productos y licencias
             </li>
           </ul>
           <ul className="store-topbar-list">
@@ -116,9 +118,14 @@ export function Header() {
             <nav className="store-account" aria-label="Cuenta">
               {user ? (
                 <>
-                  <Link to="/cuenta">Mi cuenta</Link>
-                  <Link to="/cuenta/pedidos">Mis compras</Link>
-                  {staff && <Link to="/admin">Backoffice</Link>}
+                  {staff ? (
+                    <Link to="/admin">Administración</Link>
+                  ) : (
+                    <>
+                      <Link to="/cuenta">Mi cuenta</Link>
+                      <Link to="/cuenta/pedidos">Mis compras</Link>
+                    </>
+                  )}
                   <button type="button" onClick={signOut}>
                     Salir
                   </button>
@@ -182,11 +189,16 @@ export function Header() {
             {user ? (
               <>
                 <span className="store-menu-user">{user.email}</span>
-                <NavLink to="/cuenta" end>
-                  Mi cuenta
-                </NavLink>
-                <NavLink to="/cuenta/pedidos">Mis compras</NavLink>
-                {staff && <NavLink to="/admin">Backoffice</NavLink>}
+                {staff ? (
+                  <NavLink to="/admin">Administración</NavLink>
+                ) : (
+                  <>
+                    <NavLink to="/cuenta" end>
+                      Mi cuenta
+                    </NavLink>
+                    <NavLink to="/cuenta/pedidos">Mis compras</NavLink>
+                  </>
+                )}
                 <button type="button" onClick={signOut}>
                   Salir
                 </button>

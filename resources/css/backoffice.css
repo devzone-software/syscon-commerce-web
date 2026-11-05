@@ -681,3 +681,15 @@
     display: none;
   }
 }
+/* Product descriptions and specifications share the form's control sizing. */
+.bo-card .field textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: 11px 13px;
+  border: 1px solid #d9dee9;
+  border-radius: 7px;
+  background: #fff;
+  color: #111827;
+  font: inherit;
+  resize: vertical;
+}

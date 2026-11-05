@@ -3,7 +3,7 @@ import type { CartLine, Product } from '../types';
 /** Adds units of a product without exceeding the stock known when it was added. */
 export function addToCart(lines: CartLine[], product: Product, quantity = 1): CartLine[] {
   const units = Math.floor(quantity);
-  if (product.stock < 1 || units < 1) return lines;
+  if (!product.active || product.stock < 1 || units < 1) return lines;
   const found = lines.find((line) => line.product.id === product.id);
   if (found)
     return lines.map((line) =>
@@ -28,7 +28,7 @@ export function setCartQuantity(lines: CartLine[], id: string, quantity: number)
 /** Units of a product already in the cart and how many more can still be added. */
 export function cartAvailability(lines: CartLine[], product: Product) {
   const inCart = lines.find((line) => line.product.id === product.id)?.quantity ?? 0;
-  return { inCart, remaining: Math.max(0, product.stock - inCart) };
+  return { inCart, remaining: product.active ? Math.max(0, product.stock - inCart) : 0 };
 }
 
 export const cartUnits = (lines: CartLine[]) => lines.reduce((n, line) => n + line.quantity, 0);
@@ -58,7 +58,8 @@ export function reviewCart(lines: CartLine[], products: Product[] | null) {
   const published = products ? new Set(products.map((product) => product.id)) : null;
   const issues = new Map<string, CartIssue>();
   for (const { product, quantity } of lines) {
-    if (published && !published.has(product.id)) issues.set(product.id, 'unavailable');
+    if (!product.active || (published && !published.has(product.id)))
+      issues.set(product.id, 'unavailable');
     else if (product.stock < 1) issues.set(product.id, 'out-of-stock');
     else if (quantity > product.stock) issues.set(product.id, 'exceeds-stock');
   }

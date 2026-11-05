@@ -18,7 +18,7 @@ const stockFilters = [
 ];
 
 export function ProductsAdmin() {
-  const { data, loading, error, reload } = useData(api.products);
+  const { data, loading, error, reload } = useData(api.adminProducts);
   const [params, setParams] = useSearchParams();
   const [message, setMessage] = useState('');
   const query = params.get('q') ?? '';
@@ -65,7 +65,7 @@ export function ProductsAdmin() {
     <>
       <PageHeader
         title="Productos"
-        description="Productos publicados en el catálogo. El backend solo lista los productos activos."
+        description="Administra productos activos e inactivos. El stock disponible descuenta las reservas."
         actions={
           !formOpen && (
             <>
@@ -156,7 +156,7 @@ export function ProductsAdmin() {
                       Precio
                     </th>
                     <th scope="col" className="num">
-                      Stock
+                      Disponible
                     </th>
                     <th scope="col">
                       <span className="visually-hidden">Acciones</span>
@@ -168,13 +168,18 @@ export function ProductsAdmin() {
                     <tr key={product.id}>
                       <td>
                         <strong>{product.name}</strong>
-                        <small>SKU {product.sku}</small>
+                        <small>
+                          SKU {product.sku} · {product.active ? 'Publicado' : 'Inactivo'}
+                        </small>
                       </td>
                       <td>{product.category ?? '—'}</td>
                       <td>{product.brand ?? '—'}</td>
                       <td className="num">{money(Number(product.price))}</td>
                       <td className="num">
                         {product.stock} <StockBadge stock={product.stock} />
+                        <small>
+                          Físico: {product.physicalStock} · Reservado: {product.reservedStock}
+                        </small>
                       </td>
                       <td className="num">
                         <button

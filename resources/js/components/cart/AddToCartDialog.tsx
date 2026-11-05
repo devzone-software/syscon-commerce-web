@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { useAccountPath } from '../../hooks/useAccountPath';
 import { cartAvailability, cartTotal, cartUnits } from '../../lib/cart';
 import { money, useShop } from '../../state';
 import type { Product } from '../../types';
@@ -42,6 +43,7 @@ export function AddToCartProvider({ children }: { children: ReactNode }) {
 }
 
 function AddToCartDialog({ request, onClose }: { request: Request; onClose: () => void }) {
+  const accountPath = useAccountPath();
   const { cart, add } = useShop();
   const dialog = useRef<HTMLDialogElement>(null);
   const { product } = request;
@@ -152,15 +154,17 @@ function AddToCartDialog({ request, onClose }: { request: Request; onClose: () =
           </dl>
         ) : (
           <p className="notice" role="status">
-            {product.stock < 1
-              ? 'Este producto está agotado por ahora.'
-              : 'Alcanzaste la cantidad máxima disponible para este producto.'}
+            {!product.active
+              ? 'Este producto ya no está disponible.'
+              : product.stock < 1
+                ? 'Este producto está agotado por ahora.'
+                : 'Alcanzaste la cantidad máxima disponible para este producto.'}
           </p>
         )}
 
         <ul className="add-dialog-notes">
           <li>
-            <ShieldIcon size={14} /> Producto original con garantía del fabricante
+            <ShieldIcon size={14} /> Consulta las condiciones de garantía del producto
           </li>
           <li>
             <TruckIcon size={14} /> Retiro en tienda o envío a domicilio · el precio y la
@@ -174,7 +178,7 @@ function AddToCartDialog({ request, onClose }: { request: Request; onClose: () =
               <button type="button" className="is-soft" onClick={onClose}>
                 Seguir comprando
               </button>
-              <Link to="/carrito" className="is-soft" onClick={onClose}>
+              <Link to={accountPath('/carrito')} className="is-soft" onClick={onClose}>
                 Ver carrito
               </Link>
               <Link to="/checkout" className="is-primary" onClick={onClose}>

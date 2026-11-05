@@ -1,4 +1,4 @@
-import type { Product } from '../types';
+import type { AdminProduct } from '../types';
 import { parseCsv, toCsv } from './csv';
 import { cleanProduct, validateProduct, type ProductInput } from './products';
 
@@ -15,6 +15,8 @@ export const productCsvColumns = [
   'brand',
   'category',
   'active',
+  'description',
+  'specifications',
 ] as const;
 type Column = (typeof productCsvColumns)[number];
 const required: Column[] = ['sku', 'name', 'price', 'stock'];
@@ -53,6 +55,8 @@ const fieldLabels: Record<string, string> = {
   imageUrl: 'Imagen',
   category: 'Categoría',
   brand: 'Marca',
+  description: 'Descripción',
+  specifications: 'Características técnicas',
 };
 
 /** Reads a product CSV and checks every row before anything is sent to the backend. */
@@ -104,6 +108,10 @@ export function previewProductImport(text: string, publishedSkus: Iterable<strin
       category: cell(row, 'category'),
       brand: cell(row, 'brand'),
       active: active ?? true,
+      ...(index.has('description') ? { description: cell(row, 'description').trim() || null } : {}),
+      ...(index.has('specifications')
+        ? { specifications: cell(row, 'specifications').trim() || null }
+        : {}),
     });
     const errors = Object.entries(validateProduct(input)).map(
       ([field, message]) => `${fieldLabels[field] ?? field}: ${message}`,
@@ -122,18 +130,20 @@ export function previewProductImport(text: string, publishedSkus: Iterable<strin
 }
 
 /** Exports products in the same format the importer reads, so files can round-trip. */
-export function productsToCsv(products: Product[]) {
+export function productsToCsv(products: AdminProduct[]) {
   return toCsv(
     [...productCsvColumns],
     products.map((product) => [
       product.sku,
       product.name,
       Number(product.price).toFixed(2),
-      product.stock,
+      product.physicalStock,
       product.imageUrl ?? '',
       product.brand ?? '',
       product.category ?? '',
       product.active,
+      product.description ?? '',
+      product.specifications ?? '',
     ]),
   );
 }

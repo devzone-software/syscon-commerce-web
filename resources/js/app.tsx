@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { StateProvider, useShop } from './state';
 import { AddToCartProvider } from './components/cart/AddToCartDialog';
 import { Layout, Loading, RequireAuth } from './ui';
+import { AccountLayout } from './components/account/AccountLayout';
 import '../css/app.css';
 
 const Home = lazy(() => import('./pages/Home').then((module) => ({ default: module.Home })));
@@ -14,6 +15,9 @@ const ProductPage = lazy(() =>
   import('./pages/ProductPage').then((module) => ({ default: module.ProductPage })),
 );
 const Cart = lazy(() => import('./pages/Cart').then((module) => ({ default: module.Cart })));
+const AccountCart = lazy(() =>
+  import('./pages/Cart').then((module) => ({ default: module.AccountCart })),
+);
 const Auth = lazy(() => import('./pages/Auth').then((module) => ({ default: module.Auth })));
 const Checkout = lazy(() =>
   import('./pages/Checkout').then((module) => ({ default: module.Checkout })),
@@ -105,16 +109,55 @@ function App() {
                     </RequireAuth>
                   }
                 />
-                {/* Sign in, sign up and recovery use their own slim header and footer. */}
+                {/* Authentication forms reuse the storefront header. */}
                 <Route path="/ingresar" element={<Auth />} />
                 <Route path="/registro" element={<Auth register />} />
                 <Route path="/recuperar" element={<Recover />} />
                 {/* The customer portal has its own sidebar layout (Figma "Client / Mi cuenta"). */}
+                {[
+                  { path: '/cuenta/productos', title: 'Productos', page: <Catalog /> },
+                  { path: '/cuenta/soporte', title: 'Ayuda y contacto', page: <Contact /> },
+                  { path: '/cuenta/nosotros', title: 'Sobre SYSCON', page: <About /> },
+                ].map(({ path, title, page }) => (
+                  <Route
+                    key={path}
+                    path={path}
+                    element={
+                      <RequireAuth>
+                        <AccountLayout title={title}>
+                          <div
+                            className={
+                              path === '/cuenta/productos' ? 'portal-catalog' : 'portal-page'
+                            }
+                          >
+                            {page}
+                          </div>
+                        </AccountLayout>
+                      </RequireAuth>
+                    }
+                  />
+                ))}
+                <Route
+                  path="/cuenta/seleccion"
+                  element={
+                    <RequireAuth>
+                      <Offers />
+                    </RequireAuth>
+                  }
+                />
                 <Route
                   path="/cuenta"
                   element={
                     <RequireAuth>
                       <Account />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/cuenta/carrito"
+                  element={
+                    <RequireAuth>
+                      <AccountCart />
                     </RequireAuth>
                   }
                 />

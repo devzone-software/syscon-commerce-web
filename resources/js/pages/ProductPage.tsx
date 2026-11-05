@@ -14,7 +14,7 @@ import '../../css/storefront.css';
 
 const perks = [
   { icon: <ReceiptIcon size={18} />, text: 'Boleta o factura electrónica con tu compra' },
-  { icon: <ShieldIcon size={18} />, text: 'Garantía oficial del fabricante' },
+  { icon: <ShieldIcon size={18} />, text: 'Consulta las condiciones de garantía por producto' },
   { icon: <TruckIcon size={18} />, text: 'Recojo en tienda o envío coordinado' },
   { icon: <HeadsetIcon size={18} />, text: 'Asesoría técnica antes y después de comprar' },
 ];
@@ -42,7 +42,7 @@ export function ProductPage() {
         <Loading />
       </div>
     );
-  if (error || !data)
+  if (error || !data || !data.active)
     return (
       <div className="container page">
         <Empty
@@ -65,6 +65,11 @@ export function ProductPage() {
   const inCart = cart.find((line) => line.product.id === data.id)?.quantity ?? 0;
   const remaining = Math.max(0, data.stock - inCart);
   const units = Math.min(quantity, Math.max(1, remaining));
+  const description = data.description?.trim();
+  const specifications = (data.specifications ?? '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
   const addToCart = () => {
     confirmAdd(data, units);
     setQuantity(1);
@@ -90,17 +95,24 @@ export function ProductPage() {
           </nav>
           <div className="product-detail">
             <div className="product-detail-media">
-              <ProductImage product={data} />
+              <ProductImage product={data} loading="eager" />
             </div>
             <div className="product-detail-info">
-              <p className="product-detail-eyebrow">
-                {[data.category, data.stock < 1 && 'Agotado'].filter(Boolean).join(' · ')}
-              </p>
+              <p className="product-detail-eyebrow">{data.category}</p>
               <h1>{data.name}</h1>
               <p className="product-detail-sub">
                 {[data.brand, `SKU ${data.sku}`].filter(Boolean).join(' · ')}
               </p>
+              <a className="product-info-link" href="#product-information">
+                Ver descripción y características
+              </a>
               <p className="product-detail-price">{money(Number(data.price))}</p>
+              <p className={`product-detail-stock${data.stock < 1 ? ' out' : ''}`}>
+                <i aria-hidden="true" /> {data.stock < 1 ? 'Agotado' : 'Disponible'}
+              </p>
+              <p className="product-price-note">
+                Precio por unidad. La entrega se elige en el checkout.
+              </p>
               <div className="product-buy">
                 {remaining > 0 ? (
                   <>
@@ -127,6 +139,9 @@ export function ProductPage() {
                   Tienes {inCart} {inCart === 1 ? 'unidad' : 'unidades'} en tu carrito.
                 </p>
               )}
+              <Link className="product-info-link" to="/contacto">
+                <HeadsetIcon size={16} /> Consultar este producto
+              </Link>
               <ul className="product-perks">
                 {perks.map(({ icon, text }) => (
                   <li key={text}>
@@ -139,11 +154,43 @@ export function ProductPage() {
           </div>
         </div>
       </section>
-      <PageSection title="Especificaciones y descripción">
+      <PageSection id="product-information" title="Información del producto">
+        {description && <p className="product-description">{description}</p>}
+        {specifications.length > 0 && (
+          <section aria-label="Características técnicas">
+            <h3>Características técnicas</h3>
+            <table className="product-specifications">
+              <caption className="visually-hidden">Características técnicas de {data.name}</caption>
+              <tbody>
+                {specifications.map((line, index) => {
+                  const separator = line.indexOf(':');
+                  const label = line.slice(0, separator).trim();
+                  const value = line.slice(separator + 1).trim();
+                  return separator > 0 && value ? (
+                    <tr key={index}>
+                      <th scope="row">{label}</th>
+                      <td>{value}</td>
+                    </tr>
+                  ) : (
+                    <tr key={index}>
+                      <td colSpan={2}>{line}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </section>
+        )}
+        {!description && !specifications.length && (
+          <p className="product-information-empty">
+            Las características técnicas todavía no están publicadas.{' '}
+            <Link to="/contacto">Consulta con nuestro equipo antes de comprar.</Link>
+          </p>
+        )}
         <InfoRows
           rows={[
-            { label: 'Marca', value: data.brand ?? '—' },
-            { label: 'Categoría', value: data.category ?? '—' },
+            { label: 'Marca', value: data.brand || '—' },
+            { label: 'Categoría', value: data.category || '—' },
             { label: 'SKU', value: data.sku },
           ]}
         />

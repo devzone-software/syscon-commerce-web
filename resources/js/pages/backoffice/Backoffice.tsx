@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Brand } from '../../components/layout/Header';
+import { PageMain } from '../../components/layout/PageMain';
 import { CloseIcon, ExpandIcon, MenuIcon, ShrinkIcon, SidebarIcon } from '../../components/icons';
 import { can, canUseBackoffice, permissions, roleLabel, type Permission } from '../../lib/auth';
 import {
@@ -289,6 +290,9 @@ export function Backoffice() {
           <Link to="/" className="link-button">
             Ver tienda
           </Link>
+          <Link to="/cuenta" className="link-button">
+            Área de cliente
+          </Link>
           <button type="button" className="link-button" onClick={signOut}>
             Salir
           </button>
@@ -341,7 +345,7 @@ export function Backoffice() {
             onKeyDown={resizeWithKeys}
           />
         )}
-        <main className="bo-main">
+        <PageMain className="bo-main">
           <Routes>
             {allowed.map((section) => (
               <Route
@@ -366,7 +370,7 @@ export function Backoffice() {
               }
             />
           </Routes>
-        </main>
+        </PageMain>
       </div>
     </div>
   );

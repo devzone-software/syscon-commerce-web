@@ -1,6 +1,7 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import profile from '../../../images/header/profile-sc.jpg';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { catalogSearchQuery } from '../../lib/catalog';
+import logo from '../../../images/header/logo-grupo-syscon.jpg';
 import { canUseBackoffice, displayName, initials, roleLabel } from '../../lib/auth';
 import { useShop } from '../../state';
 import {
@@ -14,9 +15,9 @@ import {
   SearchIcon,
   ShieldIcon,
   StoreIcon,
-  TruckIcon,
 } from '../icons';
 import '../../../css/account.css';
+import { PageMain } from '../layout/PageMain';
 
 /**
  * Customer portal shell from Figma "Client / Mi cuenta": sidebar with the profile card and the
@@ -25,26 +26,33 @@ import '../../../css/account.css';
 export function AccountLayout({ title, children }: { title: string; children: ReactNode }) {
   const { user, count, logout } = useShop();
   const navigate = useNavigate();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  useEffect(() => {
+    if (location.pathname === '/cuenta/productos')
+      setQuery(new URLSearchParams(location.search).get('q') ?? '');
+  }, [location.pathname, location.search]);
   const signOut = async () => {
     await logout();
     navigate('/');
   };
   const search = (event: FormEvent) => {
     event.preventDefault();
-    const value = query.trim();
-    navigate(value ? `/catalogo?q=${encodeURIComponent(value)}` : '/catalogo');
+    navigate({
+      pathname: '/cuenta/productos',
+      search: catalogSearchQuery(
+        location.pathname === '/cuenta/productos' ? location.search : '',
+        query,
+      ),
+    });
   };
 
   return (
     <div className={`portal${open ? ' is-menu-open' : ''}`}>
       <aside className="portal-sidebar" aria-label="Mi cuenta">
-        <Link to="/" className="portal-brand">
-          <span className="portal-brand-mark">S</span>
-          <span>
-            SYSCON<small>MI CUENTA</small>
-          </span>
+        <Link to="/" className="portal-brand" aria-label="Grupo SYSCON, ir al inicio">
+          <img className="brand-image" src={logo} alt="" width={180} height={50} />
         </Link>
         {user && (
           <div className="portal-user">
@@ -69,19 +77,16 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           <NavLink to="/cuenta/pedidos">
             <BoxIcon size={18} /> Mis pedidos
           </NavLink>
-          <Link to="/carrito">
+          <NavLink to="/cuenta/carrito">
             <CartIcon size={18} /> Mi carrito
-          </Link>
-          <Link to="/ofertas">
-            <TruckIcon size={18} /> Ofertas vigentes
-          </Link>
-          <p>Beneficios y ayuda</p>
-          <Link to="/contacto">
-            <ChatIcon size={18} /> Soporte y contacto
-          </Link>
-          <Link to="/nosotros">
-            <HelpIcon size={18} /> Sobre SYSCON
-          </Link>
+          </NavLink>
+          <NavLink to="/cuenta/productos">
+            <SearchIcon size={18} /> Productos
+          </NavLink>
+          <p>Ayuda</p>
+          <NavLink to="/cuenta/soporte">
+            <ChatIcon size={18} /> Ayuda y contacto
+          </NavLink>
           {canUseBackoffice(user) && (
             <Link to="/admin">
               <StoreIcon size={18} /> Backoffice
@@ -114,7 +119,7 @@ export function AccountLayout({ title, children }: { title: string; children: Re
             <input
               id="portal-search"
               type="search"
-              placeholder="Buscar productos o ayuda..."
+              placeholder="Buscar productos..."
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
@@ -122,24 +127,33 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           <Link className="portal-store" to="/">
             <StoreIcon size={16} /> Ir a la tienda
           </Link>
-          <Link className="portal-icon" to="/carrito" aria-label={`Carrito con ${count} productos`}>
+          <Link
+            className="portal-icon"
+            to="/cuenta/carrito"
+            aria-label={`Carrito con ${count} productos`}
+          >
             <CartIcon size={20} />
             {count > 0 && <span className="portal-dot" />}
           </Link>
-          <Link className="portal-icon" to="/contacto" aria-label="Ayuda">
+          <Link className="portal-icon" to="/cuenta/soporte" aria-label="Ayuda">
             <HelpIcon size={20} />
           </Link>
-          <img className="portal-logo" src={profile} alt="" />
+          <img
+            className="portal-logo brand-image"
+            src={logo}
+            alt="Grupo SYSCON"
+            width={112}
+            height={32}
+          />
         </header>
-        <main className="portal-content">{children}</main>
+        <PageMain className="portal-content">{children}</PageMain>
         <footer className="portal-footer">
           <span>
             © {new Date().getFullYear()} Grupo SYSCON S.A.C. Todos los derechos reservados.
           </span>
           <nav aria-label="Enlaces">
-            <Link to="/contacto">Centro de ayuda</Link>
-            <Link to="/nosotros">Nosotros</Link>
-            <Link to="/contacto">Contacto</Link>
+            <Link to="/cuenta/soporte">Ayuda y contacto</Link>
+            <Link to="/cuenta/nosotros">Nosotros</Link>
           </nav>
         </footer>
       </div>

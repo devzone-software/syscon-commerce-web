@@ -16,7 +16,7 @@ import {
   TruckIcon,
   UserIcon,
 } from '../components/icons';
-import { MIN_PASSWORD, passwordChecks, safeRedirect } from '../lib/auth';
+import { loginDestination, MIN_PASSWORD, passwordChecks, safeRedirect } from '../lib/auth';
 import { api } from '../services/api';
 import { useShop } from '../state';
 import type { DocumentType, SignUp } from '../types';
@@ -42,11 +42,14 @@ const emptySignUp: SignUp = {
 const loginFeatures: AuthFeature[] = [
   {
     icon: <ListCheckIcon size={16} />,
-    text: 'Seguimiento y trazabilidad de pedidos en tiempo real.',
+    text: 'Consulta el estado de tus pedidos desde tu cuenta.',
   },
   { icon: <ReceiptIcon size={16} />, text: 'Historial de compras y pagos en un solo lugar.' },
   { icon: <BuildingIcon size={16} />, text: 'Compras con RUC y facturación electrónica.' },
-  { icon: <HeadsetIcon size={16} />, text: 'Soporte IT y atención preferencial para empresas.' },
+  {
+    icon: <HeadsetIcon size={16} />,
+    text: 'Contacto con nuestro equipo para consultas sobre tus compras.',
+  },
 ];
 
 const signUpFeatures: AuthFeature[] = [
@@ -54,8 +57,8 @@ const signUpFeatures: AuthFeature[] = [
     icon: <ListCheckIcon size={16} />,
     text: (
       <>
-        <strong>Guarda tus productos y cotizaciones</strong>
-        Tu carrito te espera cuando vuelvas.
+        <strong>Conserva tu carrito</strong>
+        Tus productos se guardan en este navegador.
       </>
     ),
   },
@@ -72,8 +75,8 @@ const signUpFeatures: AuthFeature[] = [
     icon: <ReceiptIcon size={16} />,
     text: (
       <>
-        <strong>Compras ágiles y checkout express</strong>
-        Tus datos quedan listos para el próximo pedido.
+        <strong>Datos para tu compra</strong>
+        Revisa la facturación y la entrega antes de confirmar.
       </>
     ),
   },
@@ -81,7 +84,7 @@ const signUpFeatures: AuthFeature[] = [
     icon: <HeadsetIcon size={16} />,
     text: (
       <>
-        <strong>Soporte técnico preferencial</strong>
+        <strong>Ayuda sobre tus productos</strong>
         Asistencia directa con nuestro equipo.
       </>
     ),
@@ -194,7 +197,8 @@ export function Auth({ register = false }: { register?: boolean }) {
   const location = useLocation();
   const { reloadUser } = useShop();
   // Page requested before RequireAuth sent the visitor here, e.g. the checkout.
-  const from = safeRedirect((location.state as { from?: unknown } | null)?.from);
+  const requestedFrom = (location.state as { from?: unknown } | null)?.from;
+  const from = safeRedirect(requestedFrom);
   const [form, setForm] = useState<SignUp>(emptySignUp);
   const [audience, setAudience] = useState<'empresa' | 'personal'>(
     register ? 'personal' : 'empresa',
@@ -212,10 +216,10 @@ export function Auth({ register = false }: { register?: boolean }) {
   // Confirm the new session before leaving: reloadUser() alone swallows errors, which
   // would send the visitor straight back to this form without explanation.
   const finish = async (isNew: boolean) => {
-    await api.me();
+    const signedInUser = await api.me();
     await reloadUser();
     if (isNew) setCreated(true);
-    else navigate(from, { replace: true });
+    else navigate(loginDestination(signedInUser, requestedFrom), { replace: true });
   };
   const run = async (action: () => Promise<void>) => {
     setError('');
@@ -291,7 +295,7 @@ export function Auth({ register = false }: { register?: boolean }) {
       <AuthLayout
         eyebrow="Acceso para empresas y clientes"
         title="Bienvenido nuevamente a Grupo SYSCON"
-        text="Gestiona tus compras de tecnología, licencias y cotizaciones con RUC en un solo lugar seguro."
+        text="Consulta tus compras de tecnología y el estado de tus pedidos desde tu cuenta."
         features={loginFeatures}
         footnote="Conexión protegida · Cumplimiento Ley N° 29733"
       >
@@ -340,7 +344,7 @@ export function Auth({ register = false }: { register?: boolean }) {
     <AuthLayout
       eyebrow="Comunidad y clientes SYSCON"
       title="Únete a Grupo SYSCON"
-      text="Crea tu cuenta y disfruta de una experiencia de compra ágil, seguimiento de pedidos y cotizaciones corporativas."
+      text="Crea tu cuenta para comprar, consultar tus pedidos y contactar con nuestro equipo."
       features={signUpFeatures}
       footnote="Datos tratados conforme a la Ley N° 29733"
     >

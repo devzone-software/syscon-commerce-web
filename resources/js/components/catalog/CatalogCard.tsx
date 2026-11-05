@@ -14,12 +14,8 @@ export function CatalogCard({ product }: { product: Product }) {
   const origin = [product.category, product.brand].filter(Boolean).join(' / ');
   return (
     <article className={`catalog-card${out ? ' is-out' : ''}`}>
-      <div className="catalog-card-top">
-        <span className="catalog-card-tags">{out && <span className="is-gray">Agotado</span>}</span>
-      </div>
       <Link to={url} className="catalog-card-media" tabIndex={-1} aria-hidden="true">
         <ProductImage product={product} />
-        {product.brand && <span className="catalog-card-label">{product.brand}</span>}
       </Link>
       <div className="catalog-card-meta">
         <span>{origin}</span>
@@ -29,6 +25,9 @@ export function CatalogCard({ product }: { product: Product }) {
         {product.name}
       </Link>
       <div className="catalog-card-foot">
+        <p className={`catalog-card-stock${out ? ' is-out' : ''}`}>
+          <i aria-hidden="true" /> {out ? 'Agotado' : 'Disponible'}
+        </p>
         <strong className="catalog-card-price">{money(Number(product.price))}</strong>
         <div className="catalog-card-actions">
           <Link className="catalog-card-view" to={url}>

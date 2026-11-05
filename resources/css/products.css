@@ -64,45 +64,6 @@
   line-height: 20px;
   color: #434751;
 }
-.catalog-perks {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  background: #f0f3ff;
-}
-.catalog-perks > span {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #00265d;
-}
-.catalog-perks img {
-  width: 14px;
-  height: 17px;
-}
-.catalog-perks > span > span {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 16px;
-}
-.catalog-perks small {
-  font-size: 10px;
-  font-weight: 400;
-  line-height: 10px;
-  letter-spacing: 0.05em;
-  color: #434751;
-}
-.catalog-perks > i {
-  width: 1px;
-  height: 24px;
-  background: #c4c6d24d;
-}
 .catalog-search {
   display: flex;
   gap: 8px;
@@ -166,9 +127,21 @@
 .catalog-applied {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
-  padding-top: 16px;
+  height: 54px;
+  padding-top: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+.catalog-applied > * {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.catalog-applied-empty {
+  font-size: 13px;
+  color: #434751;
 }
 .catalog-applied-label {
   display: inline-flex;
@@ -520,6 +493,39 @@
   gap: 24px;
   min-width: 0;
 }
+.catalog-total.is-loading {
+  visibility: hidden;
+}
+.catalog-placeholder {
+  height: 20px;
+  border-radius: 4px;
+  background: #e7eeff;
+}
+.catalog-loading-side {
+  min-height: 640px;
+  gap: 16px;
+}
+.catalog-loading-bar {
+  min-height: 60px;
+}
+.catalog-loading-card {
+  min-height: 460px;
+  gap: 16px;
+}
+@media (max-width: 700px) {
+  /* Keep the shared header height and use its search on mobile. */
+  .catalog-search {
+    display: none;
+  }
+}
+@media (max-width: 560px) {
+  .catalog-loading-card {
+    min-height: 300px;
+  }
+  .catalog-loading-bar {
+    min-height: 112px;
+  }
+}
 .catalog-bar {
   display: flex;
   align-items: center;
@@ -760,6 +766,7 @@
 /* Help banner and pagination */
 .catalog-help {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
   margin-top: 16px;
@@ -792,6 +799,8 @@
 .catalog-help-actions {
   flex-shrink: 0;
   display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
   gap: 8px;
   margin-left: auto;
 }
@@ -878,6 +887,9 @@
   }
 }
 @media (max-width: 860px) {
+  .catalog-loading-side {
+    display: none;
+  }
   .catalog-body {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -995,7 +1007,6 @@
   }
 }
 @media (max-width: 560px) {
-  .catalog-perks,
   .catalog-search-clear {
     display: none;
   }
@@ -1027,8 +1038,16 @@
   }
   .catalog-card-top,
   .catalog-card-label,
-  .catalog-card-meta,
   .catalog-card-view {
+    display: none;
+  }
+  .catalog-card-meta {
+    display: block;
+    font-size: 10px;
+    line-height: 14px;
+    overflow-wrap: anywhere;
+  }
+  .catalog-card-meta code {
     display: none;
   }
   .catalog-card-media {
@@ -1063,7 +1082,7 @@
     padding: 20px;
   }
 }
-/* The brand already has its own label on the catalog card. */
+/* Brand and category are shown together below the image. */
 .catalog-card-media .image-fallback small {
   display: none;
 }

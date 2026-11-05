@@ -47,7 +47,7 @@ export function Orders() {
             title="Aún no tienes pedidos"
             text="Cuando completes una compra aparecerá aquí."
             action={
-              <Link className="button button-primary" to="/catalogo">
+              <Link className="button button-primary" to="/cuenta/productos">
                 Explorar productos
               </Link>
             }

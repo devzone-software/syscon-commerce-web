@@ -6,6 +6,7 @@ import { DeliveryFields } from '../components/checkout/DeliveryFields';
 import { PageHero, PageSection } from '../components/layout/PageHero';
 import { useCartReview } from '../hooks/useCartReview';
 import { displayName } from '../lib/auth';
+import { onlineGateway, type OnlineGateway } from '../lib/sales';
 import {
   billingFromProfile,
   billingPayload,
@@ -25,7 +26,7 @@ import {
 import { api } from '../services/api';
 import { money, useShop } from '../state';
 import type { DeliveryOptions, Payment, Profile } from '../types';
-import { ErrorBox } from '../ui';
+import { ErrorBox, useData } from '../ui';
 
 export function Checkout() {
   const { cart, clear, user } = useShop();
@@ -33,6 +34,9 @@ export function Checkout() {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const methods = useData(api.paymentMethods);
+  const gateway = onlineGateway(methods.data?.gateways);
+  const [provider, setProvider] = useState<'MANUAL' | OnlineGateway>('MANUAL');
   const [forms, setForms] = useState(() => initialForms(user));
   const [type, setType] = useState<BillingForm['type']>('03');
   const [delivery, setDelivery] = useState<DeliveryForm>(() =>
@@ -103,9 +107,13 @@ export function Checkout() {
       // The manual payment request is idempotent; if it fails the order page offers a retry.
       let payment: Payment | null = null;
       try {
-        payment = await api.createPayment(order.id);
+        payment = await api.createPayment(order.id, provider);
       } catch {
         payment = null;
+      }
+      if (provider !== 'MANUAL' && payment?.paymentUrl) {
+        window.location.assign(payment.paymentUrl);
+        return;
       }
       navigate(`/pedido/${order.id}?nuevo=1`, { state: { payment } });
     } catch (e) {
@@ -181,13 +189,37 @@ export function Checkout() {
         </Link>
         <h3 className="flow-subtitle">Método de pago</h3>
         <label className="payment-option">
-          <input type="radio" name="payment" checked readOnly />
+          <input
+            type="radio"
+            name="payment"
+            checked={provider === 'MANUAL'}
+            onChange={() => setProvider('MANUAL')}
+          />
           <span>
             <strong>Pago manual: transferencia bancaria o pago coordinado con un asesor</strong>
             Tras crear el pedido se registra una solicitud de pago. Un asesor la confirma cuando
             verifica el pago.
           </span>
         </label>
+        {gateway && (
+          <label className="payment-option">
+            <input
+              type="radio"
+              name="payment"
+              checked={provider === gateway.provider}
+              onChange={() => setProvider(gateway.provider)}
+            />
+            <span>
+              <strong>{gateway.label}</strong>Después de registrar el pedido te llevaremos a la
+              página de pago.
+            </span>
+          </label>
+        )}
+        {methods.error && (
+          <p className="flow-note">
+            No pudimos consultar el pago en línea. Puedes registrar el pedido con pago manual.
+          </p>
+        )}
         {error && <ErrorBox message={error} />}
       </PageSection>
       <PageSection title="Resumen del pedido" soft>

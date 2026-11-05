@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useAccountPath } from '../hooks/useAccountPath';
 import team from '../../images/about/team.jpg';
 import homeIcon from '../../images/catalog/home.svg';
 import {
@@ -90,18 +91,18 @@ const values = [
 const reasons = [
   {
     icon: <ShieldIcon size={18} />,
-    title: 'Productos 100% Confiables & Certificados',
-    text: 'Productos originales con respaldo directo de cada fabricante.',
+    title: 'Información y asesoría por producto',
+    text: 'Consulta las condiciones y el respaldo de cada producto.',
   },
   {
     icon: <ReceiptIcon size={18} />,
     title: 'Facturación Electrónica',
-    text: 'Comprobantes autorizados por SUNAT con RUC 20 o Boleta para deducción de gastos.',
+    text: 'Elige boleta o factura y registra los datos del comprobante al hacer tu pedido.',
   },
   {
     icon: <TruckIcon size={18} />,
-    title: 'Envíos a Todo el Perú',
-    text: 'Despachos coordinados a nivel nacional con seguimiento de cada pedido.',
+    title: 'Opciones de entrega',
+    text: 'Consulta las modalidades habilitadas en el checkout y sigue tu pedido desde tu cuenta.',
   },
   {
     icon: <TagIcon size={18} />,
@@ -116,7 +117,7 @@ const reasons = [
   {
     icon: <LockIcon size={18} />,
     title: 'Pago Verificado',
-    text: 'Cada pago lo confirma nuestro equipo antes de preparar tu pedido.',
+    text: 'Consulta el estado de pago de tus pedidos desde tu cuenta.',
   },
 ];
 
@@ -145,6 +146,7 @@ const steps = [
 
 /** Figma "Client / Nosotros". Figures come from the live catalog instead of fixed marketing numbers. */
 export function About() {
+  const accountPath = useAccountPath();
   const { data } = useData(api.products);
   const products = data ?? [];
   const brands = groupProducts(products, 'brand');
@@ -157,9 +159,9 @@ export function About() {
     },
     {
       icon: <BoxIcon size={22} />,
-      tag: 'Garantía',
-      value: '100%',
-      label: 'Productos originales con garantía de fábrica',
+      tag: 'Asesoría',
+      value: 'Consulta',
+      label: 'Condiciones y respaldo por producto',
     },
     {
       icon: <GridIcon size={22} />,
@@ -178,8 +180,8 @@ export function About() {
   return (
     <div className="about-page">
       <div className="about-crumb container">
-        <Link to="/">
-          <img src={homeIcon} alt="" /> Inicio
+        <Link to={accountPath('/')}>
+          <img src={homeIcon} alt="" /> {accountPath('/') === '/cuenta' ? 'Mi cuenta' : 'Inicio'}
         </Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">Nosotros</span>
@@ -199,7 +201,7 @@ export function About() {
             <a href="#historia" className="is-primary">
               Conocer nuestra historia ↓
             </a>
-            <Link to="/contacto">
+            <Link to={accountPath('/contacto')}>
               <HeadsetIcon size={15} /> Contactar a un Asesor
             </Link>
           </div>
@@ -243,7 +245,7 @@ export function About() {
             </ul>
             <div className="about-brands-box">
               <span>
-                <small>Garantía Incondicional</small>
+                <small>Condiciones por producto</small>
                 Trazabilidad Total
               </span>
               <BoxIcon size={24} />
@@ -259,8 +261,8 @@ export function About() {
             </p>
             <p>
               Nacimos con el propósito de erradicar la incertidumbre en la adquisición de
-              tecnología, brindando a cada cliente asesoramiento técnico honesto, facturación
-              electrónica autorizada por SUNAT y soporte postventa continuo con ingenieros
+              tecnología, brindando a cada cliente asesoramiento técnico honesto, facturación según
+              los datos del pedido y atención postventa con nuestro equipo de profesionales
               especializados.
             </p>
             <p>
@@ -425,8 +427,8 @@ export function About() {
             <p className="about-eyebrow is-light">GARANTÍA CORPORATIVA SYSCON</p>
             <h2>Tu confianza es nuestra prioridad número uno</h2>
             <p>
-              Operamos bajo normativas de seguridad, entrega certificada y cumplimiento tributario
-              ante los organismos reguladores peruanos.
+              Revisa las condiciones del producto y las opciones de entrega y pago antes de
+              confirmar tu pedido.
             </p>
           </div>
           <ul>
@@ -469,7 +471,7 @@ export function About() {
               <Link to="/catalogo" className="is-primary">
                 <StoreIcon size={16} /> Explorar Catálogo de Productos
               </Link>
-              <Link to="/contacto">
+              <Link to={accountPath('/contacto')}>
                 <MailIcon size={16} /> Contactar a un Asesor Comercial
               </Link>
             </div>

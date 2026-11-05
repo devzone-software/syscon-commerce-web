@@ -26,31 +26,10 @@
   gap: 10px;
   padding: 0 8px;
 }
-.portal-brand-mark {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: #00265d;
-  color: #fff;
-  font-size: 18px;
-  font-weight: 800;
-}
-.portal-brand > span:last-child {
-  display: flex;
-  flex-direction: column;
-  font-size: 18px;
-  font-weight: 800;
-  line-height: 20px;
-  color: #00265d;
-}
-.portal-brand small {
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 14px;
-  letter-spacing: 0.06em;
-  color: #00658d;
+.portal-brand img {
+  width: 180px;
+  height: 50px;
+  object-fit: contain;
 }
 .portal-user {
   display: flex;
@@ -159,6 +138,19 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  container: portal-main / inline-size;
+}
+@container portal-main (max-width: 1050px) {
+  .portal-main .portal-topbar {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  .portal-main .portal-search {
+    order: 5;
+    flex-basis: 100%;
+    max-width: none;
+  }
 }
 .portal-topbar {
   position: sticky;
@@ -257,11 +249,11 @@
   background: #b42318;
 }
 .portal-logo {
-  width: 32px;
+  display: none;
+  flex-shrink: 0;
+  width: 112px;
   height: 32px;
-  border-radius: 12px;
-  object-fit: cover;
-  object-position: 49% 50%;
+  object-fit: contain;
 }
 .portal-content {
   flex: 1;
@@ -269,6 +261,35 @@
   flex-direction: column;
   gap: 32px;
   padding: 24px;
+}
+.portal-cart {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+.portal-cart-heading h1 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  color: #00265d;
+}
+.portal-cart-heading p {
+  margin: 0;
+  font-size: 14px;
+  color: #59616c;
+}
+.portal-cart > .page-section {
+  border-radius: 8px;
+  box-shadow: 0 1px 1px #0000000d;
+}
+.portal-cart > .page-section > .container {
+  width: 100%;
+  padding: 24px;
+}
+@media (max-width: 640px) {
+  .portal-cart > .page-section > .container {
+    padding: 16px;
+  }
 }
 .portal-footer {
   display: flex;
@@ -280,6 +301,119 @@
   background: #fff;
   font-size: 11px;
   color: #434751;
+}
+.portal-page {
+  min-width: 0;
+  container: portal-page / inline-size;
+}
+.portal-page .container {
+  width: 100%;
+  max-width: none;
+}
+.portal-catalog {
+  min-width: 0;
+}
+.portal-catalog .catalog-page {
+  width: 100%;
+}
+.portal-catalog .catalog-bar > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  min-width: 0;
+}
+.portal-catalog .browser-select {
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+}
+.portal-catalog .browser-select select {
+  width: 100%;
+  min-width: 0;
+}
+.portal-catalog .catalog-help {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.portal-catalog .catalog-help-actions {
+  flex-wrap: wrap;
+  max-width: 100%;
+  margin-left: 0;
+}
+@media (max-width: 560px) {
+  .portal-catalog .catalog-bar > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 1400px) {
+  .portal-catalog .catalog-body {
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 24px;
+  }
+  .portal-catalog .catalog-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 860px) {
+  .portal-catalog .catalog-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* These shared store pages adapt to the space left by the account sidebar. */
+@container portal-page (max-width: 1100px) {
+  .portal-page .offers-hero,
+  .portal-page .about-cta,
+  .portal-page .contact-hero,
+  .portal-page .contact-whatsapp,
+  .portal-page .contact-commitment {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .portal-page .offers-hero figure {
+    flex-basis: auto;
+  }
+  .portal-page .offers-spotlight-body,
+  .portal-page .about-hero,
+  .portal-page .about-identity,
+  .portal-page .about-trust .container,
+  .portal-page .contact-main,
+  .portal-page .contact-location {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .portal-page .offers-grid,
+  .portal-page .offers-ending ul,
+  .portal-page .offers-trust ul,
+  .portal-page .offers-filters-row,
+  .portal-page .about-stats,
+  .portal-page .about-steps,
+  .portal-page .about-timeline,
+  .portal-page .about-values,
+  .portal-page .about-reasons,
+  .portal-page .contact-channels,
+  .portal-page .contact-areas ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .portal-page .offers-filters-row p {
+    justify-self: start;
+  }
+}
+@container portal-page (max-width: 640px) {
+  .portal-page .offers-grid,
+  .portal-page .offers-ending ul,
+  .portal-page .offers-trust ul,
+  .portal-page .offers-filters-row,
+  .portal-page .about-stats,
+  .portal-page .about-steps,
+  .portal-page .about-timeline,
+  .portal-page .about-values,
+  .portal-page .about-reasons,
+  .portal-page .about-purpose,
+  .portal-page .about-trust ul,
+  .portal-page .contact-channels,
+  .portal-page .contact-areas ul,
+  .portal-page .contact-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .portal-footer nav {
   display: flex;
@@ -779,6 +913,9 @@
   }
 }
 @media (max-width: 960px) {
+  .portal:not(.is-menu-open) .portal-logo {
+    display: block;
+  }
   .portal {
     grid-template-columns: minmax(0, 1fr);
   }

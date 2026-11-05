@@ -6,6 +6,8 @@ import { PageHero, PageSection } from '../components/layout/PageHero';
 import { useCartReview } from '../hooks/useCartReview';
 import { useShop } from '../state';
 import { Empty } from '../ui';
+import { AccountLayout } from '../components/account/AccountLayout';
+import { useAccountPath } from '../hooks/useAccountPath';
 
 const hero = (
   <PageHero
@@ -15,21 +17,40 @@ const hero = (
   />
 );
 
-export function Cart() {
+export function AccountCart() {
+  return (
+    <AccountLayout title="Mi carrito">
+      <div className="portal-cart">
+        <Cart account />
+      </div>
+    </AccountLayout>
+  );
+}
+
+export function Cart({ account = false }: { account?: boolean }) {
+  const accountPath = useAccountPath();
   const { cart, setQuantity, clear } = useShop();
   const { issues, checking, error } = useCartReview();
   const [confirmClear, setConfirmClear] = useState(false);
+  const heading = account ? (
+    <header className="portal-card portal-cart-heading">
+      <h1>Mi carrito</h1>
+      <p>Revisa tus productos antes de continuar al pago.</p>
+    </header>
+  ) : (
+    hero
+  );
 
   if (!cart.length)
     return (
       <>
-        {hero}
+        {heading}
         <PageSection>
           <Empty
             title="Tu carrito está vacío"
             text="Explora el catálogo y agrega los productos que necesitas."
             action={
-              <Link className="button button-primary" to="/catalogo">
+              <Link className="button button-primary" to={accountPath('/catalogo')}>
                 Ir al catálogo
               </Link>
             }
@@ -40,7 +61,7 @@ export function Cart() {
 
   return (
     <>
-      {hero}
+      {heading}
       <PageSection
         title="Productos en tu carrito"
         action={
@@ -78,7 +99,7 @@ export function Cart() {
             />
           ))}
         </ul>
-        <Link className="arrow-link cart-continue" to="/catalogo">
+        <Link className="arrow-link cart-continue" to={accountPath('/catalogo')}>
           ← Seguir comprando
         </Link>
       </PageSection>

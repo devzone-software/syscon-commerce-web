@@ -14,7 +14,7 @@ import { useData, ErrorBox, Loading, Empty } from '../../ui';
 const PAGE_SIZE = 25;
 
 export function InventoryAdmin() {
-  const { data, loading, error, reload } = useData(api.products);
+  const { data, loading, error, reload } = useData(api.adminProducts);
   const [query, setQuery] = useState('');
   const [onlyOut, setOnlyOut] = useState(false);
   const [page, setPage] = useState(1);
@@ -33,12 +33,24 @@ export function InventoryAdmin() {
     downloadCsv(
       'existencias-syscon.csv',
       toCsv(
-        ['SKU', 'Producto', 'Categoría', 'Marca', 'Stock', 'Precio', 'Valor a precio de venta'],
+        [
+          'SKU',
+          'Producto',
+          'Categoría',
+          'Marca',
+          'Stock físico',
+          'Reservado',
+          'Disponible',
+          'Precio',
+          'Valor disponible a precio de venta',
+        ],
         rows.map((product) => [
           product.sku,
           product.name,
           product.category ?? '',
           product.brand ?? '',
+          product.physicalStock,
+          product.reservedStock,
           product.stock,
           Number(product.price).toFixed(2),
           (Math.max(0, product.stock) * Number(product.price)).toFixed(2),
@@ -50,7 +62,7 @@ export function InventoryAdmin() {
     <>
       <PageHeader
         title="Existencias"
-        description="Stock actual por producto publicado. El backend maneja un único saldo global: todavía no existen almacenes, movimientos, kardex, ajustes ni transferencias."
+        description="Stock físico, reservado y disponible de todos los productos. Las compras y los retiros por uso interno se registran en sus secciones."
         actions={
           rows.length > 0 && (
             <button type="button" className="button button-secondary" onClick={exportCsv}>
@@ -66,8 +78,8 @@ export function InventoryAdmin() {
       ) : (
         <>
           <div className="bo-stats">
-            <StatCard label="Productos publicados" value={totals.products} />
-            <StatCard label="Unidades en stock" value={totals.units} />
+            <StatCard label="Productos registrados" value={totals.products} />
+            <StatCard label="Unidades disponibles" value={totals.units} />
             <StatCard label="Productos sin stock" value={totals.outOfStock} />
             <StatCard
               label="Valor a precio de venta"
@@ -136,6 +148,9 @@ export function InventoryAdmin() {
                         <td>{product.category ?? '—'}</td>
                         <td className="num">
                           {product.stock} <StockBadge stock={product.stock} />
+                          <small>
+                            Físico: {product.physicalStock} · Reservado: {product.reservedStock}
+                          </small>
                         </td>
                         <td className="num">{money(Number(product.price))}</td>
                         <td className="num">

@@ -19,7 +19,7 @@ import { useData, ErrorBox, Loading } from '../ui';
 const nextSteps = [
   {
     title: '1. Confirmación del pago',
-    text: 'Un asesor verifica tu pago y lo registra en el pedido.',
+    text: 'El pago en línea se confirma mediante la pasarela; el pago manual lo verifica un asesor.',
   },
   {
     title: '2. Preparación del pedido',
@@ -97,8 +97,8 @@ export function OrderPage() {
       {isNew ? (
         <PageHero
           large
-          eyebrow="COMPRA CONFIRMADA"
-          title="¡Gracias por tu compra!"
+          eyebrow="PEDIDO REGISTRADO"
+          title="Tu pedido fue registrado"
           text="Tu pedido fue registrado correctamente. El precio y la disponibilidad fueron confirmados."
         >
           <p className="page-hero-order">Orden #{shortId(id)}</p>
