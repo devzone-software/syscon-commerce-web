@@ -7,6 +7,7 @@ import { useCartReview } from '../hooks/useCartReview';
 import { useShop } from '../state';
 import { Empty } from '../ui';
 import { AccountLayout } from '../components/account/AccountLayout';
+import { useAccountPath } from '../hooks/useAccountPath';
 
 const hero = (
   <PageHero
@@ -27,6 +28,7 @@ export function AccountCart() {
 }
 
 export function Cart({ account = false }: { account?: boolean }) {
+  const accountPath = useAccountPath();
   const { cart, setQuantity, clear } = useShop();
   const { issues, checking, error } = useCartReview();
   const [confirmClear, setConfirmClear] = useState(false);
@@ -48,7 +50,7 @@ export function Cart({ account = false }: { account?: boolean }) {
             title="Tu carrito está vacío"
             text="Explora el catálogo y agrega los productos que necesitas."
             action={
-              <Link className="button button-primary" to="/catalogo">
+              <Link className="button button-primary" to={accountPath('/catalogo')}>
                 Ir al catálogo
               </Link>
             }
@@ -97,7 +99,7 @@ export function Cart({ account = false }: { account?: boolean }) {
             />
           ))}
         </ul>
-        <Link className="arrow-link cart-continue" to="/catalogo">
+        <Link className="arrow-link cart-continue" to={accountPath('/catalogo')}>
           ← Seguir comprando
         </Link>
       </PageSection>

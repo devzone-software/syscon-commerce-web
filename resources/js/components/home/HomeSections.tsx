@@ -21,6 +21,8 @@ import { ProductCard } from '../../ui';
 import { ChevronLeftIcon, ChevronRightIcon } from '../icons';
 import '../../../css/storefront.css';
 
+const lowPriceCatalog = `/catalogo?${catalogParams.onlyAvailable}=1&${catalogParams.sort}=precio-asc`;
+
 const trust = [
   { icon: trustLockIcon, title: 'Compra segura', text: 'Medios de pago informados al comprar' },
   { icon: trustBoltIcon, title: 'Entrega rápida', text: 'Procesamos rápidamente tus pedidos' },
@@ -65,14 +67,14 @@ const heroSlides: {
     title: 'Soluciones de Cómputo, Servidores y Software Original para Empresas y Profesionales',
     text: 'Distribuidor oficial de licencias digitales, hardware para estaciones de trabajo, componentes de alto rendimiento y seguridad informática empresarial.',
     primary: { to: '/catalogo', label: 'Ver productos', icon: heroBagIcon },
-    secondary: { to: '/ofertas', label: 'Ver selección', icon: heroFireIcon },
+    secondary: { to: lowPriceCatalog, label: 'Explorar por precio', icon: heroFireIcon },
   },
   {
     tone: 'is-offers',
     label: 'Selección por precio',
     title: 'Los precios más bajos del catálogo en hardware y software',
     text: 'Laptops, almacenamiento, redes y licencias: consulta las condiciones de cada producto antes de comprar.',
-    primary: { to: '/ofertas', label: 'Ver selección', icon: heroFireIcon },
+    primary: { to: lowPriceCatalog, label: 'Explorar por precio', icon: heroFireIcon },
     secondary: { to: '/categorias', label: 'Explorar categorías' },
   },
   {
@@ -241,11 +243,11 @@ export function FeaturedProducts({ products }: { products: Product[] }) {
     <section className="home-block" aria-labelledby="home-featured">
       <div className="section-head">
         <div className="section-title">
-          <p className="section-eyebrow">Top ventas empresariales</p>
+          <p className="section-eyebrow">Tecnología para tu empresa</p>
           <h2 id="home-featured">Productos destacados</h2>
         </div>
-        <Link className="section-pill" to="/ofertas">
-          Explorar productos seleccionados
+        <Link className="section-pill" to={lowPriceCatalog}>
+          Explorar por precio
         </Link>
       </div>
       <div className="featured-grid">
@@ -262,13 +264,13 @@ export function PromoBanner() {
     <section className="promo-banner" aria-labelledby="home-promo">
       <div>
         <span className="promo-banner-tag">Selección por precio</span>
-        <h2 id="home-promo">Precios especiales en Seguridad &amp; Almacenamiento</h2>
+        <h2 id="home-promo">Tecnología para tus proyectos</h2>
         <p>
           Equipa a tu empresa con soluciones de ciberseguridad y discos de alta capacidad para
           servidores y backups seguros.
         </p>
-        <Link className="promo-banner-cta" to="/ofertas">
-          Ver selección <img src={promoArrowIcon} alt="" />
+        <Link className="promo-banner-cta" to={lowPriceCatalog}>
+          Explorar por precio <img src={promoArrowIcon} alt="" />
         </Link>
       </div>
       <img className="promo-banner-image" src={promoImage} alt="" width={320} height={192} />

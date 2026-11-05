@@ -16,7 +16,6 @@ export function CatalogCard({ product }: { product: Product }) {
     <article className={`catalog-card${out ? ' is-out' : ''}`}>
       <Link to={url} className="catalog-card-media" tabIndex={-1} aria-hidden="true">
         <ProductImage product={product} />
-        {product.brand && <span className="catalog-card-label">{product.brand}</span>}
       </Link>
       <div className="catalog-card-meta">
         <span>{origin}</span>

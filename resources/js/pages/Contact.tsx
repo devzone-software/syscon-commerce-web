@@ -133,7 +133,7 @@ export function Contact() {
             <li>
               <ShieldIcon size={20} />
               <span>
-                <strong>Atención Certificada</strong>Ingenieros e IT Sales Specialists
+                <strong>Atención al cliente</strong>Consultas comerciales y técnicas
               </span>
             </li>
             <li>
@@ -186,10 +186,9 @@ export function Contact() {
             <i className="is-indigo">
               <HeadsetIcon size={22} />
             </i>
-            <p className="contact-eyebrow">HELP DESK &amp; CERTIFICACIÓN</p>
-            <h2>Mesa de Ayuda IT</h2>
+            <p className="contact-eyebrow">AYUDA SOBRE TUS PRODUCTOS</p>
+            <h2>Soporte técnico</h2>
             <p>¿Asistencia técnica para activación o instalación de tus productos?</p>
-            <code className="is-green">Respuesta técnica garantizada</code>
             <a href="#formulario" className="is-teal">
               <ReceiptIcon size={16} /> Solicitar soporte
             </a>
@@ -550,11 +549,11 @@ export function Contact() {
           <ul>
             <li>
               <HeadsetIcon size={20} />
-              <strong>Soporte Remoto</strong>Sin costo adicional
+              <strong>Soporte técnico</strong>Consulta las condiciones de atención
             </li>
             <li>
               <CheckIcon size={20} />
-              <strong>Garantía Escrita</strong>Oficial de fábrica
+              <strong>Garantía del producto</strong>Consulta las condiciones aplicables
             </li>
             <li>
               <TruckIcon size={20} />

@@ -1,12 +1,9 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import boxIcon from '../../images/catalog/box.svg';
-import clearIcon from '../../images/catalog/clear.svg';
 import closeIcon from '../../images/catalog/close.svg';
 import filterIcon from '../../images/catalog/filter.svg';
 import homeIcon from '../../images/catalog/home.svg';
-import searchButtonIcon from '../../images/catalog/search-button.svg';
-import searchIcon from '../../images/catalog/search.svg';
 import { CatalogCard } from '../components/catalog/CatalogCard';
 import { CatalogSidebar } from '../components/catalog/CatalogSidebar';
 import { ChatIcon, SearchIcon } from '../components/icons';
@@ -24,6 +21,7 @@ import { api } from '../services/api';
 import { useData, ErrorBox, Empty } from '../ui';
 import '../../css/products.css';
 import '../../css/storefront.css';
+import { useAccountPath } from '../hooks/useAccountPath';
 
 const PAGE_SIZES = [12, 24, 48];
 const count = new Intl.NumberFormat('es-PE');
@@ -88,23 +86,28 @@ function CatalogLoading({ size }: { size: number }) {
 
 /** Figma "Client / Productos": compact header with search, filter sidebar and 3-column grid. */
 export function Catalog() {
+  const accountPath = useAccountPath();
   const { data, loading, error, reload } = useData(api.products);
   const [params, setParams] = useSearchParams();
   const [size, setSize] = useState(PAGE_SIZES[0]);
   const paramsKey = params.toString();
   const filters = useMemo(() => readFilters(new URLSearchParams(paramsKey)), [paramsKey]);
-  const [query, setQuery] = useState(filters.query);
-  useEffect(() => setQuery(filters.query), [filters.query]);
   const [filtersOpen, setFiltersOpen] = useState(false);
   // The mobile filter panel covers the page: freeze the page behind it and close it with Escape.
   useEffect(() => {
     if (!filtersOpen) return;
     const close = (event: KeyboardEvent) => event.key === 'Escape' && setFiltersOpen(false);
+    const mobile = window.matchMedia('(max-width: 860px)');
+    const resize = () => {
+      if (!mobile.matches) setFiltersOpen(false);
+    };
     document.body.style.overflow = 'hidden';
     document.addEventListener('keydown', close);
+    mobile.addEventListener('change', resize);
     return () => {
       document.body.style.overflow = '';
       document.removeEventListener('keydown', close);
+      mobile.removeEventListener('change', resize);
     };
   }, [filtersOpen]);
 
@@ -150,17 +153,13 @@ export function Catalog() {
     setParams(next);
     window.scrollTo({ top: 0 });
   };
-  const search = (event: FormEvent) => {
-    event.preventDefault();
-    update({ [catalogParams.query]: query.trim() });
-  };
   const chips = appliedFilters(filters);
 
   return (
     <div className="container catalog-page">
       <nav className="catalog-crumb" aria-label="Ruta de navegación">
-        <Link to="/">
-          <img src={homeIcon} alt="" /> Inicio
+        <Link to={accountPath('/')}>
+          <img src={homeIcon} alt="" /> {accountPath('/') === '/cuenta' ? 'Mi cuenta' : 'Inicio'}
         </Link>
         <span aria-hidden="true">/</span>
         <span aria-current="page">
@@ -183,31 +182,6 @@ export function Catalog() {
           <p>Explora nuestro catálogo de tecnología con precios actualizados.</p>
         </div>
       </div>
-      <form className="catalog-search" role="search" onSubmit={search}>
-        <label>
-          <img src={searchIcon} alt="" />
-          <span className="visually-hidden">Buscar en el catálogo</span>
-          <input
-            type="search"
-            placeholder="Buscar productos, marcas o SKU"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-        </label>
-        <button type="submit" className="catalog-search-go">
-          <img src={searchButtonIcon} alt="" /> Buscar
-        </button>
-        <button
-          type="button"
-          className="catalog-search-clear"
-          onClick={() => {
-            setQuery('');
-            update({ [catalogParams.query]: '' });
-          }}
-        >
-          <img src={clearIcon} alt="" /> Limpiar búsqueda
-        </button>
-      </form>
       <div className="catalog-applied" role="group" aria-label="Filtros aplicados">
         {chips.length > 0 ? (
           <>
@@ -334,7 +308,7 @@ export function Catalog() {
                 <button type="button" onClick={clear}>
                   Restablecer filtros
                 </button>
-                <Link to="/contacto">
+                <Link to={accountPath('/contacto')}>
                   <ChatIcon size={16} /> Consultar con un asesor
                 </Link>
               </div>

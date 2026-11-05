@@ -8,6 +8,7 @@ import phoneIcon from '../../../images/header/phone.svg';
 import searchIcon from '../../../images/header/search.svg';
 import truckIcon from '../../../images/header/truck.svg';
 import { cartTotal } from '../../lib/cart';
+import { catalogSearchQuery } from '../../lib/catalog';
 import { canUseBackoffice } from '../../lib/auth';
 import { money, useShop } from '../../state';
 import { CloseIcon, MenuIcon } from '../icons';
@@ -31,7 +32,6 @@ const mainLinks = [
   { to: '/', label: 'Inicio', end: true },
   { to: '/catalogo', label: 'Productos' },
   { to: '/categorias', label: 'Categorías' },
-  { to: '/ofertas', label: 'Selección' },
   { to: '/nosotros', label: 'Nosotros' },
   { to: '/contacto', label: 'Contacto' },
 ];
@@ -61,8 +61,10 @@ export function Header() {
 
   const search = (event: FormEvent) => {
     event.preventDefault();
-    const value = query.trim();
-    navigate(value ? `/catalogo?q=${encodeURIComponent(value)}` : '/catalogo');
+    navigate({
+      pathname: '/catalogo',
+      search: catalogSearchQuery(location.pathname === '/catalogo' ? location.search : '', query),
+    });
   };
   const signOut = async () => {
     await logout();

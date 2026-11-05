@@ -63,9 +63,8 @@ export function AuthLayout({
             © {new Date().getFullYear()} Grupo SYSCON S.A.C. Todos los derechos reservados.
           </span>
           <nav aria-label="Enlaces">
-            <Link to="/contacto">Centro de ayuda</Link>
+            <Link to="/contacto">Ayuda y contacto</Link>
             <Link to="/nosotros">Nosotros</Link>
-            <Link to="/contacto">Contacto</Link>
             <Link to="/" className="auth-footer-back">
               <ArrowLeftIcon size={14} /> Volver a la tienda
             </Link>

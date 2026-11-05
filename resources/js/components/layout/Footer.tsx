@@ -31,12 +31,10 @@ export function Footer() {
           <h2>Tienda</h2>
           <Link to="/catalogo">Productos</Link>
           <Link to="/categorias">Categorías</Link>
-          <Link to="/ofertas">Selección de productos</Link>
         </nav>
         <nav aria-label="Ayuda">
           <h2>Ayuda</h2>
-          <Link to="/contacto">Contacto comercial</Link>
-          <Link to="/contacto">Soporte técnico</Link>
+          <Link to="/contacto">Ayuda y contacto</Link>
           <Link to={managesOrders ? '/admin/pedidos' : '/cuenta/pedidos'}>
             {managesOrders ? 'Gestión de pedidos' : 'Estado del pedido'}
           </Link>
@@ -44,7 +42,7 @@ export function Footer() {
         <nav aria-label="Empresa">
           <h2>Empresa</h2>
           <Link to="/nosotros">Nosotros</Link>
-          <Link to="/registro">Crear cuenta</Link>
+          {!user && <Link to="/registro">Crear cuenta</Link>}
           <Link to={accountHome(user)}>{staff ? 'Administración' : 'Mi cuenta'}</Link>
         </nav>
         <div className="store-footer-contact-column">

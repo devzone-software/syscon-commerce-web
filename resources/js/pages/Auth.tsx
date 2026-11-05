@@ -42,11 +42,14 @@ const emptySignUp: SignUp = {
 const loginFeatures: AuthFeature[] = [
   {
     icon: <ListCheckIcon size={16} />,
-    text: 'Seguimiento y trazabilidad de pedidos en tiempo real.',
+    text: 'Consulta el estado de tus pedidos desde tu cuenta.',
   },
   { icon: <ReceiptIcon size={16} />, text: 'Historial de compras y pagos en un solo lugar.' },
   { icon: <BuildingIcon size={16} />, text: 'Compras con RUC y facturación electrónica.' },
-  { icon: <HeadsetIcon size={16} />, text: 'Soporte IT y atención preferencial para empresas.' },
+  {
+    icon: <HeadsetIcon size={16} />,
+    text: 'Contacto con nuestro equipo para consultas sobre tus compras.',
+  },
 ];
 
 const signUpFeatures: AuthFeature[] = [
@@ -54,8 +57,8 @@ const signUpFeatures: AuthFeature[] = [
     icon: <ListCheckIcon size={16} />,
     text: (
       <>
-        <strong>Guarda tus productos y cotizaciones</strong>
-        Tu carrito te espera cuando vuelvas.
+        <strong>Conserva tu carrito</strong>
+        Tus productos se guardan en este navegador.
       </>
     ),
   },
@@ -72,8 +75,8 @@ const signUpFeatures: AuthFeature[] = [
     icon: <ReceiptIcon size={16} />,
     text: (
       <>
-        <strong>Compras ágiles y checkout express</strong>
-        Tus datos quedan listos para el próximo pedido.
+        <strong>Datos para tu compra</strong>
+        Revisa la facturación y la entrega antes de confirmar.
       </>
     ),
   },
@@ -81,7 +84,7 @@ const signUpFeatures: AuthFeature[] = [
     icon: <HeadsetIcon size={16} />,
     text: (
       <>
-        <strong>Soporte técnico preferencial</strong>
+        <strong>Ayuda sobre tus productos</strong>
         Asistencia directa con nuestro equipo.
       </>
     ),
@@ -292,7 +295,7 @@ export function Auth({ register = false }: { register?: boolean }) {
       <AuthLayout
         eyebrow="Acceso para empresas y clientes"
         title="Bienvenido nuevamente a Grupo SYSCON"
-        text="Gestiona tus compras de tecnología, licencias y cotizaciones con RUC en un solo lugar seguro."
+        text="Consulta tus compras de tecnología y el estado de tus pedidos desde tu cuenta."
         features={loginFeatures}
         footnote="Conexión protegida · Cumplimiento Ley N° 29733"
       >
@@ -341,7 +344,7 @@ export function Auth({ register = false }: { register?: boolean }) {
     <AuthLayout
       eyebrow="Comunidad y clientes SYSCON"
       title="Únete a Grupo SYSCON"
-      text="Crea tu cuenta y disfruta de una experiencia de compra ágil, seguimiento de pedidos y cotizaciones corporativas."
+      text="Crea tu cuenta para comprar, consultar tus pedidos y contactar con nuestro equipo."
       features={signUpFeatures}
       footnote="Datos tratados conforme a la Ley N° 29733"
     >

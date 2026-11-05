@@ -117,7 +117,7 @@ const reasons = [
   {
     icon: <LockIcon size={18} />,
     title: 'Pago Verificado',
-    text: 'Cada pago lo confirma nuestro equipo antes de preparar tu pedido.',
+    text: 'Consulta el estado de pago de tus pedidos desde tu cuenta.',
   },
 ];
 

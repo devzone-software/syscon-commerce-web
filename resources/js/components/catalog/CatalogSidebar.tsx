@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import filterIcon from '../../../images/catalog/filter.svg';
 import {
@@ -9,6 +10,7 @@ import {
 } from '../../lib/catalog';
 import { ArrowRightIcon, CloseIcon, HeadsetIcon, SearchIcon } from '../icons';
 import '../../../css/products.css';
+import { useAccountPath } from '../../hooks/useAccountPath';
 
 type Change = (changes: Record<string, string>, replace?: boolean) => void;
 
@@ -74,6 +76,7 @@ export function CatalogSidebar({
   onClose: () => void;
 }) {
   const [brandQuery, setBrandQuery] = useState('');
+  const accountPath = useAccountPath();
   const [min, max] = priceBounds;
   const low = filters.minPrice ?? min;
   const high = filters.maxPrice ?? max;
@@ -84,7 +87,7 @@ export function CatalogSidebar({
   const price = (key: string, value: number, bound: number) =>
     onChange({ [key]: value === bound ? '' : String(value) }, true);
 
-  return (
+  const panel = (
     <aside
       id="catalog-filters"
       className={`catalog-side${open ? ' is-open' : ''}`}
@@ -240,10 +243,8 @@ export function CatalogSidebar({
           <HeadsetIcon size={14} /> MESA CORPORATIVA
         </p>
         <h2>¿Compras por volumen?</h2>
-        <span>
-          Solicita cotizaciones formalizadas con RUC y condiciones de crédito empresarial.
-        </span>
-        <Link to="/contacto">
+        <span>Consulta disponibilidad y condiciones para las compras de tu empresa.</span>
+        <Link to={accountPath('/contacto')}>
           Cotizar con Asesor <ArrowRightIcon size={14} />
         </Link>
       </div>
@@ -254,4 +255,5 @@ export function CatalogSidebar({
       </div>
     </aside>
   );
+  return open ? createPortal(panel, document.body) : panel;
 }

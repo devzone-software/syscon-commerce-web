@@ -766,6 +766,7 @@
 /* Help banner and pagination */
 .catalog-help {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
   margin-top: 16px;
@@ -798,6 +799,8 @@
 .catalog-help-actions {
   flex-shrink: 0;
   display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
   gap: 8px;
   margin-left: auto;
 }
@@ -1079,7 +1082,7 @@
     padding: 20px;
   }
 }
-/* The brand already has its own label on the catalog card. */
+/* Brand and category are shown together below the image. */
 .catalog-card-media .image-fallback small {
   display: none;
 }

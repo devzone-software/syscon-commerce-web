@@ -3,22 +3,16 @@ import { AccountLayout } from '../components/account/AccountLayout';
 import {
   ArrowRightIcon,
   BoxIcon,
-  BuildingIcon,
-  CartIcon,
-  ChatIcon,
   HeadsetIcon,
-  PhoneIcon,
   ReceiptIcon,
-  ShieldIcon,
   TagIcon,
   TruckIcon,
 } from '../components/icons';
-import { company } from '../components/layout/Header';
 import { OrderTimeline } from '../components/orders/OrderTimeline';
 import { OrdersTable } from '../components/orders/OrdersTable';
 import { StatusBadge } from '../components/shared/StatusBadge';
-import { displayName, roleLabel } from '../lib/auth';
-import { accountSummary, orderProgress, orderStatusLabels, shortId } from '../lib/orders';
+import { displayName } from '../lib/auth';
+import { accountSummary, orderStatusLabels, shortId } from '../lib/orders';
 import { deliveryMethodLabels } from '../lib/delivery';
 import { paymentMethodLabel } from '../lib/sales';
 import { api } from '../services/api';
@@ -40,10 +34,6 @@ export function Account() {
     <AccountLayout title="Resumen">
       <section className="portal-welcome" aria-labelledby="portal-welcome-title">
         <div>
-          <span className="portal-pill">
-            <i aria-hidden="true" /> Cuenta {user?.roles.map(roleLabel).join(' / ') || 'cliente'} •
-            ID: CUST-{user?.id.slice(0, 5).toUpperCase()}
-          </span>
           <h1 id="portal-welcome-title">¡Hola de nuevo, {firstName}!</h1>
           <p>
             Gestiona tus pedidos activos, revisa tus compras y sigue el estado de cada entrega desde
@@ -60,67 +50,54 @@ export function Account() {
             </p>
           )}
         </div>
-        {current && (
-          <Link className="portal-last" to={`/pedido/${current.id}`}>
-            <span className="portal-last-head">
-              ÚLTIMO PEDIDO
-              <StatusBadge status={current.status} labels={orderStatusLabels} />
-            </span>
-            <span className="portal-last-code">#{shortId(current.id)}</span>
-            <span className="portal-progress" aria-hidden="true">
-              <i style={{ width: `${Math.max(orderProgress(current.status), 6)}%` }} />
-            </span>
-            <span className="portal-last-link">
-              Ver seguimiento <ArrowRightIcon size={14} />
-            </span>
-          </Link>
-        )}
       </section>
 
-      <ul className="portal-kpis">
-        <li>
-          <span>
-            <span className="portal-kpi-label">Pedidos realizados</span>
-            <strong>{summary.count}</strong>
-            <small>Historial acumulado</small>
-          </span>
-          <i className="is-blue">
-            <BoxIcon size={20} />
-          </i>
-        </li>
-        <li>
-          <span>
-            <span className="portal-kpi-label">
-              En proceso <em>ACTIVOS</em>
+      {!orders.loading && !orders.error && summary.count > 0 && (
+        <ul className="portal-kpis">
+          <li>
+            <span>
+              <span className="portal-kpi-label">Pedidos realizados</span>
+              <strong>{summary.count}</strong>
+              <small>Historial acumulado</small>
             </span>
-            <strong className="is-teal">{summary.active}</strong>
-            <small>Pedidos sin entregar</small>
-          </span>
-          <i className="is-sky">
-            <TruckIcon size={20} />
-          </i>
-        </li>
-        <li>
-          <span>
-            <span className="portal-kpi-label">Compras totales</span>
-            <strong>{money(summary.spent)}</strong>
-            <small>Pedidos con pago confirmado</small>
-          </span>
-          <i className="is-green">
-            <ReceiptIcon size={20} />
-          </i>
-        </li>
-        <li>
-          <span>
-            <span className="portal-kpi-label">Pagos pendientes</span>
-            <strong>{summary.pendingPayment}</strong>
-            <small>Esperando confirmación</small>
-          </span>
-          <i className="is-red">
-            <TagIcon size={20} />
-          </i>
-        </li>
-      </ul>
+            <i className="is-blue">
+              <BoxIcon size={20} />
+            </i>
+          </li>
+          <li>
+            <span>
+              <span className="portal-kpi-label">
+                En proceso <em>ACTIVOS</em>
+              </span>
+              <strong className="is-teal">{summary.active}</strong>
+              <small>Pedidos sin entregar</small>
+            </span>
+            <i className="is-sky">
+              <TruckIcon size={20} />
+            </i>
+          </li>
+          <li>
+            <span>
+              <span className="portal-kpi-label">Compras totales</span>
+              <strong>{money(summary.spent)}</strong>
+              <small>Pedidos con pago confirmado</small>
+            </span>
+            <i className="is-green">
+              <ReceiptIcon size={20} />
+            </i>
+          </li>
+          <li>
+            <span>
+              <span className="portal-kpi-label">Pagos pendientes</span>
+              <strong>{summary.pendingPayment}</strong>
+              <small>Esperando confirmación</small>
+            </span>
+            <i className="is-red">
+              <TagIcon size={20} />
+            </i>
+          </li>
+        </ul>
+      )}
 
       {orders.loading ? (
         <Loading />
@@ -132,7 +109,7 @@ export function Account() {
             title="Aún no tienes pedidos"
             text="Cuando completes una compra aparecerá aquí."
             action={
-              <Link className="button button-primary" to="/catalogo">
+              <Link className="button button-primary" to="/cuenta/productos">
                 Explorar productos
               </Link>
             }
@@ -200,100 +177,20 @@ export function Account() {
               </div>
             </section>
           )}
-          <div className="portal-columns">
-            <section className="portal-card" aria-labelledby="portal-history-title">
-              <div className="portal-card-head">
-                <div>
-                  <h2 id="portal-history-title">Historial de pedidos recientes</h2>
-                  <p>Consulta el estado de tus adquisiciones</p>
-                </div>
-                <Link className="portal-link" to="/cuenta/pedidos">
-                  Ver todos ({orders.data.length}) ›
-                </Link>
+          <section className="portal-card" aria-labelledby="portal-history-title">
+            <div className="portal-card-head">
+              <div>
+                <h2 id="portal-history-title">Historial de pedidos recientes</h2>
+                <p>Consulta el estado de tus adquisiciones</p>
               </div>
-              <OrdersTable orders={orders.data.slice(0, 5)} />
-            </section>
-            <aside className="portal-side">
-              <section className="portal-card" aria-labelledby="portal-data-title">
-                <h2 id="portal-data-title">
-                  <BuildingIcon size={18} /> Datos de la cuenta
-                </h2>
-                <div className="portal-box">
-                  <strong>{user && displayName(user)}</strong>
-                  <span>{user?.email}</span>
-                  <span>Cuenta: {user?.roles.map(roleLabel).join(', ') || 'Cliente'}</span>
-                </div>
-              </section>
-              <section className="portal-card" aria-labelledby="portal-support-title">
-                <h2 id="portal-support-title">
-                  <ShieldIcon size={18} /> Soporte y Asistencia
-                </h2>
-                <Link className="portal-box is-link" to="/cuenta/soporte">
-                  <ChatIcon size={18} />
-                  <span>
-                    <strong>Contactar a soporte</strong>Para garantías o dudas técnicas
-                  </span>
-                </Link>
-                <a className="portal-box is-link" href={company.phoneHref}>
-                  <PhoneIcon size={18} />
-                  <span>
-                    <strong>Central telefónica</strong>
-                    {company.phone}
-                  </span>
-                </a>
-              </section>
-            </aside>
-          </div>
+              <Link className="portal-link" to="/cuenta/pedidos">
+                Ver todos ({orders.data.length}) ›
+              </Link>
+            </div>
+            <OrdersTable orders={orders.data.slice(0, 5)} />
+          </section>
         </>
       )}
-
-      <section className="portal-card" aria-labelledby="portal-ops-title">
-        <p id="portal-ops-title" className="portal-ops-title">
-          ACCESOS RÁPIDOS
-        </p>
-        <ul className="portal-ops">
-          <li>
-            <Link to="/cuenta/seleccion">
-              <i className="is-navy">
-                <TagIcon size={18} />
-              </i>
-              <span>
-                <strong>Selección de productos</strong>Los precios más bajos del catálogo
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/catalogo">
-              <i className="is-teal">
-                <CartIcon size={18} />
-              </i>
-              <span>
-                <strong>Comprar de nuevo</strong>Explora todo el catálogo
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/cuenta/pedidos">
-              <i className="is-light">
-                <BoxIcon size={18} />
-              </i>
-              <span>
-                <strong>Mis pedidos</strong>Estado y pagos de tus compras
-              </span>
-            </Link>
-          </li>
-          <li>
-            <Link to="/cuenta/soporte">
-              <i className="is-dark">
-                <ShieldIcon size={18} />
-              </i>
-              <span>
-                <strong>Garantías y Devoluciones</strong>Atención con un asesor
-              </span>
-            </Link>
-          </li>
-        </ul>
-      </section>
     </AccountLayout>
   );
 }

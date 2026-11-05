@@ -115,8 +115,8 @@ function App() {
                 <Route path="/recuperar" element={<Recover />} />
                 {/* The customer portal has its own sidebar layout (Figma "Client / Mi cuenta"). */}
                 {[
-                  { path: '/cuenta/seleccion', title: 'Selección de productos', page: <Offers /> },
-                  { path: '/cuenta/soporte', title: 'Soporte y contacto', page: <Contact /> },
+                  { path: '/cuenta/productos', title: 'Productos', page: <Catalog /> },
+                  { path: '/cuenta/soporte', title: 'Ayuda y contacto', page: <Contact /> },
                   { path: '/cuenta/nosotros', title: 'Sobre SYSCON', page: <About /> },
                 ].map(({ path, title, page }) => (
                   <Route
@@ -125,12 +125,26 @@ function App() {
                     element={
                       <RequireAuth>
                         <AccountLayout title={title}>
-                          <div className="portal-page">{page}</div>
+                          <div
+                            className={
+                              path === '/cuenta/productos' ? 'portal-catalog' : 'portal-page'
+                            }
+                          >
+                            {page}
+                          </div>
                         </AccountLayout>
                       </RequireAuth>
                     }
                   />
                 ))}
+                <Route
+                  path="/cuenta/seleccion"
+                  element={
+                    <RequireAuth>
+                      <Offers />
+                    </RequireAuth>
+                  }
+                />
                 <Route
                   path="/cuenta"
                   element={

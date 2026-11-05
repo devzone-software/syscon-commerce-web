@@ -3,7 +3,8 @@ import { useLocation } from 'react-router-dom';
 const accountPaths: Record<string, string> = {
   '/': '/cuenta',
   '/carrito': '/cuenta/carrito',
-  '/ofertas': '/cuenta/seleccion',
+  '/ofertas': '/cuenta/productos?disponible=1&orden=precio-asc',
+  '/catalogo': '/cuenta/productos',
   '/contacto': '/cuenta/soporte',
   '/nosotros': '/cuenta/nosotros',
 };

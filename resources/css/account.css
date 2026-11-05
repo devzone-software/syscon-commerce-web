@@ -310,6 +310,55 @@
   width: 100%;
   max-width: none;
 }
+.portal-catalog {
+  min-width: 0;
+}
+.portal-catalog .catalog-page {
+  width: 100%;
+}
+.portal-catalog .catalog-bar > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  min-width: 0;
+}
+.portal-catalog .browser-select {
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+}
+.portal-catalog .browser-select select {
+  width: 100%;
+  min-width: 0;
+}
+.portal-catalog .catalog-help {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.portal-catalog .catalog-help-actions {
+  flex-wrap: wrap;
+  max-width: 100%;
+  margin-left: 0;
+}
+@media (max-width: 560px) {
+  .portal-catalog .catalog-bar > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 1400px) {
+  .portal-catalog .catalog-body {
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 24px;
+  }
+  .portal-catalog .catalog-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 860px) {
+  .portal-catalog .catalog-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 /* These shared store pages adapt to the space left by the account sidebar. */
 @container portal-page (max-width: 1100px) {
   .portal-page .offers-hero,

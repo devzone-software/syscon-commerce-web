@@ -1,5 +1,6 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { catalogSearchQuery } from '../../lib/catalog';
 import logo from '../../../images/header/logo-grupo-syscon.jpg';
 import { canUseBackoffice, displayName, initials, roleLabel } from '../../lib/auth';
 import { useShop } from '../../state';
@@ -14,7 +15,6 @@ import {
   SearchIcon,
   ShieldIcon,
   StoreIcon,
-  TruckIcon,
 } from '../icons';
 import '../../../css/account.css';
 import { PageMain } from '../layout/PageMain';
@@ -26,16 +26,26 @@ import { PageMain } from '../layout/PageMain';
 export function AccountLayout({ title, children }: { title: string; children: ReactNode }) {
   const { user, count, logout } = useShop();
   const navigate = useNavigate();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  useEffect(() => {
+    if (location.pathname === '/cuenta/productos')
+      setQuery(new URLSearchParams(location.search).get('q') ?? '');
+  }, [location.pathname, location.search]);
   const signOut = async () => {
     await logout();
     navigate('/');
   };
   const search = (event: FormEvent) => {
     event.preventDefault();
-    const value = query.trim();
-    navigate(value ? `/catalogo?q=${encodeURIComponent(value)}` : '/catalogo');
+    navigate({
+      pathname: '/cuenta/productos',
+      search: catalogSearchQuery(
+        location.pathname === '/cuenta/productos' ? location.search : '',
+        query,
+      ),
+    });
   };
 
   return (
@@ -70,15 +80,12 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           <NavLink to="/cuenta/carrito">
             <CartIcon size={18} /> Mi carrito
           </NavLink>
-          <NavLink to="/cuenta/seleccion">
-            <TruckIcon size={18} /> Selección de productos
+          <NavLink to="/cuenta/productos">
+            <SearchIcon size={18} /> Productos
           </NavLink>
-          <p>Beneficios y ayuda</p>
+          <p>Ayuda</p>
           <NavLink to="/cuenta/soporte">
-            <ChatIcon size={18} /> Soporte y contacto
-          </NavLink>
-          <NavLink to="/cuenta/nosotros">
-            <HelpIcon size={18} /> Sobre SYSCON
+            <ChatIcon size={18} /> Ayuda y contacto
           </NavLink>
           {canUseBackoffice(user) && (
             <Link to="/admin">
@@ -145,9 +152,8 @@ export function AccountLayout({ title, children }: { title: string; children: Re
             © {new Date().getFullYear()} Grupo SYSCON S.A.C. Todos los derechos reservados.
           </span>
           <nav aria-label="Enlaces">
-            <Link to="/cuenta/soporte">Centro de ayuda</Link>
+            <Link to="/cuenta/soporte">Ayuda y contacto</Link>
             <Link to="/cuenta/nosotros">Nosotros</Link>
-            <Link to="/cuenta/soporte">Contacto</Link>
           </nav>
         </footer>
       </div>
