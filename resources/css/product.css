@@ -1,14 +1,38 @@
 /* Product detail page and the shared quantity stepper. */
+.product-hero {
+  background: #f9fafc;
+}
+.product-hero > .container {
+  padding: 24px 0 44px;
+}
+.product-hero .breadcrumb {
+  margin-bottom: 20px;
+}
+.product-detail-eyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #00265d;
+}
+.product-detail-sub {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: #59616e;
+}
 .breadcrumb {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   font-size: 13px;
   color: var(--store-muted);
-  margin-bottom: 24px;
+  margin-bottom: 25px;
 }
 .breadcrumb a {
-  color: var(--store-brand-strong);
+  color: var(--store-brand);
 }
 .breadcrumb a:hover {
   text-decoration: underline;
@@ -20,10 +44,12 @@
 .product-detail {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
-  gap: 56px;
+  grid-template-areas: 'media heading' 'media info';
+  gap: 20px 48px;
   align-items: start;
 }
 .product-detail-media {
+  grid-area: media;
   display: grid;
   place-items: center;
   min-height: 460px;
@@ -39,20 +65,77 @@
   padding: 36px;
 }
 
-.product-detail-info h1 {
-  font-size: clamp(28px, 3.2vw, 42px);
+.product-detail-heading {
+  display: grid;
+  gap: 8px;
+  grid-area: heading;
+  min-width: 0;
+}
+.product-detail-heading h1 {
+  font-size: 34px;
   letter-spacing: -0.045em;
-  line-height: 1.15;
-  margin: 12px 0 16px;
-  color: var(--store-ink);
+  line-height: 42px;
+  margin: 0;
+  color: #111c2d;
   overflow-wrap: anywhere;
+}
+.product-detail-info {
+  display: grid;
+  gap: 16px;
+  grid-area: info;
+  min-width: 0;
+}
+.product-price-row .product-detail-price,
+.product-price-row .product-detail-stock {
+  margin: 0;
+}
+.product-detail-info .product-delivery-preview {
+  margin: 0;
+}
+.product-price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+.product-highlights {
+  padding-left: 20px;
+  margin: 16px 0 0;
+  color: var(--store-ink-soft);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.product-buy > .flow-button {
+  flex: 1 1 180px;
+  min-width: 220px;
+  min-height: 48px;
+  margin: 0;
+  justify-content: center;
+}
+.product-info-link.product-consult {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--store-line);
+  border-radius: 8px;
+  background: var(--store-surface);
+  text-decoration: none;
+}
+.product-info-link.product-consult:hover {
+  border-color: var(--store-brand);
+  background: var(--store-soft);
 }
 
 .product-detail-price {
-  font: 800 36px Inter, sans-serif;
+  font:
+    700 30px / 38px Inter,
+    sans-serif;
   letter-spacing: -0.05em;
-  color: var(--store-ink);
-  margin: 0 0 10px;
+  color: #00265d;
+  margin: 0;
 }
 .product-detail-info .stock-badge {
   font-size: 14px;
@@ -61,8 +144,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
-  margin: 28px 0 12px;
+  gap: 12px;
+  margin: var(--syscon-space-6) 0 var(--syscon-space-3);
 }
 .product-buy .button {
   flex: 1 1 220px;
@@ -121,19 +204,29 @@
 @media (max-width: 900px) {
   .product-detail {
     grid-template-columns: minmax(0, 1fr);
-    gap: 28px;
+    grid-template-areas: 'heading' 'media' 'info';
+    gap: 20px;
   }
   .product-detail-media {
-    min-height: 320px;
+    min-height: 260px;
   }
   .product-detail-media img {
-    height: 320px;
+    height: 280px;
     padding: 24px;
   }
 }
 @media (max-width: 420px) {
   .product-buy .button {
     flex-basis: 100%;
+  }
+}
+@media (max-width: 600px) {
+  .product-detail-heading h1 {
+    font-size: 26px;
+    line-height: 32px;
+  }
+  .product-buy > .flow-button {
+    min-width: 0;
   }
 }
 /* Preserve line breaks in the technical details entered by the catalog team. */
@@ -158,9 +251,16 @@
   color: var(--store-muted);
 }
 .product-detail-stock {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: #1f7340;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+.product-detail-stock.out {
+  color: #9a6700;
 }
 .product-detail-stock i {
   width: 8px;
@@ -198,4 +298,88 @@
 .product-information-empty a {
   color: var(--store-brand);
   text-decoration: underline;
+}
+.product-delivery-preview {
+  padding: 14px 16px;
+  margin-block: 16px;
+  border: 1px solid var(--store-line, #dbe3ee);
+  border-radius: 10px;
+  background: var(--store-soft);
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.product-delivery-preview h2 {
+  margin: 0 0 8px;
+  color: var(--store-brand);
+  font-size: 15px;
+}
+.product-delivery-preview ul {
+  padding-left: 18px;
+  margin: 0;
+}
+.product-delivery-preview p {
+  margin: 8px 0 0;
+}
+.product-delivery-preview a {
+  text-decoration: underline;
+}
+.product-comparison {
+  padding: 16px;
+  margin-bottom: 24px;
+  border: 1px solid var(--store-line, #dbe3ee);
+  border-radius: 10px;
+}
+.product-comparison summary {
+  cursor: pointer;
+  color: var(--store-brand);
+  font-weight: 600;
+  padding-block: 8px;
+}
+.product-comparison .field {
+  margin-block: 16px;
+}
+.product-comparison table {
+  width: 100%;
+  table-layout: fixed;
+}
+.product-comparison th,
+.product-comparison td {
+  width: auto;
+  overflow-wrap: anywhere;
+}
+.product-comparison caption {
+  padding-block: 12px;
+  text-align: left;
+  font-size: 13px;
+}
+@media (max-width: 480px) {
+  .product-comparison .product-specifications thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+  }
+  .product-comparison .product-specifications,
+  .product-comparison .product-specifications tbody {
+    display: block;
+  }
+  .product-comparison .product-specifications tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 12px;
+    border: 1px solid #dbe3ee;
+    border-radius: 8px;
+  }
+  .product-comparison .product-specifications th {
+    grid-column: 1 / -1;
+  }
+  .product-comparison .product-specifications td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 6px;
+    font-size: 11px;
+    color: #526477;
+  }
 }

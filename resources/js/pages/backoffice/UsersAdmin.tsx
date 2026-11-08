@@ -306,7 +306,7 @@ export function UsersAdmin() {
           <ErrorBox message={error} retry={reload} />
         ) : data?.items.length ? (
           <>
-            <div className="table-wrap">
+            <div className="table-wrap responsive-table">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -323,7 +323,7 @@ export function UsersAdmin() {
                 <tbody>
                   {data.items.map((account) => (
                     <tr key={account.id}>
-                      <td>
+                      <td data-label="Cuenta">
                         <strong>
                           {[account.firstName, account.lastName].filter(Boolean).join(' ') ||
                             account.email}
@@ -336,18 +336,18 @@ export function UsersAdmin() {
                           </small>
                         )}
                       </td>
-                      <td>{roleLabel(`ROLE_${account.role}`)}</td>
-                      <td>
+                      <td data-label="Rol">{roleLabel(`ROLE_${account.role}`)}</td>
+                      <td data-label="Estado">
                         <StatusBadge status={account.status} labels={accountStatusLabels} />
                         {account.mustChangePassword && <small>Con contraseña temporal</small>}
                       </td>
-                      <td>{formatDateTime(account.lastLoginAt)}</td>
-                      <td>
+                      <td data-label="Último ingreso">{formatDateTime(account.lastLoginAt)}</td>
+                      <td data-label="Alta">
                         {formatDateTime(account.createdAt)}
                         {account.createdBy && <small>Creada por {account.createdBy}</small>}
                         {account.validatedBy && <small>Validada por {account.validatedBy}</small>}
                       </td>
-                      <td className="num">
+                      <td data-label="Acciones" className="num">
                         {confirm?.id === account.id ? (
                           <span className="bo-confirm">
                             {actionHints[confirm.action]}

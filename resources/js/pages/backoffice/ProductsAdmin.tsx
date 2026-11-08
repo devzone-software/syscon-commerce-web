@@ -1,5 +1,6 @@
+import { CatalogToolsNav } from '../../components/backoffice/CatalogToolsNav';
 import { useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { PageHeader } from '../../components/backoffice/PageHeader';
 import { ProductForm } from '../../components/backoffice/ProductForm';
 import { StockBadge } from '../../components/product/StockBadge';
@@ -18,7 +19,9 @@ const stockFilters = [
 ];
 
 export function ProductsAdmin() {
-  const { data, loading, error, reload } = useData(api.adminProducts);
+  const { data, loading, refreshing, error, reload } = useData(api.adminProducts, [], {
+    keepPreviousData: true,
+  });
   const [params, setParams] = useSearchParams();
   const [message, setMessage] = useState('');
   const query = params.get('q') ?? '';
@@ -63,23 +66,19 @@ export function ProductsAdmin() {
 
   return (
     <>
+      <CatalogToolsNav />
       <PageHeader
         title="Productos"
         description="Administra productos activos e inactivos. El stock disponible descuenta las reservas."
         actions={
           !formOpen && (
-            <>
-              <Link className="button button-secondary" to="/admin/carga-masiva">
-                Importar / exportar
-              </Link>
-              <button
-                type="button"
-                className="button button-primary"
-                onClick={() => update({ nuevo: '1', editar: '' })}
-              >
-                Nuevo producto
-              </button>
-            </>
+            <button
+              type="button"
+              className="button button-primary"
+              onClick={() => update({ nuevo: '1', editar: '' })}
+            >
+              Nuevo producto
+            </button>
           )
         }
       />
@@ -99,6 +98,11 @@ export function ProductsAdmin() {
           onSaved={saved}
           onCancel={closeForm}
         />
+      )}
+      {refreshing && (
+        <p role="status" className="visually-hidden">
+          Actualizando productos…
+        </p>
       )}
       {loading ? (
         <Loading />
@@ -145,59 +149,91 @@ export function ProductsAdmin() {
             {filtered.length} {filtered.length === 1 ? 'producto' : 'productos'}
           </p>
           {items.length ? (
-            <div className="table-wrap">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th scope="col">Producto</th>
-                    <th scope="col">Categoría</th>
-                    <th scope="col">Marca</th>
-                    <th scope="col" className="num">
-                      Precio
-                    </th>
-                    <th scope="col" className="num">
-                      Disponible
-                    </th>
-                    <th scope="col">
-                      <span className="visually-hidden">Acciones</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((product) => (
-                    <tr key={product.id}>
-                      <td>
-                        <strong>{product.name}</strong>
-                        <small>
-                          SKU {product.sku} · {product.active ? 'Publicado' : 'Inactivo'}
-                        </small>
-                      </td>
-                      <td>{product.category ?? '—'}</td>
-                      <td>{product.brand ?? '—'}</td>
-                      <td className="num">{money(Number(product.price))}</td>
-                      <td className="num">
-                        {product.stock} <StockBadge stock={product.stock} />
-                        <small>
-                          Físico: {product.physicalStock} · Reservado: {product.reservedStock}
-                        </small>
-                      </td>
-                      <td className="num">
-                        <button
-                          type="button"
-                          className="link-button"
-                          onClick={() => {
-                            update({ editar: product.sku, nuevo: '' });
-                            window.scrollTo({ top: 0 });
-                          }}
-                        >
-                          Editar<span className="visually-hidden"> {product.name}</span>
-                        </button>
-                      </td>
+            <>
+              <ul className="products-admin-cards">
+                {items.map((product) => (
+                  <li key={product.id}>
+                    <strong>{product.name}</strong>
+                    <small>
+                      SKU {product.sku} · {product.active ? 'Publicado' : 'Inactivo'}
+                    </small>
+                    <span>
+                      {product.category ?? 'Sin categoría'} · {product.brand ?? 'Sin marca'}
+                    </span>
+                    <strong>{money(Number(product.price))}</strong>
+                    <span>
+                      Disponible: {product.stock} <StockBadge stock={product.stock} />
+                    </span>
+                    <small>
+                      Físico: {product.physicalStock} · Reservado: {product.reservedStock}
+                    </small>
+                    <button
+                      type="button"
+                      className="button button-secondary"
+                      onClick={() => {
+                        update({ editar: product.sku, nuevo: '' });
+                        window.scrollTo({ top: 0 });
+                      }}
+                    >
+                      Editar<span className="visually-hidden"> {product.name}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <div className="table-wrap products-admin-table">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Producto</th>
+                      <th scope="col">Categoría</th>
+                      <th scope="col">Marca</th>
+                      <th scope="col" className="num">
+                        Precio
+                      </th>
+                      <th scope="col" className="num">
+                        Disponible
+                      </th>
+                      <th scope="col">
+                        <span className="visually-hidden">Acciones</span>
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {items.map((product) => (
+                      <tr key={product.id}>
+                        <td>
+                          <strong>{product.name}</strong>
+                          <small>
+                            SKU {product.sku} · {product.active ? 'Publicado' : 'Inactivo'}
+                          </small>
+                        </td>
+                        <td>{product.category ?? '—'}</td>
+                        <td>{product.brand ?? '—'}</td>
+                        <td className="num">{money(Number(product.price))}</td>
+                        <td className="num">
+                          {product.stock} <StockBadge stock={product.stock} />
+                          <small>
+                            Físico: {product.physicalStock} · Reservado: {product.reservedStock}
+                          </small>
+                        </td>
+                        <td className="num">
+                          <button
+                            type="button"
+                            className="link-button"
+                            onClick={() => {
+                              update({ editar: product.sku, nuevo: '' });
+                              window.scrollTo({ top: 0 });
+                            }}
+                          >
+                            Editar<span className="visually-hidden"> {product.name}</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           ) : (
             <Empty title="Sin productos" text="No hay productos que coincidan con los filtros." />
           )}

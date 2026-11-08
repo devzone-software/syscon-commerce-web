@@ -118,7 +118,7 @@ export function InventoryAdmin() {
               mayor stock
             </p>
             {current.items.length ? (
-              <div className="table-wrap">
+              <div className="table-wrap responsive-table">
                 <table className="data-table">
                   <thead>
                     <tr>
@@ -141,22 +141,24 @@ export function InventoryAdmin() {
                   <tbody>
                     {current.items.map((product) => (
                       <tr key={product.id}>
-                        <td>
+                        <td data-label="Producto">
                           <strong>{product.name}</strong>
                           <small>SKU {product.sku}</small>
                         </td>
-                        <td>{product.category ?? '—'}</td>
-                        <td className="num">
+                        <td data-label="Categoría">{product.category ?? '—'}</td>
+                        <td data-label="Stock" className="num">
                           {product.stock} <StockBadge stock={product.stock} />
                           <small>
                             Físico: {product.physicalStock} · Reservado: {product.reservedStock}
                           </small>
                         </td>
-                        <td className="num">{money(Number(product.price))}</td>
-                        <td className="num">
+                        <td data-label="Precio" className="num">
+                          {money(Number(product.price))}
+                        </td>
+                        <td data-label="Valor a precio de venta" className="num">
                           {money(Math.max(0, product.stock) * Number(product.price))}
                         </td>
-                        <td className="num">
+                        <td data-label="Acciones" className="num">
                           <Link
                             className="link-button"
                             to={`/admin/productos?editar=${encodeURIComponent(product.sku)}`}

@@ -7,7 +7,8 @@ import { formatDateTime, shortId } from '../../lib/orders';
 import { amountError, differenceLabel } from '../../lib/cash';
 import { paymentMethodLabel } from '../../lib/sales';
 import { api } from '../../services/api';
-import { money } from '../../state';
+import { money, useShop } from '../../state';
+import { can, permissions } from '../../lib/auth';
 import type { CashSession } from '../../types';
 import { useData, ErrorBox, Loading } from '../../ui';
 
@@ -312,6 +313,7 @@ function History({ version }: { version: number }) {
 }
 
 export function CashRegister() {
+  const { user } = useShop();
   const current = useData(api.cashCurrent);
   const [version, setVersion] = useState(0);
   const refresh = () => {
@@ -322,7 +324,18 @@ export function CashRegister() {
     <>
       <PageHeader
         title="Caja"
-        description="Apertura con fondo inicial, ingresos y egresos de efectivo, y cierre con arqueo. Las ventas directas se cobran en tu caja abierta."
+        description="Apertura con fondo inicial, ingresos y egresos de efectivo, y cierre con arqueo."
+        actions={
+          can(user, permissions.salesCreate) ? (
+            <Link className="button button-primary" to="/admin/venta-directa">
+              Registrar venta en mostrador
+            </Link>
+          ) : (
+            <Link className="button button-secondary" to="/admin/mi-acceso">
+              Consultar mi acceso
+            </Link>
+          )
+        }
       />
       {current.loading && current.data === null && !current.error ? (
         <Loading />

@@ -1,22 +1,21 @@
+import { InputBox, PasswordInput } from '../components/auth/AuthFields';
 import { useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthLayout, type AuthFeature } from '../components/auth/AuthLayout';
 import { GoogleButton, googleClientId } from '../components/auth/GoogleButton';
+import { PasswordRequirements } from '../components/auth/PasswordRequirements';
 import {
   ArrowRightIcon,
   BuildingIcon,
   CheckIcon,
-  EyeIcon,
-  EyeOffIcon,
   HeadsetIcon,
   ListCheckIcon,
-  LockIcon,
   MailIcon,
   ReceiptIcon,
   TruckIcon,
   UserIcon,
 } from '../components/icons';
-import { loginDestination, MIN_PASSWORD, passwordChecks, safeRedirect } from '../lib/auth';
+import { loginDestination, MIN_PASSWORD, safeRedirect } from '../lib/auth';
 import { api } from '../services/api';
 import { useShop } from '../state';
 import type { DocumentType, SignUp } from '../types';
@@ -90,78 +89,6 @@ const signUpFeatures: AuthFeature[] = [
     ),
   },
 ];
-
-/** Text input with a leading icon and an optional trailing control (Figma inputs). */
-function InputBox({
-  icon,
-  label,
-  required,
-  trailing,
-  children,
-}: {
-  icon?: ReactNode;
-  label: string;
-  required?: boolean;
-  trailing?: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <label className="auth-field">
-      <span className="auth-label">
-        {label} {required && <em aria-hidden="true">*</em>}
-      </span>
-      <span className="auth-input">
-        {icon}
-        {children}
-        {trailing}
-      </span>
-    </label>
-  );
-}
-
-export function PasswordInput({
-  label,
-  value,
-  onChange,
-  autoComplete,
-  minLength,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  autoComplete: string;
-  minLength?: number;
-}) {
-  const [visible, setVisible] = useState(false);
-  return (
-    <InputBox
-      icon={<LockIcon size={16} />}
-      label={label}
-      required
-      trailing={
-        <button
-          type="button"
-          className="auth-eye"
-          onClick={() => setVisible((v) => !v)}
-          aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-          aria-pressed={visible}
-        >
-          {visible ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
-        </button>
-      }
-    >
-      <input
-        type={visible ? 'text' : 'password'}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        required
-        minLength={minLength}
-        autoComplete={autoComplete}
-        placeholder="••••••••••••"
-      />
-    </InputBox>
-  );
-}
 
 function Segmented<T extends string>({
   label,
@@ -337,7 +264,6 @@ export function Auth({ register = false }: { register?: boolean }) {
     );
 
   const docType = personalDocuments.find((type) => type.value === form.documentType);
-  const strength = passwordChecks(form.password);
   const matches =
     form.password_confirmation.length > 0 && form.password === form.password_confirmation;
   return (
@@ -486,31 +412,7 @@ export function Auth({ register = false }: { register?: boolean }) {
             minLength={MIN_PASSWORD}
           />
         </div>
-        <div className="auth-strength" aria-live="polite">
-          <div className="auth-strength-head">
-            <span>
-              FORTALEZA DE CONTRASEÑA:{' '}
-              {strength.strength && <b className={`is-${strength.passed}`}>{strength.strength}</b>}
-            </span>
-            {matches && (
-              <span className="auth-match">
-                <CheckIcon size={14} /> Las contraseñas coinciden
-              </span>
-            )}
-          </div>
-          <div className="auth-strength-bars" aria-hidden="true">
-            {strength.checks.map((_, index) => (
-              <i key={index} className={index < strength.passed ? 'is-on' : undefined} />
-            ))}
-          </div>
-          <ul>
-            {strength.checks.map((check) => (
-              <li key={check.label} className={check.ok ? 'is-ok' : undefined}>
-                <CheckIcon size={12} /> {check.label}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <PasswordRequirements value={form.password} matches={matches} />
         <button className="auth-submit" disabled={busy}>
           {busy ? 'Procesando…' : 'CREAR CUENTA'} <ArrowRightIcon size={16} />
         </button>

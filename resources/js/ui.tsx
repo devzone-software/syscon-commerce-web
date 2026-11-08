@@ -9,7 +9,11 @@ import { Footer } from './components/layout/Footer';
 import { Header } from './components/layout/Header';
 import { PageMain } from './components/layout/PageMain';
 
-export function useData<T>(load: () => Promise<T>, deps: unknown[] = []) {
+export function useData<T>(
+  load: () => Promise<T>,
+  deps: unknown[] = [],
+  options: { keepPreviousData?: boolean } = {},
+) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -32,14 +36,20 @@ export function useData<T>(load: () => Promise<T>, deps: unknown[] = []) {
       live = false;
     };
   }, [...deps, retry]);
-  return { data, error, loading, reload: () => setRetry((n) => n + 1) };
+  return {
+    data,
+    error,
+    loading: loading && (!options.keepPreviousData || data === null),
+    refreshing: loading && Boolean(options.keepPreviousData) && data !== null,
+    reload: () => setRetry((n) => n + 1),
+  };
 }
 export function ErrorBox({ message, retry }: { message: string; retry?: () => void }) {
   return (
     <div className="notice error" role="alert">
       {message}{' '}
       {retry && (
-        <button className="link-button" onClick={retry}>
+        <button type="button" className="link-button" onClick={retry}>
           Reintentar
         </button>
       )}
@@ -49,7 +59,12 @@ export function ErrorBox({ message, retry }: { message: string; retry?: () => vo
 export function Loading() {
   return (
     <div className="loading" role="status">
-      Cargando…
+      <span>Cargando…</span>
+      <div className="loading-skeleton" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </div>
     </div>
   );
 }

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Header } from '../layout/Header';
 import { PageMain } from '../layout/PageMain';
 import { ArrowLeftIcon, ShieldIcon } from '../icons';
-import { company } from '../layout/Header';
 import '../../../css/auth.css';
 
 export type AuthFeature = { icon: ReactNode; text: ReactNode };

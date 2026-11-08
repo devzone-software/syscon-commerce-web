@@ -15,9 +15,13 @@ import { CloseIcon, MenuIcon } from '../icons';
 
 /** Company contact data shown in the top bar and the footer. */
 export const company = {
+  city: 'Juliaca, Puno, Perú',
   phone: '(01) 748-2900',
   phoneHref: 'tel:+5117482900',
   email: 'contacto@gruposyscon.pe',
+  salesEmail: 'ventas@gruposyscon.pe',
+  whatsappLabel: '+51 987 654 321',
+  whatsappHref: 'https://wa.me/51987654321',
 };
 
 export function Brand() {
@@ -123,7 +127,7 @@ export function Header() {
                   ) : (
                     <>
                       <Link to="/cuenta">Mi cuenta</Link>
-                      <Link to="/cuenta/pedidos">Mis compras</Link>
+                      <Link to="/cuenta/pedidos">Mis pedidos</Link>
                     </>
                   )}
                   <button type="button" onClick={signOut}>
@@ -134,7 +138,7 @@ export function Header() {
                 <>
                   <Link to="/registro">Crea tu cuenta</Link>
                   <Link to="/ingresar">Ingresa</Link>
-                  <Link to="/cuenta/pedidos">Mis compras</Link>
+                  <Link to="/cuenta/pedidos">Mis pedidos</Link>
                 </>
               )}
             </nav>
@@ -196,7 +200,7 @@ export function Header() {
                     <NavLink to="/cuenta" end>
                       Mi cuenta
                     </NavLink>
-                    <NavLink to="/cuenta/pedidos">Mis compras</NavLink>
+                    <NavLink to="/cuenta/pedidos">Mis pedidos</NavLink>
                   </>
                 )}
                 <button type="button" onClick={signOut}>
@@ -207,7 +211,7 @@ export function Header() {
               <>
                 <NavLink to="/ingresar">Iniciar sesión</NavLink>
                 <NavLink to="/registro">Crear cuenta</NavLink>
-                <NavLink to="/cuenta/pedidos">Mis compras</NavLink>
+                <NavLink to="/cuenta/pedidos">Mis pedidos</NavLink>
               </>
             )}
           </div>

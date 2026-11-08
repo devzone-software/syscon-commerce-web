@@ -19,42 +19,64 @@ export function OrderDocuments({ orderId }: { orderId: string }) {
       </p>
     );
   return (
-    <ul className="document-list">
-      {data.map((invoice) => (
-        <li key={invoice.id}>
-          <div>
-            <strong>
-              {invoiceTypeLabel(invoice.type)} {invoice.serialNumber}
-            </strong>
-            <small>
-              {money(Number(invoice.total))}
-              {invoice.createdAt && ` · ${formatDateTime(invoice.createdAt)}`}
-              {invoice.referencedSerialNumber && ` · modifica ${invoice.referencedSerialNumber}`}
-            </small>
-            {invoice.test && (
-              <small className="field-error">Documento de prueba, sin valor tributario.</small>
-            )}
-          </div>
-          <div className="document-actions">
-            <a
-              className="flow-button"
-              href={invoiceFileUrl(invoice.id, 'pdf', orderId)}
-              target="_blank"
-              rel="noopener"
-            >
-              Ver PDF
-            </a>
-            <a className="link-button" href={invoiceFileUrl(invoice.id, 'xml', orderId)} download>
-              XML
-            </a>
-            {invoice.hasCdr && (
-              <a className="link-button" href={invoiceFileUrl(invoice.id, 'cdr', orderId)} download>
-                CDR
+    <div>
+      <p className="flow-note">
+        El comprobante tiene su propio proceso de emisión. Un pago confirmado no significa que el
+        documento ya esté disponible.
+      </p>
+      <ul className="document-list">
+        {data.map((invoice) => (
+          <li key={invoice.id}>
+            <div>
+              <strong>
+                {invoiceTypeLabel(invoice.type)} {invoice.serialNumber}
+              </strong>
+              <small>
+                {money(Number(invoice.total))}
+                {invoice.createdAt && ` · ${formatDateTime(invoice.createdAt)}`}
+                {invoice.referencedSerialNumber && ` · modifica ${invoice.referencedSerialNumber}`}
+              </small>
+              {invoice.test && (
+                <small className="field-error">Documento de prueba, sin valor tributario.</small>
+              )}
+            </div>
+            <div className="document-actions">
+              <a
+                className="flow-button"
+                href={invoiceFileUrl(invoice.id, 'pdf', orderId)}
+                target="_blank"
+                rel="noopener"
+              >
+                Ver comprobante PDF
               </a>
-            )}
-          </div>
-        </li>
-      ))}
-    </ul>
+              <details className="document-technical">
+                <summary>Archivos electrónicos</summary>
+                <p className="flow-note">
+                  PDF: representación para leer o imprimir. XML: archivo electrónico del
+                  comprobante. CDR: respuesta de recepción de SUNAT; su contenido informa el
+                  resultado.
+                </p>
+                <a
+                  className="link-button"
+                  href={invoiceFileUrl(invoice.id, 'xml', orderId)}
+                  download
+                >
+                  XML
+                </a>
+                {invoice.hasCdr && (
+                  <a
+                    className="link-button"
+                    href={invoiceFileUrl(invoice.id, 'cdr', orderId)}
+                    download
+                  >
+                    Constancia de recepción (CDR)
+                  </a>
+                )}
+              </details>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

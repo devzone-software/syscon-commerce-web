@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { accountHome, can, canUseBackoffice } from '../../lib/auth';
 import { useShop } from '../../state';
 import chipIcon from '../../../images/footer/chip.svg';
-import clockIcon from '../../../images/footer/clock.svg';
 import mailIcon from '../../../images/footer/mail.svg';
 import phoneIcon from '../../../images/footer/phone.svg';
 import whatsappIcon from '../../../images/footer/whatsapp.svg';
@@ -23,8 +22,8 @@ export function Footer() {
             </span>
           </Link>
           <p>
-            Expertos en tecnología informática, hardware empresarial, servidores, licenciamiento
-            corporativo y soluciones de red certificadas.
+            Equipos de seguridad electrónica, redes, cómputo y licencias de software. Instalación y
+            mantenimiento en Juliaca y la región Puno.
           </p>
         </div>
         <nav aria-label="Tienda">
@@ -50,7 +49,7 @@ export function Footer() {
           <ul className="store-footer-contact">
             <li>
               <img src={mailIcon} alt="" />
-              <a href="mailto:ventas@gruposyscon.pe">ventas@gruposyscon.pe</a>
+              <a href={`mailto:${company.salesEmail}`}>{company.salesEmail}</a>
             </li>
             <li>
               <img src={phoneIcon} alt="" />
@@ -58,13 +57,9 @@ export function Footer() {
             </li>
             <li>
               <img src={whatsappIcon} alt="" />
-              <a href="https://wa.me/51987654321" target="_blank" rel="noreferrer">
-                WhatsApp Oficial: 987 654 321
+              <a href={company.whatsappHref} target="_blank" rel="noreferrer">
+                WhatsApp: {company.whatsappLabel}
               </a>
-            </li>
-            <li>
-              <img src={clockIcon} alt="" />
-              <span>Lun - Sáb: 8:30 AM - 6:30 PM</span>
             </li>
           </ul>
         </div>

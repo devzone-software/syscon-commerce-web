@@ -1,0 +1,53 @@
+/* SYSCON foundations: loaded once before shared components and page styles. */
+:root {
+  /* SYSCON design system (Figma "01 — Design System" · Foundations). */
+  --syscon-brand-primary: #00265d;
+  --syscon-brand-cyan: #00a6d2;
+  --syscon-brand-cyan-soft: #e6f7fc;
+  --syscon-brand-dark: #0c131f;
+  --syscon-surface-default: #ffffff;
+  --syscon-surface-soft: #f6faff;
+  --syscon-border-default: #e0e8f0;
+  --syscon-text-primary: #111827;
+  --syscon-text-secondary: #59616c;
+  --syscon-success: #177245;
+  --syscon-warning: #9a6700;
+  --syscon-danger: #b42318;
+  /* Shared spacing scale: see docs/DISENO-INTERFAZ.md. */
+  --syscon-space-1: 4px;
+  --syscon-space-2: 8px;
+  --syscon-space-3: 12px;
+  --syscon-space-4: 16px;
+  --syscon-space-6: 24px;
+  --syscon-space-8: 32px;
+  --syscon-space-12: 48px;
+  --syscon-space-16: 64px;
+  --syscon-page-gutter: var(--syscon-space-6);
+  --syscon-card-padding: var(--syscon-space-6);
+  --syscon-control-height: 44px;
+  --syscon-radius-sm: 8px;
+  --syscon-radius-md: 12px;
+  --syscon-radius-lg: 16px;
+
+  --store-ink: var(--syscon-text-primary);
+  --store-ink-soft: #3d4654;
+  --store-muted: var(--syscon-text-secondary);
+  --store-line: var(--syscon-border-default);
+  --store-surface: var(--syscon-surface-default);
+  --store-soft: var(--syscon-surface-soft);
+  --store-brand: var(--syscon-brand-primary);
+  --store-brand-strong: #001a42;
+  --store-navy: var(--syscon-brand-dark);
+  --store-header: var(--syscon-surface-default);
+  --store-radius: var(--syscon-radius-md);
+  /* Catalog banner: navy band under the white header. */
+  --store-banner: linear-gradient(90deg, #0c131f 0%, #00265d 60%, #0b3a82 100%);
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+@media (max-width: 700px) {
+  :root {
+    --syscon-page-gutter: var(--syscon-space-4);
+    --syscon-card-padding: var(--syscon-space-4);
+  }
+}

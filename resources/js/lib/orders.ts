@@ -12,6 +12,26 @@ export const orderStatusLabels: Record<string, string> = {
   EXPIRED: 'Vencido',
 };
 
+const customerOrderHints: Record<string, string> = {
+  PAYMENT_PENDING:
+    'Tu siguiente paso es completar el pago. La confirmación en línea depende de la pasarela; los pagos manuales los verifica el equipo.',
+  PAID: 'El pago está confirmado. El equipo coordinará la preparación y entrega del pedido.',
+  PROCESSING:
+    'Tu pedido está en preparación. Puedes consultar la modalidad de entrega registrada abajo.',
+  SHIPPED:
+    'Tu pedido figura como enviado. Si necesitas información del despacho, consulta con el equipo.',
+  DELIVERED:
+    'Tu pedido figura como entregado. Puedes revisar los productos y comprobantes o consultar por soporte.',
+  EXPIRED:
+    'La reserva venció. Revisa la disponibilidad actual en el catálogo antes de crear otro pedido.',
+  CANCELLED:
+    'El pedido está cancelado. Si realizaste un abono, consulta su situación con el equipo.',
+};
+
+export const customerOrderHint = (status: string) =>
+  customerOrderHints[status] ??
+  'Consulta el estado informado y contacta al equipo si necesitas ayuda.';
+
 /** Tabs of the backoffice orders inbox, in working order; '' lists every state. */
 export const orderInboxTabs = [
   '',

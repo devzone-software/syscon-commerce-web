@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   accountSummary,
+  customerOrderHint,
   allowedTransitions,
   orderProgress,
   orderStatusLabels,
@@ -9,6 +10,15 @@ import {
 } from './orders';
 
 describe('order states', () => {
+  it('explains next steps without presenting unknown or pending states as paid', () => {
+    expect(customerOrderHint('PAYMENT_PENDING')).toContain('completar el pago');
+    expect(customerOrderHint('PAID')).toContain('pago está confirmado');
+    expect(customerOrderHint('EXPIRED')).toContain('reserva venció');
+    expect(customerOrderHint('CANCELLED')).toContain('pedido está cancelado');
+    expect(customerOrderHint('NEW_STATE')).toBe(
+      'Consulta el estado informado y contacta al equipo si necesitas ayuda.',
+    );
+  });
   it('mirrors the order-service transitions', () => {
     expect(allowedTransitions('PAYMENT_PENDING')).toEqual(['CANCELLED']);
     expect(allowedTransitions('PAID')).toEqual(['PROCESSING']);

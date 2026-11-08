@@ -46,17 +46,23 @@ function SupplierForm({ onCreated }: { onCreated: () => void }) {
     >
       <h2 id="supplier-form-title">Nuevo proveedor</h2>
       <p className="muted">
-        El host del feed debe estar autorizado en <code>SUPPLIER_ALLOWED_HOSTS</code> del backend.
-        Formato: CSV UTF-8 separado por punto y coma con cabecera{' '}
-        <code>sku;name;price;stock;imageUrl;brand;category</code>.
+        Conecta el catálogo del proveedor para actualizar sus productos, precios y existencias.
       </p>
+      <details className="supplier-format">
+        <summary>Formato y requisitos del catálogo</summary>
+        <p>
+          Usa un archivo CSV UTF-8 separado por punto y coma, con cabecera{' '}
+          <code>sku;name;price;stock;imageUrl;brand;category</code>. Si la dirección aún no está
+          autorizada, solicita su configuración a soporte.
+        </p>
+      </details>
       <div className="field-row">
         <label className="field">
           Nombre
           <input value={name} onChange={(e) => setName(e.target.value)} maxLength={255} required />
         </label>
         <label className="field">
-          URL del feed (HTTPS)
+          Dirección del catálogo (HTTPS)
           <input type="url" value={feedUrl} onChange={(e) => setFeedUrl(e.target.value)} required />
         </label>
         <label className="field">
@@ -141,7 +147,7 @@ export function SuppliersAdmin() {
   return (
     <>
       <PageHeader
-        title="Proveedores"
+        title="Catálogos de proveedores"
         description="Sincronización de productos desde feeds CSV de proveedores (supplier-service)."
       />
       <p className="notice error" role="note">

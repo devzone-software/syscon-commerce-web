@@ -1,3 +1,4 @@
+import { ContentDisclosure } from '../components/shared/ContentDisclosure';
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import homeIcon from '../../images/catalog/home.svg';
@@ -31,13 +32,13 @@ const trust = [
   },
   {
     icon: trustBoltIcon,
-    title: 'Entrega Rápida',
-    text: 'Despachos coordinados para Lima y provincias con seguimiento de cada pedido.',
+    title: 'Entrega coordinada',
+    text: 'Consulta las opciones de entrega y retiro disponibles para tu pedido.',
   },
   {
     icon: trustSupportIcon,
     title: 'Soporte Técnico',
-    text: 'Atención especializada IT previa y posventa con ingenieros de sistemas.',
+    text: 'Consulta la disponibilidad de asesoría, instalación y mantenimiento en la región Puno.',
   },
   {
     icon: trustShieldIcon,
@@ -46,7 +47,7 @@ const trust = [
   },
 ];
 const gradients = ['is-navy', 'is-teal', 'is-green'];
-const campaignTags = ['MÁS SOLICITADO', 'ESTABILIDAD EMPRESARIAL', 'RECOMENDADO'];
+const campaignTags = ['EXPLORA EL CATÁLOGO', 'PARA TU NEGOCIO', 'PRODUCTOS DISPONIBLES'];
 
 /** Compact product card of the category rows (SKU, availability, price and actions). */
 function ShowcaseCard({ product }: { product: Product }) {
@@ -198,7 +199,7 @@ export function Categories() {
                 </p>
               </div>
               <ul className="category-tiles">
-                {summary.categories.slice(0, 8).map((category) => {
+                {summary.categories.map((category) => {
                   const sample = summary.sample(category.name);
                   const brands = summary.brandsOf(category.name);
                   return (
@@ -231,100 +232,103 @@ export function Categories() {
             </div>
           </section>
 
-          <section className="categories-band is-soft">
-            <div className="container">
-              <div className="categories-heading">
-                <div>
-                  <p className="categories-eyebrow">02 / CAMPAÑAS ESPECIALIZADAS</p>
-                  <h2>Categorías Destacadas</h2>
-                </div>
-              </div>
-              <ul className="category-campaigns">
-                {summary.categories.slice(0, 3).map((category, index) => (
-                  <li key={category.name} className={gradients[index]}>
-                    <span>{campaignTags[index]}</span>
-                    <h3>{category.name}</h3>
-                    <p>
-                      Productos seleccionados con precios actualizados y atención especializada para
-                      empresas.
-                    </p>
-                    <Link to={byCategory(category.name)}>
-                      Explorar {category.name} <ArrowRightIcon size={14} />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-
-          <section className="categories-band">
-            <div className="container">
-              <div className="categories-heading">
-                <div>
-                  <p className="categories-eyebrow">03 / MAPA DE SUBCATEGORÍAS</p>
-                  <h2>Explora por Subcategorías</h2>
-                </div>
-                <Link className="categories-more" to="/catalogo">
-                  Ver catálogo completo con filtros avanzados <ArrowRightIcon size={14} />
-                </Link>
-              </div>
-              <ul className="category-map">
-                {summary.categories.map((category) => (
-                  <li key={category.name}>
-                    <Link className="category-map-head" to={byCategory(category.name)}>
-                      <img src={categoryIcon(category.name)} alt="" /> {category.name}
-                    </Link>
-                    <ul>
-                      {summary.brandsOf(category.name).map((brand) => (
-                        <li key={brand.name}>
-                          <Link
-                            to={`${byCategory(category.name)}&${catalogParams.brand}=${encodeURIComponent(brand.name)}`}
-                          >
-                            {brand.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-
-          {summary.categories.slice(0, 2).map((category, index) => (
-            <section key={category.name} className={`categories-band${index ? '' : ' is-soft'}`}>
+          <ContentDisclosure title="Categorías destacadas">
+            <section className="categories-band is-soft">
               <div className="container">
                 <div className="categories-heading">
                   <div>
-                    <p className="categories-eyebrow">SELECCIÓN DEL CATÁLOGO</p>
-                    <h2>{category.name}</h2>
+                    <p className="categories-eyebrow">02 / CAMPAÑAS ESPECIALIZADAS</p>
+                    <h2>Categorías Destacadas</h2>
                   </div>
-                  <Link className="categories-more" to={byCategory(category.name)}>
-                    Ver todos los productos de {category.name} <ArrowRightIcon size={14} />
-                  </Link>
                 </div>
-                <div className="showcase-grid">
-                  {summary.inStock(category.name).map((product) => (
-                    <ShowcaseCard key={product.id} product={product} />
+                <ul className="category-campaigns">
+                  {summary.categories.slice(0, 3).map((category, index) => (
+                    <li key={category.name} className={gradients[index]}>
+                      <span>{campaignTags[index]}</span>
+                      <h3>{category.name}</h3>
+                      <p>
+                        Productos seleccionados con precios actualizados y atención especializada
+                        para empresas.
+                      </p>
+                      <Link to={byCategory(category.name)}>
+                        Explorar {category.name} <ArrowRightIcon size={14} />
+                      </Link>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             </section>
+          </ContentDisclosure>
+
+          <ContentDisclosure title="Categorías y marcas">
+            <section className="categories-band">
+              <div className="container">
+                <div className="categories-heading">
+                  <div>
+                    <p className="categories-eyebrow">03 / CATEGORÍAS Y MARCAS</p>
+                    <h2>Explora por categorías y marcas</h2>
+                  </div>
+                  <Link className="categories-more" to="/catalogo">
+                    Ver catálogo completo con filtros avanzados <ArrowRightIcon size={14} />
+                  </Link>
+                </div>
+                <ul className="category-map">
+                  {summary.categories.map((category) => (
+                    <li key={category.name}>
+                      <Link className="category-map-head" to={byCategory(category.name)}>
+                        <img src={categoryIcon(category.name)} alt="" /> {category.name}
+                      </Link>
+                      <ul>
+                        {summary.brandsOf(category.name).map((brand) => (
+                          <li key={brand.name}>
+                            <Link
+                              to={`${byCategory(category.name)}&${catalogParams.brand}=${encodeURIComponent(brand.name)}`}
+                            >
+                              {brand.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          </ContentDisclosure>
+
+          {summary.categories.slice(0, 2).map((category, index) => (
+            <ContentDisclosure key={category.name} title={`Productos de ${category.name}`}>
+              <section className={`categories-band${index ? '' : ' is-soft'}`}>
+                <div className="container">
+                  <div className="categories-heading">
+                    <div>
+                      <p className="categories-eyebrow">SELECCIÓN DEL CATÁLOGO</p>
+                      <h2>{category.name}</h2>
+                    </div>
+                    <Link className="categories-more" to={byCategory(category.name)}>
+                      Ver todos los productos de {category.name} <ArrowRightIcon size={14} />
+                    </Link>
+                  </div>
+                  <div className="showcase-grid">
+                    {summary.inStock(category.name).map((product) => (
+                      <ShowcaseCard key={product.id} product={product} />
+                    ))}
+                  </div>
+                </div>
+              </section>
+            </ContentDisclosure>
           ))}
 
           <div className="container">
             <section className="categories-cta" aria-labelledby="categories-cta-title">
               <div>
                 <span>
-                  <ShieldIcon size={14} /> RUC 20 // FACTURACIÓN ELECTRÓNICA
+                  <ShieldIcon size={14} /> COMPRAS PARA EMPRESAS
                 </span>
                 <h2 id="categories-cta-title">
                   Encuentra todo lo que necesitas para tu infraestructura IT en un solo lugar
                 </h2>
-                <p>
-                  Software y hardware con garantía oficial para empresas peruanas e instituciones
-                  públicas.
-                </p>
+                <p>Software y hardware para empresas peruanas e instituciones públicas.</p>
               </div>
               <div className="categories-cta-actions">
                 <Link to="/contacto" className="is-teal">

@@ -9,7 +9,13 @@ import { PaymentDetails } from '../components/orders/PaymentDetails';
 import { StatusBadge } from '../components/shared/StatusBadge';
 import { billingRows } from '../lib/billing';
 import { deliveryRows } from '../lib/delivery';
-import { formatDateTime, orderStatusLabels, shortId, statusLabel } from '../lib/orders';
+import {
+  customerOrderHint,
+  formatDateTime,
+  orderStatusLabels,
+  shortId,
+  statusLabel,
+} from '../lib/orders';
 import { api } from '../services/api';
 import { gatewayReturnNotice, onlineGateway, type OnlineGateway } from '../lib/sales';
 import { money } from '../state';
@@ -99,7 +105,7 @@ export function OrderPage() {
           large
           eyebrow="PEDIDO REGISTRADO"
           title="Tu pedido fue registrado"
-          text="Tu pedido fue registrado correctamente. El precio y la disponibilidad fueron confirmados."
+          text="Recibimos tu pedido. Revisa aquí el estado del pago y la coordinación de entrega."
         >
           <p className="page-hero-order">Orden #{shortId(id)}</p>
         </PageHero>
@@ -122,6 +128,9 @@ export function OrderPage() {
         data && (
           <>
             <PageSection title="Resumen de la compra">
+              <p className="notice" role="status">
+                {customerOrderHint(data.status)}
+              </p>
               <OrderTimeline status={data.status} />
               <div className="order-info">
                 <InfoRows
@@ -206,6 +215,12 @@ export function OrderPage() {
               )}
               <Link className="flow-button is-secondary" to="/cuenta/pedidos">
                 Ver mis pedidos
+              </Link>
+              <Link
+                className="link-button"
+                to={`/cuenta/soporte?${new URLSearchParams({ pedido: data.id })}#formulario`}
+              >
+                Consultar sobre este pedido
               </Link>
             </PageSection>
           </>

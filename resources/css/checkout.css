@@ -1,5 +1,71 @@
 /* Checkout steps, payment option and order status timeline. */
 
+.checkout-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  align-items: start;
+  gap: var(--syscon-space-6);
+  margin: var(--syscon-space-8) auto var(--syscon-space-12);
+}
+.checkout-layout > .page-section {
+  min-width: 0;
+  padding: var(--syscon-card-padding);
+  border: 1px solid var(--store-line);
+  border-radius: var(--syscon-radius-md);
+}
+.checkout-layout > .page-section > .container {
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+.checkout-layout > .page-section.is-soft {
+  position: sticky;
+  top: var(--syscon-space-6);
+}
+.checkout-layout .info-rows > div {
+  grid-template-columns: minmax(0, 120px) minmax(0, 1fr);
+  min-height: var(--syscon-control-height);
+  padding: var(--syscon-space-3);
+}
+.checkout-layout .order-summary .info-rows > div {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--syscon-space-3);
+}
+.checkout-layout .order-summary dd {
+  text-align: right;
+}
+.checkout-layout .flow-button {
+  width: 100%;
+  min-width: 0;
+  white-space: normal;
+  text-align: center;
+}
+.checkout-layout .field input:not([type='radio']):not([type='checkbox']),
+.checkout-layout .field select {
+  min-height: var(--syscon-control-height);
+}
+.checkout-layout .payment-option + .payment-option {
+  margin-top: var(--syscon-space-3);
+}
+@media (max-width: 999px) {
+  .checkout-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .checkout-layout > .page-section.is-soft {
+    position: static;
+  }
+}
+@media (max-width: 700px) {
+  .checkout-layout {
+    gap: var(--syscon-space-4);
+    margin-top: var(--syscon-space-6);
+  }
+  .checkout-layout .info-rows > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--syscon-space-1);
+  }
+}
+
 .checkout-card-head {
   display: flex;
   align-items: baseline;
@@ -46,7 +112,7 @@
   list-style: none;
   font-size: 13px;
   font-weight: 600;
-  color: #8a93a3;
+  color: var(--syscon-text-secondary);
   text-align: center;
 }
 .order-timeline li {
@@ -78,7 +144,7 @@
   height: 40px;
   border-radius: 8px;
   background: #e7eeff;
-  color: #8a93a3;
+  color: var(--syscon-text-secondary);
 }
 .order-timeline li span::after {
   content: '';

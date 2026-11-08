@@ -1,5 +1,5 @@
+import { CatalogToolsNav } from '../../components/backoffice/CatalogToolsNav';
 import { useRef, useState, type ChangeEvent } from 'react';
-import { Link } from 'react-router-dom';
 import { PageHeader } from '../../components/backoffice/PageHeader';
 import { StatCard } from '../../components/backoffice/StatCard';
 import { Pagination } from '../../components/shared/Pagination';
@@ -107,14 +107,10 @@ export function ProductBulkAdmin() {
 
   return (
     <>
+      <CatalogToolsNav />
       <PageHeader
-        title="Carga masiva de productos"
-        description="Exporta productos activos e inactivos con stock físico o importa productos desde un archivo CSV. Cada fila se guarda con el mismo upsert por SKU que el formulario de productos."
-        actions={
-          <Link className="button button-secondary" to="/admin/productos">
-            Volver a productos
-          </Link>
-        }
+        title="Importar / exportar productos"
+        description="Importa o descarga productos mediante archivos CSV. Si el SKU ya existe, se actualiza ese producto; el stock del archivo representa unidades físicas."
       />
       <div className="bo-two-columns">
         <section className="bo-card" aria-labelledby="export-title">

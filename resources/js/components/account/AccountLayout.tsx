@@ -1,12 +1,13 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { catalogSearchQuery } from '../../lib/catalog';
 import logo from '../../../images/header/logo-grupo-syscon.jpg';
-import { canUseBackoffice, displayName, initials, roleLabel } from '../../lib/auth';
+import { canUseBackoffice, displayName, initials } from '../../lib/auth';
 import { useShop } from '../../state';
 import {
   BoxIcon,
   CartIcon,
+  CloseIcon,
   ChatIcon,
   GridIcon,
   HelpIcon,
@@ -25,9 +26,55 @@ import { PageMain } from '../layout/PageMain';
  */
 export function AccountLayout({ title, children }: { title: string; children: ReactNode }) {
   const { user, count, logout } = useShop();
+  const staff = canUseBackoffice(user);
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [mobile, setMobile] = useState(() => window.matchMedia('(max-width: 960px)').matches);
+  const sidebarRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 960px)');
+    const resize = () => {
+      setMobile(media.matches);
+      if (!media.matches) setOpen(false);
+    };
+    media.addEventListener('change', resize);
+    return () => media.removeEventListener('change', resize);
+  }, []);
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const controls = () =>
+      Array.from(
+        sidebarRef.current?.querySelectorAll<HTMLElement>('a[href], button:not(:disabled)') ?? [],
+      ).filter((element) => element.getClientRects().length);
+    controls()[0]?.focus();
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setOpen(false);
+      }
+      if (event.key !== 'Tab') return;
+      const elements = controls();
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    };
+    document.addEventListener('keydown', keydown);
+    return () => {
+      document.body.style.overflow = overflow;
+      document.removeEventListener('keydown', keydown);
+      if (previous?.isConnected) previous.focus();
+    };
+  }, [open]);
   const [query, setQuery] = useState('');
   useEffect(() => {
     if (location.pathname === '/cuenta/productos')
@@ -50,10 +97,37 @@ export function AccountLayout({ title, children }: { title: string; children: Re
 
   return (
     <div className={`portal${open ? ' is-menu-open' : ''}`}>
-      <aside className="portal-sidebar" aria-label="Mi cuenta">
-        <Link to="/" className="portal-brand" aria-label="Grupo SYSCON, ir al inicio">
-          <img className="brand-image" src={logo} alt="" width={180} height={50} />
-        </Link>
+      {open && (
+        <button
+          type="button"
+          className="portal-menu-scrim"
+          aria-label="Cerrar menú de cuenta"
+          onClick={() => setOpen(false)}
+          tabIndex={-1}
+        />
+      )}
+      <aside
+        ref={sidebarRef}
+        id="account-menu"
+        className="portal-sidebar"
+        aria-label="Mi cuenta"
+        role={open ? 'dialog' : undefined}
+        aria-modal={open || undefined}
+        inert={mobile && !open ? true : undefined}
+      >
+        <div className="portal-sidebar-heading">
+          <Link to="/" className="portal-brand" aria-label="Grupo SYSCON, ir al inicio">
+            <img className="brand-image" src={logo} alt="" width={180} height={50} />
+          </Link>
+          <button
+            type="button"
+            className="portal-sidebar-close"
+            aria-label="Cerrar menú"
+            onClick={() => setOpen(false)}
+          >
+            <CloseIcon />
+          </button>
+        </div>
         {user && (
           <div className="portal-user">
             <span className="portal-avatar" aria-hidden="true">
@@ -64,7 +138,7 @@ export function AccountLayout({ title, children }: { title: string; children: Re
                 {displayName(user)} <ShieldIcon size={14} />
               </strong>
               <span>{user.email}</span>
-              <em>{user.roles.map(roleLabel).join(' / ') || 'Cliente'}</em>
+              <em>{staff ? 'Compras personales' : 'Cuenta de cliente'}</em>
             </div>
           </div>
         )}
@@ -87,9 +161,9 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           <NavLink to="/cuenta/soporte">
             <ChatIcon size={18} /> Ayuda y contacto
           </NavLink>
-          {canUseBackoffice(user) && (
+          {staff && (
             <Link to="/admin">
-              <StoreIcon size={18} /> Backoffice
+              <StoreIcon size={18} /> Volver a administración
             </Link>
           )}
           <button type="button" onClick={signOut}>
@@ -97,19 +171,21 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           </button>
         </nav>
       </aside>
-      <div className="portal-main">
+      <div className="portal-main" inert={open || undefined}>
         <header className="portal-topbar">
           <button
             type="button"
             className="portal-menu"
             aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
             aria-expanded={open}
+            aria-controls="account-menu"
             onClick={() => setOpen((value) => !value)}
           >
             <MenuIcon />
           </button>
           <p className="portal-crumb">
-            Mi Cuenta <span aria-hidden="true">/</span> <strong>{title}</strong>
+            {staff ? 'Mis compras' : 'Mi cuenta'} <span aria-hidden="true">/</span>{' '}
+            <strong>{title}</strong>
           </p>
           <form className="portal-search" role="search" onSubmit={search}>
             <SearchIcon size={16} />
@@ -138,15 +214,21 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           <Link className="portal-icon" to="/cuenta/soporte" aria-label="Ayuda">
             <HelpIcon size={20} />
           </Link>
-          <img
-            className="portal-logo brand-image"
-            src={logo}
-            alt="Grupo SYSCON"
-            width={112}
-            height={32}
-          />
+          <Link to="/" className="portal-logo" aria-label="Grupo SYSCON, ir a la tienda">
+            <img className="brand-image" src={logo} alt="Grupo SYSCON" width={112} height={32} />
+          </Link>
         </header>
-        <PageMain className="portal-content">{children}</PageMain>
+        <PageMain className="portal-content">
+          {staff && (
+            <aside className="portal-context" aria-label="Área de compras personales">
+              <span>
+                Estás en tu cuenta de compras. Aquí aparecen únicamente tus pedidos personales.
+              </span>
+              <Link to="/admin">Volver al panel de trabajo</Link>
+            </aside>
+          )}
+          {children}
+        </PageMain>
         <footer className="portal-footer">
           <span>
             © {new Date().getFullYear()} Grupo SYSCON S.A.C. Todos los derechos reservados.

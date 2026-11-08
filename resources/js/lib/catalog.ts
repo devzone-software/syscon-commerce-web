@@ -2,6 +2,24 @@ import type { Product } from '../types';
 
 export type CatalogGroup = { name: string; count: number };
 
+/** Preserve free text while separating published "label: value" characteristics. */
+export function productSpecifications(value?: string | null) {
+  return (value ?? '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((text) => {
+      const colon = text.indexOf(':');
+      const label = text.slice(0, colon).trim();
+      const value = text.slice(colon + 1).trim();
+      return colon > 0 && value ? { text, label, value } : { text, label: null, value: text };
+    });
+}
+
+export function productInquiryUrl(product: Pick<Product, 'name' | 'sku'>) {
+  return `/contacto?${new URLSearchParams({ producto: product.name, sku: product.sku })}#formulario`;
+}
+
 /** Groups the catalog by category or brand, most populated first. */
 export function groupProducts(products: Product[], key: 'category' | 'brand'): CatalogGroup[] {
   const counts = new Map<string, number>();
@@ -32,6 +50,23 @@ export function pickFeatured(products: Product[], limit: number): Product[] {
     }
   }
   return [...firstOfCategory, ...rest].slice(0, limit);
+}
+
+/** Lowest current price among purchasable products; this is not a promotional discount. */
+export function lowestAvailablePrice(products: Product[]): number | null {
+  let lowest: number | null = null;
+  for (const product of products) {
+    const price = Number(product.price);
+    if (
+      product.active &&
+      product.stock > 0 &&
+      Number.isFinite(price) &&
+      price >= 0 &&
+      (lowest === null || price < lowest)
+    )
+      lowest = price;
+  }
+  return lowest;
 }
 
 export type SortKey = 'relevancia' | 'precio-asc' | 'precio-desc' | 'nombre';

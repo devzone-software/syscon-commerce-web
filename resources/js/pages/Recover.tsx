@@ -35,15 +35,15 @@ export function Recover() {
           text: 'Tus pedidos e historial se conservan intactos.',
         },
         { icon: <HeadsetIcon size={16} />, text: 'Soporte técnico preventa y postventa.' },
-        { icon: <LockIcon size={16} />, text: 'Protección de datos personales.' },
+        { icon: <LockIcon size={16} />, text: 'No compartas tu contraseña con otras personas.' },
       ]}
-      footnote="Datos tratados conforme a la Ley N° 29733"
+      footnote="La recuperación se coordina con el equipo de soporte."
       below={
         <ul className="auth-assurance">
           <li>
             <ShieldIcon size={16} />
             <span>
-              <strong>Garantía SYSCON S.A.C.</strong>Partner tecnológico corporativo
+              <strong>Cuenta SYSCON</strong>Recupera tu acceso para consultar tus pedidos
             </span>
           </li>
           <li>
@@ -55,7 +55,7 @@ export function Recover() {
           <li>
             <HeadsetIcon size={16} />
             <span>
-              <strong>Atención corporativa</strong>Lun - Sáb: 8:30 AM - 6:30 PM
+              <strong>Atención corporativa</strong>Consulta los canales vigentes de contacto.
             </span>
           </li>
         </ul>

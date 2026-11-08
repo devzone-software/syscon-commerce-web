@@ -33,6 +33,9 @@ export function validateDelivery(
   options: DeliveryOptions | null,
 ): Partial<Record<keyof DeliveryForm, string>> {
   const errors: Partial<Record<keyof DeliveryForm, string>> = {};
+  if (options && deliveryCost(form.method, options) === null)
+    errors.method =
+      'Esta modalidad no tiene una tarifa disponible. Elige otra opción o consulta con SYSCON.';
   if (form.method === 'DELIVERY' && options && !options.delivery.enabled)
     errors.method = 'El envío a domicilio no está disponible por ahora.';
   if (squash(form.contactName).length < 2) errors.contactName = 'Ingresa quién recibe o retira.';
@@ -60,8 +63,10 @@ export function deliveryPayload(form: DeliveryForm): Delivery {
 /** Cost the platform will charge for the chosen method, or null while the options load. */
 export function deliveryCost(method: DeliveryMethod, options: DeliveryOptions | null) {
   if (!options) return null;
-  const cost = method === 'DELIVERY' ? options.delivery.cost : options.pickup.cost;
-  return cost === null ? null : Number(cost);
+  const option = method === 'DELIVERY' ? options.delivery : options.pickup;
+  if (!option.enabled || option.cost == null || option.cost.trim() === '') return null;
+  const cost = Number(option.cost);
+  return Number.isFinite(cost) && cost >= 0 ? cost : null;
 }
 
 /** Rows shown in the order detail; older orders say the delivery was not recorded. */

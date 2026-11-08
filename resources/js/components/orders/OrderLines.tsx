@@ -4,7 +4,7 @@ import type { Order } from '../../types';
 
 export function OrderLines({ order }: { order: Order }) {
   return (
-    <div className="table-wrap">
+    <div className="table-wrap responsive-table order-lines">
       <table className="data-table">
         <caption className="visually-hidden">Productos del pedido</caption>
         <thead>
@@ -24,13 +24,19 @@ export function OrderLines({ order }: { order: Order }) {
         <tbody>
           {order.details.map((item) => (
             <tr key={item.productId}>
-              <td>
+              <td data-label="Producto">
                 <strong>{item.name}</strong>
                 <small>SKU {item.sku}</small>
               </td>
-              <td className="num">{item.quantity}</td>
-              <td className="num">{money(Number(item.unitPrice))}</td>
-              <td className="num">{money(Number(item.unitPrice) * item.quantity)}</td>
+              <td className="num" data-label="Cantidad">
+                {item.quantity}
+              </td>
+              <td className="num" data-label="Precio unitario">
+                {money(Number(item.unitPrice))}
+              </td>
+              <td className="num" data-label="Subtotal">
+                {money(Number(item.unitPrice) * item.quantity)}
+              </td>
             </tr>
           ))}
         </tbody>

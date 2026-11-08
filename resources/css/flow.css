@@ -2,10 +2,6 @@
  * Purchase flow from Figma "02 — Client Web": product detail, cart, checkout and the
  * confirmation. Pages open with the navy .page-hero and continue in white / soft sections.
  */
-.page-section-head h2 {
-  font-size: 24px;
-  line-height: 30px;
-}
 .page-hero-order {
   margin: 4px 0 0;
   font-size: 18px;
@@ -125,13 +121,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--syscon-space-2);
   min-width: 250px;
-  min-height: 50px;
+  min-height: 48px;
   margin-top: 4px;
-  padding: 0 24px;
+  padding: var(--syscon-space-3) var(--syscon-space-6);
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--syscon-radius-sm);
   background: #00265d;
   color: #fff;
   font-size: 13px;
@@ -190,10 +186,10 @@
 .cart-line:last-child {
   grid-template-columns: 128px 1fr auto;
   align-items: center;
-  gap: 20px;
-  padding: 14px;
+  gap: var(--syscon-space-4);
+  padding: var(--syscon-space-4);
   border: 1px solid #e0e8f0;
-  border-radius: 14px;
+  border-radius: var(--syscon-radius-md);
   background: #fbfcfe;
 }
 .cart-line-media {
@@ -227,87 +223,6 @@
   background: #fbfcfe;
 }
 
-/* Product detail */
-.product-hero {
-  background: #f9fafc;
-}
-.product-hero > .container {
-  padding: 24px 0 44px;
-}
-.product-hero .breadcrumb {
-  margin-bottom: 20px;
-}
-.product-detail {
-  grid-template-columns: minmax(0, 520px) minmax(0, 1fr);
-  gap: 40px;
-  align-items: center;
-}
-.product-detail-media {
-  min-height: 332px;
-  border: 0;
-  border-radius: 18px;
-  background: #fff;
-}
-.product-detail-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 14px;
-}
-.product-detail-eyebrow {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 18px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #00265d;
-}
-.product-detail-info h1 {
-  margin: 0;
-  font-size: 34px;
-  line-height: 42px;
-  color: #111c2d;
-}
-.product-detail-sub {
-  margin: 0;
-  font-size: 15px;
-  line-height: 22px;
-  color: #59616e;
-}
-.product-detail-price {
-  margin: 0;
-  font-size: 30px;
-  font-weight: 700;
-  line-height: 38px;
-  color: #00265d;
-}
-.product-detail-stock {
-  margin: 0;
-  font-size: 13px;
-  line-height: 20px;
-  color: #1f7340;
-}
-.product-detail-stock.out {
-  color: #9a6700;
-}
-.product-buy {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.product-buy .flow-button {
-  min-width: 220px;
-  min-height: 48px;
-  margin: 0;
-}
-
-@media (max-width: 860px) {
-  .product-detail {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
 @media (max-width: 600px) {
   .info-rows > div {
     grid-template-columns: minmax(0, 1fr);
@@ -328,23 +243,19 @@
     width: 100%;
     min-width: 0;
   }
-  .product-detail-info h1 {
-    font-size: 26px;
-    line-height: 32px;
-  }
 }
 
 /* Checkout · comprobante (boleta / factura) */
 .billing-fields {
   display: grid;
-  gap: 14px;
+  gap: var(--syscon-space-4);
   margin: 0;
   padding: 0;
   border: 0;
   min-width: 0;
 }
 .billing-fields legend {
-  margin-bottom: 10px;
+  margin-bottom: var(--syscon-space-3);
   padding: 0;
   font-size: 13px;
   font-weight: 700;
@@ -358,9 +269,9 @@
 .billing-option {
   display: flex;
   gap: 12px;
-  padding: 14px;
+  padding: var(--syscon-space-4);
   border: 1px solid #dbe3ed;
-  border-radius: 10px;
+  border-radius: var(--syscon-radius-md);
   background: #fbfcfe;
   font-size: 13px;
   line-height: 1.5;

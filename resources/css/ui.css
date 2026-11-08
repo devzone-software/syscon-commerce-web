@@ -1,32 +1,4 @@
-/* Shared interface pieces: status badges, data tables, detail lists and form fields. */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 26px;
-  padding: 0 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.status-badge.tone-success {
-  background: #e6f5ee;
-  color: #1c6b49;
-}
-.status-badge.tone-warning {
-  background: #fdf3e3;
-  color: #8a5a17;
-}
-.status-badge.tone-danger {
-  background: #fdecea;
-  color: #9a3a2e;
-}
-.status-badge.tone-info {
-  background: var(--store-soft);
-  color: var(--store-brand-strong);
-}
-
+/* Shared data tables, detail lists and form fields. Badges and controls live in syscon.css. */
 .table-wrap {
   position: relative;
   width: 100%;
@@ -36,7 +8,8 @@
     linear-gradient(to right, #fff 30%, #fff0) left / 32px 100% no-repeat local,
     linear-gradient(to left, #fff 30%, #fff0) right / 32px 100% no-repeat local,
     radial-gradient(farthest-side at 0 50%, #00265d26, #00265d00) left / 12px 100% no-repeat scroll,
-    radial-gradient(farthest-side at 100% 50%, #00265d26, #00265d00) right / 12px 100% no-repeat scroll;
+    radial-gradient(farthest-side at 100% 50%, #00265d26, #00265d00) right / 12px 100% no-repeat
+      scroll;
 }
 .data-table {
   width: 100%;
@@ -127,10 +100,11 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
+  gap: var(--syscon-space-2);
+  font-size: 12px;
+  line-height: 18px;
   font-weight: 700;
-  color: var(--store-ink);
+  color: var(--syscon-text-secondary);
 }
 .field small {
   font-weight: 400;
@@ -139,7 +113,7 @@
 .field-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 14px;
+  gap: var(--syscon-space-4);
 }
 .field-row.is-single {
   grid-template-columns: minmax(0, 1fr);
@@ -147,25 +121,27 @@
 .form-stack {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--syscon-space-4);
 }
 .form-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--syscon-space-2);
   align-items: center;
 }
-.field-error {
+.field-error,
+.field .field-error {
   margin: 0;
   font-size: 12px;
   font-weight: 600;
-  color: #9a3a2e;
+  color: var(--syscon-danger);
 }
-.field-warning {
+.field-warning,
+.field .field-warning {
   margin: 0;
   font-size: 12px;
   font-weight: 600;
-  color: #8a5a17;
+  color: var(--syscon-warning);
 }
 .field input[aria-invalid='true'] {
   border-color: #c9533f;
@@ -176,4 +152,8 @@
 }
 .button-danger:hover:not(:disabled) {
   background: #97321f;
+}
+
+.bo-card.form-stack > h2 {
+  margin-bottom: 0;
 }

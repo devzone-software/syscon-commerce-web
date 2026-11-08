@@ -7,7 +7,10 @@ import {
   pageNumbers,
   paginate,
   pickFeatured,
+  lowestAvailablePrice,
   readFilters,
+  productSpecifications,
+  productInquiryUrl,
 } from './catalog';
 
 const product = (id: string, patch: Partial<Product> = {}): Product => ({
@@ -28,6 +31,30 @@ const catalog = [
   product('3', { name: 'Switch 8 puertos', price: 90, category: 'Redes', brand: 'TP-Link' }),
 ];
 const base = readFilters(new URLSearchParams());
+
+describe('published product information', () => {
+  it('keeps free text and separates only complete label/value pairs', () => {
+    expect(productSpecifications(null)).toEqual([]);
+    expect(
+      productSpecifications(
+        ' \r\n Puertos: 8 \r\n Compatible con: A:B\nSin datos estructurados\nModelo: ',
+      ),
+    ).toEqual([
+      { text: 'Puertos: 8', label: 'Puertos', value: '8' },
+      { text: 'Compatible con: A:B', label: 'Compatible con', value: 'A:B' },
+      { text: 'Sin datos estructurados', label: null, value: 'Sin datos estructurados' },
+      { text: 'Modelo:', label: null, value: 'Modelo:' },
+    ]);
+  });
+  it('preserves product names and SKUs containing query characters in an inquiry', () => {
+    const input = { name: 'Router A&B / Wi-Fi + 6', sku: 'R#01?x=2' };
+    const url = new URL(productInquiryUrl(input), 'https://example.test');
+    expect(url.pathname).toBe('/contacto');
+    expect(url.searchParams.get('producto')).toBe(input.name);
+    expect(url.searchParams.get('sku')).toBe(input.sku);
+    expect(url.hash).toBe('#formulario');
+  });
+});
 
 describe('catalog filters', () => {
   it('preserves category, availability and sorting when searching, and resets the page', () => {
@@ -105,5 +132,24 @@ describe('catalog pagination', () => {
     expect(pageNumbers(1, 12)).toEqual([1, 2, 3, 4, 5, null, 12]);
     expect(pageNumbers(6, 12)).toEqual([1, null, 5, 6, 7, null, 12]);
     expect(pageNumbers(12, 12)).toEqual([1, null, 8, 9, 10, 11, 12]);
+  });
+});
+
+describe('home catalog price', () => {
+  it('excludes unavailable and inactive products from the advertised starting price', () => {
+    expect(
+      lowestAvailablePrice([
+        product('hidden', { active: false, price: 1 }),
+        product('out', { stock: 0, price: 2 }),
+        product('available', { price: 49.9 }),
+        product('higher', { price: 100 }),
+      ]),
+    ).toBe(49.9);
+  });
+  it('does not advertise a starting price without a valid available product', () => {
+    expect(lowestAvailablePrice([])).toBeNull();
+    expect(lowestAvailablePrice([product('out', { stock: 0 })])).toBeNull();
+    expect(lowestAvailablePrice([product('invalid', { price: NaN })])).toBeNull();
+    expect(lowestAvailablePrice([product('free', { price: 0 })])).toBe(0);
   });
 });

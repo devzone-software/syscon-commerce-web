@@ -29,7 +29,7 @@ export function AccountCart() {
 
 export function Cart({ account = false }: { account?: boolean }) {
   const accountPath = useAccountPath();
-  const { cart, setQuantity, clear } = useShop();
+  const { cart, setQuantity, clear, user } = useShop();
   const { issues, checking, error } = useCartReview();
   const [confirmClear, setConfirmClear] = useState(false);
   const heading = account ? (
@@ -105,6 +105,12 @@ export function Cart({ account = false }: { account?: boolean }) {
       </PageSection>
       <PageSection title="Resumen de compra" soft>
         <OrderSummary lines={cart}>
+          {!user && (
+            <p className="flow-note">
+              Para confirmar el pedido necesitas iniciar sesión o crear una cuenta. Tu carrito se
+              conservará.
+            </p>
+          )}
           {issues.size > 0 && (
             <p className="notice error" role="alert">
               Revisa los productos marcados antes de continuar.
@@ -120,7 +126,7 @@ export function Cart({ account = false }: { account?: boolean }) {
             </button>
           ) : (
             <Link className="flow-button" to="/checkout">
-              Continuar al checkout
+              {user ? 'Continuar al checkout' : 'Iniciar sesión para continuar'}
             </Link>
           )}
         </OrderSummary>

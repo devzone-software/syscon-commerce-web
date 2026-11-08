@@ -31,6 +31,16 @@
   height: 50px;
   object-fit: contain;
 }
+.portal-sidebar-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.portal-sidebar-close,
+.portal-menu-scrim {
+  display: none;
+}
 .portal-user {
   display: flex;
   align-items: center;
@@ -181,7 +191,7 @@
 }
 .portal-crumb span {
   margin: 0 6px;
-  color: #8a93a3;
+  color: var(--syscon-text-secondary);
 }
 .portal-crumb strong {
   font-weight: 500;
@@ -255,12 +265,36 @@
   height: 32px;
   object-fit: contain;
 }
+.portal-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.portal-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border: 1px solid #cbdcf0;
+  border-radius: 8px;
+  background: #eef5fc;
+  color: #15375a;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.portal-context a {
+  font-weight: 600;
+  text-decoration: underline;
+}
 .portal-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  padding: 24px;
+  gap: var(--syscon-space-8);
+  padding: var(--syscon-page-gutter);
 }
 .portal-cart {
   display: flex;
@@ -361,7 +395,6 @@
 }
 /* These shared store pages adapt to the space left by the account sidebar. */
 @container portal-page (max-width: 1100px) {
-  .portal-page .offers-hero,
   .portal-page .about-cta,
   .portal-page .contact-hero,
   .portal-page .contact-whatsapp,
@@ -369,10 +402,6 @@
     flex-direction: column;
     align-items: flex-start;
   }
-  .portal-page .offers-hero figure {
-    flex-basis: auto;
-  }
-  .portal-page .offers-spotlight-body,
   .portal-page .about-hero,
   .portal-page .about-identity,
   .portal-page .about-trust .container,
@@ -380,10 +409,6 @@
   .portal-page .contact-location {
     grid-template-columns: minmax(0, 1fr);
   }
-  .portal-page .offers-grid,
-  .portal-page .offers-ending ul,
-  .portal-page .offers-trust ul,
-  .portal-page .offers-filters-row,
   .portal-page .about-stats,
   .portal-page .about-steps,
   .portal-page .about-timeline,
@@ -393,15 +418,8 @@
   .portal-page .contact-areas ul {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .portal-page .offers-filters-row p {
-    justify-self: start;
-  }
 }
 @container portal-page (max-width: 640px) {
-  .portal-page .offers-grid,
-  .portal-page .offers-ending ul,
-  .portal-page .offers-trust ul,
-  .portal-page .offers-filters-row,
   .portal-page .about-stats,
   .portal-page .about-steps,
   .portal-page .about-timeline,
@@ -621,9 +639,9 @@
 .portal-card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px;
-  border-radius: 8px;
+  gap: var(--syscon-space-4);
+  padding: var(--syscon-card-padding);
+  border-radius: var(--syscon-radius-md);
   background: #fff;
   box-shadow: 0 1px 2px #0000000d;
 }
@@ -913,6 +931,25 @@
   }
 }
 @media (max-width: 960px) {
+  .portal-menu-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    border: 0;
+    background: #08234766;
+  }
+  .portal-sidebar-close {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 8px;
+    background: #eef5fc;
+    color: #15375a;
+  }
   .portal:not(.is-menu-open) .portal-logo {
     display: block;
   }
@@ -923,7 +960,7 @@
     position: fixed;
     inset: 0 auto 0 0;
     z-index: 40;
-    width: 296px;
+    width: min(296px, calc(100vw - 24px));
     transform: translateX(-100%);
     transition: transform 0.2s;
   }
@@ -997,5 +1034,48 @@
   .portal-kpis strong {
     font-size: 22px;
     line-height: 28px;
+  }
+}
+
+/* Keep the account header in a predictable order on narrow screens. */
+@media (max-width: 640px) {
+  .portal-topbar {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px 44px;
+    gap: 8px;
+  }
+  .portal-menu {
+    grid-column: 1;
+    grid-row: 1;
+    width: 44px;
+    height: 44px;
+  }
+  .portal-logo {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .portal-topbar > .portal-icon {
+    grid-column: 3;
+    grid-row: 1;
+    width: 44px;
+    height: 44px;
+  }
+  .portal-topbar > .portal-icon[aria-label='Ayuda'] {
+    grid-column: 4;
+  }
+  .portal-topbar > .portal-store {
+    display: none;
+  }
+  .portal-search {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .portal-crumb {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 }

@@ -1,9 +1,11 @@
+import { can, permissions } from '../../lib/auth';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { PageHeader } from '../../components/backoffice/PageHeader';
 import { downloadCsv, toCsv } from '../../lib/csv';
 import { stockBy, type StockSummary } from '../../lib/inventory';
 import { api } from '../../services/api';
-import { money } from '../../state';
+import { money, useShop } from '../../state';
 import { useData, ErrorBox, Loading, Empty } from '../../ui';
 
 const dimensions = [
@@ -14,9 +16,9 @@ const dimensions = [
 function SummaryTable({ label, rows }: { label: string; rows: StockSummary[] }) {
   const max = Math.max(...rows.map((row) => row.saleValue), 0);
   return (
-    <div className="table-wrap">
+    <div className="table-wrap responsive-table">
       <table className="data-table">
-        <caption className="visually-hidden">Stock por {label.toLowerCase()}</caption>
+        <caption className="visually-hidden">Disponibilidad por {label.toLowerCase()}</caption>
         <thead>
           <tr>
             <th scope="col">{label}</th>
@@ -27,7 +29,7 @@ function SummaryTable({ label, rows }: { label: string; rows: StockSummary[] }) 
               Sin stock
             </th>
             <th scope="col" className="num">
-              Unidades
+              Unidades disponibles
             </th>
             <th scope="col" className="num">
               Valor a precio de venta
@@ -40,14 +42,22 @@ function SummaryTable({ label, rows }: { label: string; rows: StockSummary[] }) 
         <tbody>
           {rows.map((row) => (
             <tr key={row.name}>
-              <td>
+              <td data-label={label}>
                 <strong>{row.name}</strong>
               </td>
-              <td className="num">{row.products}</td>
-              <td className="num">{row.outOfStock}</td>
-              <td className="num">{row.units}</td>
-              <td className="num">{money(row.saleValue)}</td>
-              <td className="bo-bar-cell" aria-hidden="true">
+              <td data-label="Productos" className="num">
+                {row.products}
+              </td>
+              <td data-label="Sin stock" className="num">
+                {row.outOfStock}
+              </td>
+              <td data-label="Unidades disponibles" className="num">
+                {row.units}
+              </td>
+              <td data-label="Valor a precio de venta" className="num">
+                {money(row.saleValue)}
+              </td>
+              <td data-label="Participación" className="bo-bar-cell" aria-hidden="true">
                 <span
                   className="bo-bar"
                   style={{ width: `${max ? (row.saleValue / max) * 100 : 0}%` }}
@@ -62,6 +72,7 @@ function SummaryTable({ label, rows }: { label: string; rows: StockSummary[] }) 
 }
 
 export function ReportsAdmin() {
+  const { user } = useShop();
   const { data, loading, error, reload } = useData(api.products);
   const [dimension, setDimension] = useState<'category' | 'brand'>('category');
   const label = dimensions.find((item) => item.value === dimension)!.label;
@@ -71,7 +82,7 @@ export function ReportsAdmin() {
     downloadCsv(
       `reporte-stock-por-${dimension === 'category' ? 'categoria' : 'marca'}.csv`,
       toCsv(
-        [label, 'Productos', 'Sin stock', 'Unidades', 'Valor a precio de venta'],
+        [label, 'Productos', 'Sin stock', 'Unidades disponibles', 'Valor a precio de venta'],
         rows.map((row) => [
           row.name,
           row.products,
@@ -85,14 +96,21 @@ export function ReportsAdmin() {
   return (
     <>
       <PageHeader
-        title="Reportes"
-        description="Reportes calculados con el catálogo publicado y su stock actual. Las ventas, pagos y comprobantes están en “Ventas y conciliación”."
+        title="Resumen del catálogo"
+        description="Disponibilidad de los productos publicados, agrupada por categoría o marca. Consulta el stock físico, reservado y disponible en Existencias."
         actions={
-          rows.length > 0 && (
-            <button type="button" className="button button-secondary" onClick={exportCsv}>
-              Exportar CSV
-            </button>
-          )
+          <>
+            {can(user, permissions.catalogWrite) && (
+              <Link className="button button-secondary" to="/admin/existencias">
+                Ver existencias
+              </Link>
+            )}
+            {rows.length > 0 && (
+              <button type="button" className="button button-secondary" onClick={exportCsv}>
+                Exportar CSV
+              </button>
+            )}
+          </>
         }
       />
       {loading ? (
@@ -102,7 +120,7 @@ export function ReportsAdmin() {
       ) : rows.length ? (
         <section className="bo-card" aria-labelledby="report-title">
           <div className="checkout-card-head">
-            <h2 id="report-title">Catálogo e inventario por {label.toLowerCase()}</h2>
+            <h2 id="report-title">Productos publicados por {label.toLowerCase()}</h2>
             <label className="catalog-sort">
               <span>Agrupar por</span>
               <select

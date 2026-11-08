@@ -1,4 +1,4 @@
-import type { Billing, DocumentType, InvoiceSeries, Profile } from '../types';
+import type { Billing, DocumentType, InvoiceCustomer, InvoiceSeries, Profile } from '../types';
 
 /** Document types accepted by invoice-service (SUNAT catalog 01). */
 export const invoiceTypes = [
@@ -133,8 +133,12 @@ export function invoiceValidity(status: string, test: boolean | undefined) {
   if (status === 'VOIDED') return 'Anulado ante SUNAT: no tiene valor tributario.';
   if (status === 'VOIDING') return 'SUNAT está procesando la anulación.';
   if (status === 'PENDING_CHECK')
-    return 'Sin respuesta de SUNAT: puede haber llegado. Concilia antes de emitir otro comprobante.';
-  return 'Borrador sin enviar: el PDF es solo una vista previa sin valor tributario.';
+    return 'Aceptación pendiente de confirmar con SUNAT. Concilia y revisa el CDR antes de emitir otro comprobante.';
+  if (status === 'FAILED')
+    return 'Envío con error: aceptación no confirmada; el PDF es una vista previa sin valor tributario. Revisa el intento antes de reenviar.';
+  if (status === 'DRAFT')
+    return 'Borrador sin enviar: el PDF es solo una vista previa sin valor tributario.';
+  return 'Estado sin confirmar: revisa el resultado antes de utilizar el comprobante.';
 }
 
 /** "(18%)" from the stored rate "0.1800". */
@@ -385,3 +389,10 @@ export function billingRows(billing: Billing | null | undefined) {
       : []),
   ];
 }
+
+/** Shared normalization for issuing a document and correcting a draft. */
+export const customerOf = (input: InvoiceCustomer): InvoiceCustomer => ({
+  customerDocumentType: input.customerDocumentType,
+  customerDocumentNumber: input.customerDocumentNumber.trim(),
+  customerName: input.customerName.trim(),
+});

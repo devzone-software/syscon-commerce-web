@@ -1,3 +1,4 @@
+import { ContentDisclosure } from '../components/shared/ContentDisclosure';
 import { Link } from 'react-router-dom';
 import { useAccountPath } from '../hooks/useAccountPath';
 import team from '../../images/about/team.jpg';
@@ -27,31 +28,22 @@ import '../../css/about.css';
 
 const count = new Intl.NumberFormat('es-PE');
 
-const history = [
+const businessLines = [
   {
-    year: '2021',
-    title: 'Fundación & Soporte',
-    text: 'Inicio de operaciones en Lima enfocado en soporte corporativo y ensamblaje de estaciones de trabajo de alto rendimiento.',
+    title: 'Seguridad electrónica',
+    text: 'Equipos para videovigilancia y seguridad de hogares, negocios e instituciones.',
   },
   {
-    year: '2022',
-    title: 'Alianzas de Canal',
-    text: 'Alianzas de distribución con mayoristas autorizados y fabricantes líderes de hardware.',
+    title: 'Redes y conectividad',
+    text: 'Productos para conectar equipos y desarrollar infraestructura de red.',
   },
   {
-    year: '2024',
-    title: 'Catálogo Digital',
-    text: 'Catálogo en línea con precios actualizados y atención comercial para empresas y profesionales.',
+    title: 'Cómputo y licencias',
+    text: 'Equipos, componentes y software para el trabajo y las necesidades de cada cliente.',
   },
   {
-    year: '2025',
-    title: 'Seguridad & Servidores',
-    text: 'Expansión del portafolio hacia ciberseguridad, servidores en rack y soluciones de red para el sector corporativo.',
-  },
-  {
-    year: '2026',
-    title: 'Nueva Plataforma',
-    text: 'Lanzamiento de la nueva plataforma de comercio electrónico de Grupo SYSCON.',
+    title: 'Instalación y mantenimiento',
+    text: 'Asesoría y servicios técnicos coordinados con el equipo de SYSCON en Juliaca y Puno.',
   },
 ];
 
@@ -63,28 +55,28 @@ const values = [
   },
   {
     icon: <CheckIcon size={20} />,
-    title: 'Autenticidad',
-    text: 'Comercializamos únicamente productos originales con respaldo y trazabilidad ante fabricantes de primer nivel.',
+    title: 'Calidad técnica',
+    text: 'Orientamos la selección de equipos y coordinamos instalación y mantenimiento en la región Puno.',
   },
   {
     icon: <ListCheckIcon size={20} />,
     title: 'Compromiso',
-    text: 'Asumimos cada pedido, grande o pequeño, con la máxima responsabilidad, celeridad y diligencia operativa.',
+    text: 'Atendemos a instituciones, microempresas y personas con información clara sobre cada compra.',
   },
   {
     icon: <GridIcon size={20} />,
     title: 'Innovación',
-    text: 'Actualizamos constantemente nuestras herramientas y catálogo con los últimos lanzamientos de hardware y software.',
+    text: 'Mejoramos el canal digital y la gestión de productos, compras y pedidos.',
   },
   {
     icon: <SearchIcon size={20} />,
     title: 'Transparencia',
-    text: 'Precios con IGV incluido, condiciones de garantía claras por escrito y sin tarifas ocultas al facturar.',
+    text: 'Antes de confirmar, revisa el precio, la entrega y las condiciones del producto y del comprobante.',
   },
   {
     icon: <HeadsetIcon size={20} />,
-    title: 'Soporte Técnico Real',
-    text: 'Ingenieros informáticos dedicados a resolver dudas técnicas antes, durante y después de cada compra.',
+    title: 'Atención y soporte',
+    text: 'Consulta sobre productos, instalación y mantenimiento disponibles en Juliaca y la región Puno.',
   },
 ];
 
@@ -96,8 +88,8 @@ const reasons = [
   },
   {
     icon: <ReceiptIcon size={18} />,
-    title: 'Facturación Electrónica',
-    text: 'Elige boleta o factura y registra los datos del comprobante al hacer tu pedido.',
+    title: 'Boleta o factura',
+    text: 'Indica el tipo de comprobante y registra sus datos durante el pedido.',
   },
   {
     icon: <TruckIcon size={18} />,
@@ -106,13 +98,13 @@ const reasons = [
   },
   {
     icon: <TagIcon size={18} />,
-    title: 'Precios Competitivos Mayoristas',
-    text: 'Tarifas para proyectos empresariales, licitaciones y compras por volumen.',
+    title: 'Cotizaciones para empresas',
+    text: 'Consulta las condiciones para proyectos, licitaciones y compras por volumen.',
   },
   {
     icon: <HelpIcon size={18} />,
-    title: 'Soporte Postventa Especializado',
-    text: 'Atención telefónica y vía remota por ingenieros capacitados para resolver incidencias.',
+    title: 'Servicios técnicos',
+    text: 'Consulta la disponibilidad de instalación y mantenimiento en Juliaca y la región Puno.',
   },
   {
     icon: <LockIcon size={18} />,
@@ -124,23 +116,23 @@ const reasons = [
 const steps = [
   {
     title: 'Selección y Validación',
-    text: 'Verificamos compatibilidad y requerimientos técnicos específicos para tu entorno informático antes de procesar.',
+    text: 'Revisa los detalles del catálogo o solicita orientación sobre los requerimientos de tu proyecto.',
     tag: 'Asesoría previa',
   },
   {
-    title: 'Cotización y Asesoría Clara',
-    text: 'Te proporcionamos costos desglosados con IGV, tiempos de entrega y condiciones de soporte.',
-    tag: 'Sin costos ocultos',
+    title: 'Confirmación de condiciones',
+    text: 'Consulta precio, disponibilidad, entrega y condiciones antes de confirmar la compra.',
+    tag: 'Antes de confirmar',
   },
   {
-    title: 'Procesamiento Seguro',
-    text: 'Verificamos tu pago y emitimos el comprobante electrónico correspondiente.',
-    tag: 'SUNAT',
+    title: 'Pago y comprobante',
+    text: 'Elige un medio de pago habilitado y solicita boleta o factura durante el pedido.',
+    tag: 'Estado en tu cuenta',
   },
   {
     title: 'Acompañamiento Postventa',
-    text: 'Asistencia guiada en instalación, configuración o seguimiento de despacho hasta tu plena satisfacción.',
-    tag: 'Garantía activa',
+    text: 'Los envíos se coordinan por courier a nivel nacional. Instalación y soporte se ofrecen en la región Puno.',
+    tag: 'Cobertura según servicio',
   },
 ];
 
@@ -190,16 +182,17 @@ export function About() {
       <section className="about-hero container" aria-labelledby="about-title">
         <div>
           <span className="about-pill">
-            <ShieldIcon size={13} /> Compromiso y Solvencia Tecnológica en el Perú
+            <ShieldIcon size={13} /> Tecnología y seguridad desde Juliaca
           </span>
           <h1 id="about-title">Conoce quiénes somos</h1>
           <p>
-            Trabajamos para ofrecer soluciones tecnológicas confiables, productos originales y una
-            experiencia de compra segura para empresas y profesionales en todo el país.
+            Somos Grupo Syscon S.A.C., una empresa de Juliaca que atiende a instituciones,
+            microempresas y personas. Enviamos pedidos por courier a nivel nacional y coordinamos
+            servicios técnicos en la región Puno.
           </p>
           <div className="about-hero-actions">
             <a href="#historia" className="is-primary">
-              Conocer nuestra historia ↓
+              Conocer nuestra actividad ↓
             </a>
             <Link to={accountPath('/contacto')}>
               <HeadsetIcon size={15} /> Contactar a un Asesor
@@ -207,79 +200,80 @@ export function About() {
           </div>
           <ul className="about-hero-flags">
             <li>
-              <i className="is-green" /> Facturación RUC 20 SUNAT
+              <i className="is-green" /> Boleta o factura según tu compra
             </li>
             <li>
-              <i className="is-cyan" /> Atención Personalizada
+              <i className="is-cyan" /> Servicios en Juliaca y Puno
             </li>
           </ul>
         </div>
         <figure>
-          <img src={team} alt="Equipo de Grupo SYSCON trabajando en oficina técnica" />
+          <img src={team} alt="Imagen referencial de un equipo de trabajo tecnológico" />
           <figcaption>
             <i>
               <ShieldIcon size={20} />
             </i>
             <span>
-              <strong>Empresa peruana de tecnología</strong>
-              <code>Soporte Técnico y Consultoría</code>
+              <strong>Grupo Syscon S.A.C. · Juliaca</strong>
+              <code>Imagen referencial</code>
             </span>
           </figcaption>
         </figure>
       </section>
 
-      <section className="about-band is-soft">
-        <div className="container about-identity">
-          <div className="about-brands">
-            <p className="about-eyebrow">MARCAS QUE COMERCIALIZAMOS</p>
-            <ul>
-              {brands.slice(0, 3).map((brand) => (
-                <li key={brand.name}>
-                  <ShieldIcon size={18} />
-                  <span>
-                    <strong>{brand.name}</strong>
-                    {brand.count} {brand.count === 1 ? 'producto' : 'productos'} en catálogo
-                  </span>
+      <ContentDisclosure title="Nuestra empresa y marcas">
+        <section className="about-band is-soft">
+          <div className="container about-identity">
+            <div className="about-brands">
+              <p className="about-eyebrow">MARCAS QUE COMERCIALIZAMOS</p>
+              <ul>
+                {brands.slice(0, 3).map((brand) => (
+                  <li key={brand.name}>
+                    <ShieldIcon size={18} />
+                    <span>
+                      <strong>{brand.name}</strong>
+                      {brand.count} {brand.count === 1 ? 'producto' : 'productos'} en catálogo
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div className="about-brands-box">
+                <span>
+                  <small>Condiciones por producto</small>
+                  Consulta disponibilidad y garantía
+                </span>
+                <BoxIcon size={24} />
+              </div>
+            </div>
+            <div className="about-identity-copy">
+              <p className="about-eyebrow">NUESTRA IDENTIDAD</p>
+              <h2>Tecnología para personas y empresas</h2>
+              <p>
+                Somos <strong>Grupo Syscon S.A.C.</strong>, una empresa de Juliaca, Puno, dedicada a
+                la venta de equipos de cómputo, redes, seguridad electrónica y licencias de
+                software.
+              </p>
+              <p>
+                Atendemos a instituciones, microempresas y personas. Coordinamos instalación y
+                mantenimiento en Juliaca y la región Puno; los pedidos de otras regiones se envían
+                mediante courier.
+              </p>
+              <p>
+                Consulta disponibilidad, costo de entrega y condiciones del producto antes de
+                confirmar el pedido.
+              </p>
+              <ul>
+                <li>
+                  <ReceiptIcon size={18} /> Comprobantes de compra
                 </li>
-              ))}
-            </ul>
-            <div className="about-brands-box">
-              <span>
-                <small>Condiciones por producto</small>
-                Trazabilidad Total
-              </span>
-              <BoxIcon size={24} />
+                <li>
+                  <TruckIcon size={18} /> Entrega coordinada
+                </li>
+              </ul>
             </div>
           </div>
-          <div className="about-identity-copy">
-            <p className="about-eyebrow">NUESTRA IDENTIDAD</p>
-            <h2>Respaldando la continuidad operativa del Perú</h2>
-            <p>
-              Somos <strong>Grupo SYSCON</strong>, una empresa especializada en la distribución y
-              comercialización de software original, servidores y equipamiento informático de alto
-              rendimiento para personas, instituciones y empresas en todo el Perú.
-            </p>
-            <p>
-              Nacimos con el propósito de erradicar la incertidumbre en la adquisición de
-              tecnología, brindando a cada cliente asesoramiento técnico honesto, facturación según
-              los datos del pedido y atención postventa con nuestro equipo de profesionales
-              especializados.
-            </p>
-            <p>
-              Nuestro compromiso diario es ser el aliado estratégico de su infraestructura digital,
-              asegurando continuidad operativa y el mejor retorno de inversión tecnológica.
-            </p>
-            <ul>
-              <li>
-                <ReceiptIcon size={18} /> Emisión RUC 20 / Boleta
-              </li>
-              <li>
-                <TruckIcon size={18} /> Cobertura Nacional
-              </li>
-            </ul>
-          </div>
-        </div>
-      </section>
+        </section>
+      </ContentDisclosure>
 
       <section className="about-band">
         <ul className="container about-stats">
@@ -296,165 +290,174 @@ export function About() {
         </ul>
       </section>
 
-      <section id="historia" className="about-band is-soft">
-        <div className="container">
-          <div className="about-center">
-            <p className="about-eyebrow">EVOLUCIÓN ESTRATÉGICA</p>
-            <h2>Nuestra Historia y Evolución</h2>
-            <p>
-              El camino que nos ha consolidado como un referente de confianza tecnológica en el
-              mercado corporativo y retail peruano.
-            </p>
+      <ContentDisclosure title="Conoce a SYSCON">
+        <section id="historia" className="about-band is-soft">
+          <div className="container">
+            <div className="about-center">
+              <p className="about-eyebrow">NUESTRA ACTIVIDAD</p>
+              <h2>Tecnología y atención en Juliaca</h2>
+              <p>
+                SYSCON combina la venta de tecnología con asesoría, instalación y mantenimiento para
+                atender a sus clientes en Juliaca y la región Puno.
+              </p>
+            </div>
+            <ul className="about-business-lines">
+              {businessLines.map((item) => (
+                <li key={item.title}>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </li>
+              ))}
+            </ul>
           </div>
-          <ol className="about-timeline">
-            {history.map((item, index) => (
-              <li key={item.year} className={index === history.length - 1 ? 'is-current' : ''}>
-                <span>{item.year}</span>
-                <strong>{item.title}</strong>
-                {item.text}
+        </section>
+      </ContentDisclosure>
+
+      <ContentDisclosure title="Misión y visión">
+        <section className="about-band">
+          <div className="container about-purpose">
+            <article>
+              <i>
+                <SearchIcon size={22} />
+              </i>
+              <p className="about-eyebrow is-mono">PROPÓSITO FUNDAMENTAL</p>
+              <h2>Nuestra Misión</h2>
+              <p>
+                Facilitar el acceso a tecnología y soluciones de seguridad a instituciones,
+                microempresas y personas, con información clara, cotizaciones oportunas y asistencia
+                técnica en la región.
+              </p>
+              <span>
+                <CheckIcon size={14} /> Información y cotizaciones claras
+              </span>
+            </article>
+            <article>
+              <i>
+                <StoreIcon size={22} />
+              </i>
+              <p className="about-eyebrow is-mono">DIRECCIÓN DE FUTURO</p>
+              <h2>Nuestra Visión</h2>
+              <p>
+                Ser reconocida en el sur del Perú como una empresa de tecnología y seguridad
+                electrónica con procesos integrados y un canal digital confiable.
+              </p>
+              <span>
+                <ArrowRightIcon size={14} /> Servicio en el sur del Perú
+              </span>
+            </article>
+          </div>
+        </section>
+      </ContentDisclosure>
+
+      <ContentDisclosure title="Nuestros valores">
+        <section className="about-band is-soft">
+          <div className="container">
+            <div className="about-center">
+              <p className="about-eyebrow">CULTURA DE EXCELENCIA</p>
+              <h2>Nuestros Valores Fundamentales</h2>
+              <p>
+                Principios que guían cada consulta técnica, cada venta y cada interacción con
+                nuestros clientes.
+              </p>
+            </div>
+            <ul className="about-values">
+              {values.map((value) => (
+                <li key={value.title}>
+                  <i>{value.icon}</i>
+                  <strong>{value.title}</strong>
+                  {value.text}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      </ContentDisclosure>
+
+      <ContentDisclosure title="Por qué elegir SYSCON">
+        <section className="about-band">
+          <div className="container">
+            <div className="about-center">
+              <p className="about-eyebrow">QUÉ OFRECE SYSCON</p>
+              <h2>¿Por qué elegir a Grupo SYSCON?</h2>
+              <p>
+                Compara productos y consulta las condiciones de compra y los servicios disponibles.
+              </p>
+            </div>
+            <ul className="about-reasons">
+              {reasons.map((reason) => (
+                <li key={reason.title}>
+                  <i>{reason.icon}</i>
+                  <span>
+                    <strong>{reason.title}</strong>
+                    {reason.text}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      </ContentDisclosure>
+
+      <ContentDisclosure title="Cómo comprar">
+        <section className="about-band is-soft">
+          <div className="container">
+            <div className="about-center">
+              <p className="about-eyebrow">PASOS DE COMPRA</p>
+              <h2>Cómo trabajamos: Tu compra paso a paso</h2>
+              <p>Revisa disponibilidad, pago y entrega antes de confirmar el pedido.</p>
+            </div>
+            <ol className="about-steps">
+              {steps.map((step, index) => (
+                <li key={step.title}>
+                  <code>0{index + 1}</code>
+                  <strong>{step.title}</strong>
+                  <span>{step.text}</span>
+                  <em>
+                    <CheckIcon size={13} /> {step.tag}
+                  </em>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      </ContentDisclosure>
+
+      <ContentDisclosure title="Confianza y condiciones">
+        <section className="about-trust">
+          <div className="container">
+            <div>
+              <p className="about-eyebrow is-light">INFORMACIÓN DE COMPRA</p>
+              <h2>Revisa las condiciones antes de comprar</h2>
+              <p>
+                Revisa las condiciones del producto y las opciones de entrega y pago antes de
+                confirmar tu pedido.
+              </p>
+            </div>
+            <ul>
+              <li>
+                <TruckIcon size={20} />
+                <strong>Envíos</strong>
+                <code>A nivel nacional</code>
               </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section className="about-band">
-        <div className="container about-purpose">
-          <article>
-            <i>
-              <SearchIcon size={22} />
-            </i>
-            <p className="about-eyebrow is-mono">PROPÓSITO FUNDAMENTAL</p>
-            <h2>Nuestra Misión</h2>
-            <p>
-              Brindar a empresas, profesionales y entidades soluciones de software, hardware y
-              conectividad de máxima autenticidad, facilitando su competitividad con precios justos,
-              entrega ágil y soporte técnico de clase mundial.
-            </p>
-            <span>
-              <CheckIcon size={14} /> Compromiso de Eficiencia Operativa
-            </span>
-          </article>
-          <article>
-            <i>
-              <StoreIcon size={22} />
-            </i>
-            <p className="about-eyebrow is-mono">DIRECCIÓN DE FUTURO</p>
-            <h2>Nuestra Visión</h2>
-            <p>
-              Consolidarnos como la plataforma de tecnología más confiable y preferida del mercado
-              peruano, reconocida por nuestra integridad comercial, excelencia en atención al
-              cliente y rigurosidad técnica.
-            </p>
-            <span>
-              <ArrowRightIcon size={14} /> Liderazgo Tecnológico 2026-2030
-            </span>
-          </article>
-        </div>
-      </section>
-
-      <section className="about-band is-soft">
-        <div className="container">
-          <div className="about-center">
-            <p className="about-eyebrow">CULTURA DE EXCELENCIA</p>
-            <h2>Nuestros Valores Fundamentales</h2>
-            <p>
-              Principios que guían cada consulta técnica, cada venta y cada interacción con nuestros
-              clientes.
-            </p>
-          </div>
-          <ul className="about-values">
-            {values.map((value) => (
-              <li key={value.title}>
-                <i>{value.icon}</i>
-                <strong>{value.title}</strong>
-                {value.text}
+              <li>
+                <CheckIcon size={20} />
+                <strong>Atención local</strong>
+                <code>Juliaca y Puno</code>
               </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section className="about-band">
-        <div className="container">
-          <div className="about-center">
-            <p className="about-eyebrow">DIFERENCIALES COMPETITIVOS</p>
-            <h2>¿Por qué elegir a Grupo SYSCON?</h2>
-            <p>Brindamos certezas comerciales y técnicas en cada etapa de adquisición.</p>
-          </div>
-          <ul className="about-reasons">
-            {reasons.map((reason) => (
-              <li key={reason.title}>
-                <i>{reason.icon}</i>
-                <span>
-                  <strong>{reason.title}</strong>
-                  {reason.text}
-                </span>
+              <li>
+                <ReceiptIcon size={20} />
+                <strong>Comprobante</strong>
+                <code>Boleta o factura</code>
               </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section className="about-band is-soft">
-        <div className="container">
-          <div className="about-center">
-            <p className="about-eyebrow">METODOLOGÍA CLARA</p>
-            <h2>Cómo trabajamos: Tu compra paso a paso</h2>
-            <p>
-              Un flujo ágil diseñado para garantizar que recibas la solución exacta que tu
-              infraestructura demanda.
-            </p>
-          </div>
-          <ol className="about-steps">
-            {steps.map((step, index) => (
-              <li key={step.title}>
-                <code>0{index + 1}</code>
-                <strong>{step.title}</strong>
-                <span>{step.text}</span>
-                <em>
-                  <CheckIcon size={13} /> {step.tag}
-                </em>
+              <li>
+                <ShieldIcon size={20} />
+                <strong>Condiciones</strong>
+                <code>Por producto</code>
               </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section className="about-trust">
-        <div className="container">
-          <div>
-            <p className="about-eyebrow is-light">GARANTÍA CORPORATIVA SYSCON</p>
-            <h2>Tu confianza es nuestra prioridad número uno</h2>
-            <p>
-              Revisa las condiciones del producto y las opciones de entrega y pago antes de
-              confirmar tu pedido.
-            </p>
+            </ul>
           </div>
-          <ul>
-            <li>
-              <LockIcon size={20} />
-              <strong>Conexión</strong>
-              <code>Segura</code>
-            </li>
-            <li>
-              <CheckIcon size={20} />
-              <strong>Fabricantes</strong>
-              <code>Respaldo Directo</code>
-            </li>
-            <li>
-              <BuildingIcon size={20} />
-              <strong>SUNAT</strong>
-              <code>Factura RUC 20</code>
-            </li>
-            <li>
-              <ShieldIcon size={20} />
-              <strong>Garantía</strong>
-              <code>Escrita de Fábrica</code>
-            </li>
-          </ul>
-        </div>
-      </section>
+        </section>
+      </ContentDisclosure>
 
       <section className="about-band">
         <div className="container">

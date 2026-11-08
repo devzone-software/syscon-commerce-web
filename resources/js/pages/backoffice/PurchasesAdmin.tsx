@@ -66,9 +66,10 @@ function PurchaseForm({ products, onSaved }: { products: Product[]; onSaved: () 
       noValidate
       aria-labelledby="purchase-title"
     >
-      <h2 id="purchase-title">Registrar compra al por mayor</h2>
+      <h2 id="purchase-title">Registrar compra recibida</h2>
       <p className="muted">
-        Las unidades se suman al stock y quedan disponibles para la venta al{' '}
+        Registra únicamente mercadería que ya recibiste. Al guardar, las unidades se suman
+        inmediatamente al stock y quedan disponibles para la venta al{' '}
         <strong>precio del catálogo</strong>; el costo unitario se guarda como último costo del
         producto.
       </p>
@@ -92,7 +93,7 @@ function PurchaseForm({ products, onSaved }: { products: Product[]; onSaved: () 
           />
         </label>
       </div>
-      <div className="table-wrap">
+      <div className="table-wrap responsive-table is-entry">
         <table className="data-table">
           <thead>
             <tr>
@@ -117,7 +118,7 @@ function PurchaseForm({ products, onSaved }: { products: Product[]; onSaved: () 
               const subtotal = Number(line.quantity) * Number(line.unitCost);
               return (
                 <tr key={index}>
-                  <td>
+                  <td data-label="Producto">
                     <select
                       aria-label={`Producto de la línea ${index + 1}`}
                       value={line.productId}
@@ -137,7 +138,7 @@ function PurchaseForm({ products, onSaved }: { products: Product[]; onSaved: () 
                       </small>
                     )}
                   </td>
-                  <td className="num">
+                  <td data-label="Cantidad" className="num">
                     <input
                       aria-label={`Cantidad de la línea ${index + 1}`}
                       type="number"
@@ -147,7 +148,7 @@ function PurchaseForm({ products, onSaved }: { products: Product[]; onSaved: () 
                       onChange={(e) => setLine(index, { quantity: e.target.value })}
                     />
                   </td>
-                  <td className="num">
+                  <td data-label="Costo unitario (S/)" className="num">
                     <input
                       aria-label={`Costo unitario de la línea ${index + 1}`}
                       inputMode="decimal"
@@ -159,10 +160,10 @@ function PurchaseForm({ products, onSaved }: { products: Product[]; onSaved: () 
                       <small className="field-error">Igual o mayor que el precio de venta</small>
                     )}
                   </td>
-                  <td className="num">
+                  <td data-label="Subtotal" className="num">
                     {Number.isFinite(subtotal) && subtotal > 0 ? money(subtotal) : '—'}
                   </td>
-                  <td className="num">
+                  <td data-label="Quitar" className="num">
                     {lines.length > 1 && (
                       <button
                         type="button"
@@ -206,7 +207,7 @@ function PurchaseForm({ products, onSaved }: { products: Product[]; onSaved: () 
       )}
       <div className="form-actions">
         <button type="submit" className="button button-primary" disabled={busy}>
-          {busy ? 'Registrando…' : 'Registrar compra'}
+          {busy ? 'Registrando…' : 'Registrar ingreso de compra'}
         </button>
       </div>
     </form>
@@ -222,7 +223,7 @@ export function PurchasesAdmin() {
   return (
     <>
       <PageHeader
-        title="Compras al por mayor"
+        title="Compras a proveedores"
         description="Mercadería comprada a proveedores a precio de mayorista que ingresa al inventario para venderse en tienda."
       />
       {products.loading ? (
@@ -247,7 +248,7 @@ export function PurchasesAdmin() {
           <ErrorBox message={error} retry={reload} />
         ) : data?.items.length ? (
           <>
-            <div className="table-wrap">
+            <div className="table-wrap responsive-table">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -268,8 +269,8 @@ export function PurchasesAdmin() {
                 <tbody>
                   {data.items.map((purchase) => (
                     <tr key={purchase.id}>
-                      <td>{formatDateTime(purchase.createdAt)}</td>
-                      <td>
+                      <td data-label="Fecha">{formatDateTime(purchase.createdAt)}</td>
+                      <td data-label="Proveedor">
                         <strong>{purchase.supplierName}</strong>
                         {purchase.documentRef && <small>{purchase.documentRef}</small>}
                         {open === purchase.id && (
@@ -297,12 +298,14 @@ export function PurchasesAdmin() {
                           </ul>
                         )}
                       </td>
-                      <td className="num">
+                      <td data-label="Productos" className="num">
                         {purchase.items.reduce((sum, item) => sum + item.quantity, 0)}
                       </td>
-                      <td className="num">{money(Number(purchase.total))}</td>
-                      <td>{purchase.createdBy ?? '—'}</td>
-                      <td className="num">
+                      <td data-label="Total" className="num">
+                        {money(Number(purchase.total))}
+                      </td>
+                      <td data-label="Registró">{purchase.createdBy ?? '—'}</td>
+                      <td data-label="Detalle" className="num">
                         <button
                           type="button"
                           className="link-button"

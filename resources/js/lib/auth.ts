@@ -1,6 +1,6 @@
 import type { User } from '../types';
 
-/** Roles issued by auth-service (claim `authorities`, prefixed with ROLE_). */
+/** Roles returned by the platform, prefixed with ROLE_. */
 export const roleLabels: Record<string, string> = {
   ROLE_SUPERADMIN: 'Superadministrador',
   ROLE_ADMIN: 'Administrador',
@@ -16,7 +16,7 @@ export const accountStatusLabels: Record<string, string> = {
 
 export const roleLabel = (role: string) => roleLabels[role] ?? role.replace(/^ROLE_/, '');
 
-/** Permissions checked by the Java services with @PreAuthorize. */
+/** Permissions returned by the platform and used to filter frontend tasks. */
 export const permissions = {
   catalogWrite: 'catalog:write',
   ordersManage: 'orders:manage',
@@ -54,7 +54,7 @@ export const loginDestination = (user: User, requested?: unknown) =>
 export const safeRedirect = (value: unknown, fallback = '/cuenta') =>
   typeof value === 'string' && /^\/(?![/\\])/.test(value) ? value : fallback;
 
-/** auth-service only stores the e-mail, so the visible name comes from its local part. */
+/** Email-based fallback when a profile has no registered name. */
 const emailWords = (email: string) =>
   email
     .split('@')[0]
@@ -84,16 +84,9 @@ export function initials(user: Identity) {
   return letters.toUpperCase();
 }
 
-/** The backend only enforces the length; the other rules feed the strength meter. */
+/** Keep the client-side minimum aligned with registration and password-change APIs. */
 export const MIN_PASSWORD = 12;
-export function passwordChecks(password: string) {
-  const checks = [
-    { label: `Mín. ${MIN_PASSWORD} caract.`, ok: password.length >= MIN_PASSWORD },
-    { label: 'Mayús. y minús.', ok: /[a-zà-ÿñ]/.test(password) && /[A-ZÀ-ÝÑ]/.test(password) },
-    { label: 'Al menos 1 núm.', ok: /\d/.test(password) },
-    { label: 'Carácter especial', ok: /[^\p{L}\d]/u.test(password) },
-  ];
-  const passed = checks.filter((check) => check.ok).length;
-  const strength = !password ? '' : passed <= 1 ? 'Débil' : passed <= 3 ? 'Media' : 'Fuerte';
-  return { checks, passed, strength };
+export function passwordRequirementStatus(password: string) {
+  const remaining = Math.max(0, MIN_PASSWORD - password.length);
+  return { remaining, complete: remaining === 0 };
 }

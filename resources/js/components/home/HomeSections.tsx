@@ -5,9 +5,6 @@ import b2bIcon from '../../../images/home/b2b-building.svg';
 import b2bMailIcon from '../../../images/home/b2b-mail.svg';
 import heroBagIcon from '../../../images/home/hero-bag.svg';
 import heroFireIcon from '../../../images/home/hero-fire.svg';
-import heroReceiptIcon from '../../../images/home/hero-receipt.svg';
-import heroTruckIcon from '../../../images/home/hero-truck.svg';
-import heroVerifiedIcon from '../../../images/home/hero-verified.svg';
 import promoArrowIcon from '../../../images/home/arrow-right-dark.svg';
 import promoImage from '../../../images/home/promo-security.jpg';
 import trustBoltIcon from '../../../images/home/trust-bolt.svg';
@@ -17,7 +14,9 @@ import trustSupportIcon from '../../../images/home/trust-support.svg';
 import { catalogParams, type CatalogGroup } from '../../lib/catalog';
 import { categoryIcon } from '../../lib/categoryIcon';
 import type { Product } from '../../types';
+import { money } from '../../state';
 import { ProductCard } from '../../ui';
+import { ProductImage } from '../ProductImage';
 import { ChevronLeftIcon, ChevronRightIcon } from '../icons';
 import '../../../css/storefront.css';
 
@@ -25,11 +24,11 @@ const lowPriceCatalog = `/catalogo?${catalogParams.onlyAvailable}=1&${catalogPar
 
 const trust = [
   { icon: trustLockIcon, title: 'Compra segura', text: 'Medios de pago informados al comprar' },
-  { icon: trustBoltIcon, title: 'Entrega rápida', text: 'Procesamos rápidamente tus pedidos' },
+  { icon: trustBoltIcon, title: 'Entrega coordinada', text: 'Consulta las opciones al comprar' },
   { icon: trustSupportIcon, title: 'Soporte técnico', text: 'Atención especializada IT' },
   {
     icon: trustShieldIcon,
-    title: 'Garantía oficial',
+    title: 'Garantía por producto',
     text: 'Consulta las condiciones por producto',
   },
 ];
@@ -63,9 +62,9 @@ const heroSlides: {
 }[] = [
   {
     tone: '',
-    label: 'Distribuidor oficial IT & licenciamiento digital',
-    title: 'Soluciones de Cómputo, Servidores y Software Original para Empresas y Profesionales',
-    text: 'Distribuidor oficial de licencias digitales, hardware para estaciones de trabajo, componentes de alto rendimiento y seguridad informática empresarial.',
+    label: 'Tecnología y licenciamiento para empresas',
+    title: 'Tecnología para tu trabajo y tu negocio',
+    text: 'Licencias digitales, hardware para estaciones de trabajo, componentes de alto rendimiento y seguridad informática empresarial.',
     primary: { to: '/catalogo', label: 'Ver productos', icon: heroBagIcon },
     secondary: { to: lowPriceCatalog, label: 'Explorar por precio', icon: heroFireIcon },
   },
@@ -89,28 +88,35 @@ const heroSlides: {
     tone: 'is-payment',
     label: 'Compra en línea',
     title: 'Consulta los medios de pago disponibles',
-    text: 'Elige una modalidad de entrega habilitada y sigue tu pedido desde Mis compras.',
+    text: 'Elige una modalidad de entrega habilitada y sigue tu pedido desde Mis pedidos.',
     primary: { to: '/catalogo', label: 'Comprar ahora', icon: heroBagIcon },
-    secondary: { to: '/cuenta/pedidos', label: 'Mis compras' },
+    secondary: { to: '/cuenta/pedidos', label: 'Mis pedidos' },
   },
 ];
 
 /** Time each slide stays visible while the carousel plays on its own. */
 const HERO_INTERVAL = 6000;
 
-export function HomeHero() {
+export function HomeHero({
+  products = [],
+  lowestProduct,
+}: {
+  products?: Product[];
+  lowestProduct?: Product | null;
+}) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [userPaused, setUserPaused] = useState(false);
   const touchStart = useRef<number | null>(null);
   const total = heroSlides.length;
   const go = (next: number) => setIndex((next + total) % total);
 
   useEffect(() => {
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    if (paused || reduced) return;
+    if (paused || userPaused || reduced) return;
     const timer = window.setTimeout(() => setIndex((value) => (value + 1) % total), HERO_INTERVAL);
     return () => window.clearTimeout(timer);
-  }, [index, paused, total]);
+  }, [index, paused, userPaused, total]);
 
   return (
     <section
@@ -135,9 +141,11 @@ export function HomeHero() {
         if (Math.abs(delta) > 50) go(index + (delta < 0 ? 1 : -1));
       }}
     >
+      <h1 className="visually-hidden">SYSCON: tecnología, redes y seguridad</h1>
       <div className="home-carousel-track" style={{ transform: `translateX(-${index * 100}%)` }}>
         {heroSlides.map((slide, i) => {
-          const Title = i === 0 ? 'h1' : 'h2';
+          const product =
+            i === 1 ? (lowestProduct ?? products[0]) : products[i % Math.max(1, products.length)];
           return (
             <div
               key={slide.title}
@@ -148,33 +156,41 @@ export function HomeHero() {
               aria-hidden={i !== index}
               inert={i !== index}
             >
-              <span className="home-hero-label">
-                <i aria-hidden="true" /> {slide.label}
-              </span>
-              <Title>{slide.title}</Title>
-              <p>{slide.text}</p>
-              <div className="home-hero-actions">
-                {[slide.primary, slide.secondary].map((action, n) => (
-                  <Link
-                    key={action.to}
-                    className={n === 0 ? 'home-hero-primary' : 'home-hero-secondary'}
-                    to={action.to}
-                  >
-                    {action.icon && <img src={action.icon} alt="" />} {action.label}
-                  </Link>
-                ))}
+              <div className="home-hero-copy">
+                <span className="home-hero-label">
+                  <i aria-hidden="true" /> {slide.label}
+                </span>
+                <h2>{slide.title}</h2>
+                <p>{slide.text}</p>
+                <div className="home-hero-actions">
+                  {[slide.primary, slide.secondary].map((action, n) => (
+                    <Link
+                      key={action.to}
+                      className={n === 0 ? 'home-hero-primary' : 'home-hero-secondary'}
+                      to={action.to}
+                    >
+                      {action.icon && <img src={action.icon} alt="" />} {action.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
-              <ul className="home-hero-badges">
-                <li>
-                  <img src={heroVerifiedIcon} alt="" /> Consulta las condiciones de garantía
-                </li>
-                <li>
-                  <img src={heroReceiptIcon} alt="" /> Boleta o factura según tu pedido
-                </li>
-                <li>
-                  <img src={heroTruckIcon} alt="" /> Entrega según opciones del checkout
-                </li>
-              </ul>
+              <div className="home-hero-feature">
+                {product ? (
+                  <Link className="home-hero-product" to={`/producto/${product.id}`}>
+                    <span className="home-feature-media">
+                      <ProductImage product={product} loading="eager" />
+                    </span>
+                    <span className="home-feature-details">
+                      <small>DEL CATÁLOGO</small>
+                      <strong>{product.name}</strong>
+                      <b>{money(Number(product.price))}</b>
+                      <span>Ver producto →</span>
+                    </span>
+                  </Link>
+                ) : (
+                  <div className="home-feature-placeholder" aria-hidden="true" />
+                )}
+              </div>
             </div>
           );
         })}
@@ -194,6 +210,14 @@ export function HomeHero() {
         onClick={() => go(index + 1)}
       >
         <ChevronRightIcon size={22} />
+      </button>
+      <button
+        type="button"
+        className="home-carousel-pause"
+        aria-pressed={userPaused}
+        onClick={() => setUserPaused(!userPaused)}
+      >
+        {userPaused ? 'Reanudar' : 'Pausar'} carrusel
       </button>
       <div className="home-carousel-dots">
         {heroSlides.map((slide, i) => (
@@ -238,16 +262,30 @@ export function CategoryShowcase({ categories }: { categories: CatalogGroup[] })
   );
 }
 
-export function FeaturedProducts({ products }: { products: Product[] }) {
+export function FeaturedProducts({
+  products,
+  availableFrom,
+}: {
+  products: Product[];
+  availableFrom: number | null;
+}) {
   return (
     <section className="home-block" aria-labelledby="home-featured">
       <div className="section-head">
         <div className="section-title">
-          <p className="section-eyebrow">Tecnología para tu empresa</p>
-          <h2 id="home-featured">Productos destacados</h2>
+          <p className="section-eyebrow">Precios actuales del catálogo</p>
+          <h2 id="home-featured">Explora productos y precios</h2>
         </div>
-        <Link className="section-pill" to={lowPriceCatalog}>
-          Explorar por precio
+        <Link
+          className="section-pill"
+          to={availableFrom === null ? '/catalogo' : lowPriceCatalog}
+          aria-label={
+            availableFrom === null
+              ? 'Ver catálogo'
+              : `Ver catálogo disponible desde ${money(availableFrom)}, de menor a mayor precio`
+          }
+        >
+          {availableFrom === null ? 'Ver catálogo' : `Catálogo desde ${money(availableFrom)}`}
         </Link>
       </div>
       <div className="featured-grid">
@@ -288,8 +326,8 @@ export function B2BBanner() {
         <div>
           <h2 id="home-b2b">¿Necesitas cotización corporativa por volumen?</h2>
           <p>
-            Emitimos Facturas electrónicas con RUC, contratos de licenciamiento corporativo (CSP /
-            Open) y condiciones para compras de instituciones públicas y privadas.
+            Cuéntanos qué productos y cantidades necesitas. Nuestro equipo te orienta sobre
+            disponibilidad, entrega y el comprobante de tu compra.
           </p>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { money, useShop } from '../state';
@@ -7,8 +7,10 @@ import { ProductImage } from '../components/ProductImage';
 import { InfoRows } from '../components/cart/OrderSummary';
 import { PageSection } from '../components/layout/PageHero';
 import { QuantityStepper } from '../components/shared/QuantityStepper';
+import { DeliveryPreview } from '../components/product/DeliveryPreview';
+import { ProductComparison } from '../components/product/ProductComparison';
 import { CartIcon, HeadsetIcon, ReceiptIcon, ShieldIcon, TruckIcon } from '../components/icons';
-import { relatedProducts } from '../lib/catalog';
+import { relatedProducts, productSpecifications, productInquiryUrl } from '../lib/catalog';
 import { useData, Loading, Empty, ProductCard } from '../ui';
 import '../../css/storefront.css';
 
@@ -26,6 +28,8 @@ export function ProductPage() {
   const { cart } = useShop();
   const confirmAdd = useConfirmAdd();
   const [quantity, setQuantity] = useState(1);
+  const buyRef = useRef<HTMLDivElement>(null);
+  const [showQuickBuy, setShowQuickBuy] = useState(false);
 
   useEffect(() => {
     setQuantity(1);
@@ -35,6 +39,16 @@ export function ProductPage() {
     () => (data && catalog.data ? relatedProducts(data, catalog.data) : []),
     [data, catalog.data],
   );
+
+  useEffect(() => {
+    const target = buyRef.current;
+    if (!target || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(([entry]) => setShowQuickBuy(!entry.isIntersecting), {
+      threshold: 0.15,
+    });
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [data?.id]);
 
   if (loading)
     return (
@@ -66,17 +80,15 @@ export function ProductPage() {
   const remaining = Math.max(0, data.stock - inCart);
   const units = Math.min(quantity, Math.max(1, remaining));
   const description = data.description?.trim();
-  const specifications = (data.specifications ?? '')
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const specifications = productSpecifications(data.specifications);
+  const inquiryUrl = productInquiryUrl(data);
   const addToCart = () => {
     confirmAdd(data, units);
     setQuantity(1);
   };
 
   return (
-    <>
+    <div className="product-view">
       <section className="product-hero">
         <div className="container">
           <nav className="breadcrumb" aria-label="Ruta de navegación">
@@ -94,10 +106,7 @@ export function ProductPage() {
             <span aria-hidden="true">/</span> <span aria-current="page">{data.name}</span>
           </nav>
           <div className="product-detail">
-            <div className="product-detail-media">
-              <ProductImage product={data} loading="eager" />
-            </div>
-            <div className="product-detail-info">
+            <header className="product-detail-heading">
               <p className="product-detail-eyebrow">{data.category}</p>
               <h1>{data.name}</h1>
               <p className="product-detail-sub">
@@ -106,14 +115,31 @@ export function ProductPage() {
               <a className="product-info-link" href="#product-information">
                 Ver descripción y características
               </a>
-              <p className="product-detail-price">{money(Number(data.price))}</p>
-              <p className={`product-detail-stock${data.stock < 1 ? ' out' : ''}`}>
-                <i aria-hidden="true" /> {data.stock < 1 ? 'Agotado' : 'Disponible'}
-              </p>
+            </header>
+            <div className="product-detail-media">
+              <ProductImage product={data} loading="eager" />
+            </div>
+            <div className="product-detail-info">
+              <div className="product-price-row">
+                <p className="product-detail-price">{money(Number(data.price))}</p>
+                <p className={`product-detail-stock${data.stock < 1 ? ' out' : ''}`}>
+                  <i aria-hidden="true" /> {data.stock < 1 ? 'Agotado' : 'Disponible'}
+                </p>
+              </div>
               <p className="product-price-note">
                 Precio por unidad. La entrega se elige en el checkout.
               </p>
-              <div className="product-buy">
+              {specifications.length > 0 && (
+                <ul
+                  className="product-highlights"
+                  aria-label="Características publicadas destacadas"
+                >
+                  {specifications.slice(0, 3).map((line, index) => (
+                    <li key={index}>{line.text}</li>
+                  ))}
+                </ul>
+              )}
+              <div className="product-buy" ref={buyRef}>
                 {remaining > 0 ? (
                   <>
                     <QuantityStepper
@@ -139,9 +165,10 @@ export function ProductPage() {
                   Tienes {inCart} {inCart === 1 ? 'unidad' : 'unidades'} en tu carrito.
                 </p>
               )}
-              <Link className="product-info-link" to="/contacto">
+              <Link className="product-info-link product-consult" to={inquiryUrl}>
                 <HeadsetIcon size={16} /> Consultar este producto
               </Link>
+              <DeliveryPreview />
               <ul className="product-perks">
                 {perks.map(({ icon, text }) => (
                   <li key={text}>
@@ -162,21 +189,18 @@ export function ProductPage() {
             <table className="product-specifications">
               <caption className="visually-hidden">Características técnicas de {data.name}</caption>
               <tbody>
-                {specifications.map((line, index) => {
-                  const separator = line.indexOf(':');
-                  const label = line.slice(0, separator).trim();
-                  const value = line.slice(separator + 1).trim();
-                  return separator > 0 && value ? (
+                {specifications.map(({ label, value, text }, index) =>
+                  label ? (
                     <tr key={index}>
                       <th scope="row">{label}</th>
                       <td>{value}</td>
                     </tr>
                   ) : (
                     <tr key={index}>
-                      <td colSpan={2}>{line}</td>
+                      <td colSpan={2}>{text}</td>
                     </tr>
-                  );
-                })}
+                  ),
+                )}
               </tbody>
             </table>
           </section>
@@ -184,7 +208,7 @@ export function ProductPage() {
         {!description && !specifications.length && (
           <p className="product-information-empty">
             Las características técnicas todavía no están publicadas.{' '}
-            <Link to="/contacto">Consulta con nuestro equipo antes de comprar.</Link>
+            <Link to={inquiryUrl}>Consulta con nuestro equipo antes de comprar.</Link>
           </p>
         )}
         <InfoRows
@@ -198,6 +222,7 @@ export function ProductPage() {
       </PageSection>
       {related.length > 0 && (
         <PageSection title={data.category ? `Más en ${data.category}` : `Más de ${data.brand}`}>
+          <ProductComparison product={data} alternatives={related} />
           <div className="featured-grid">
             {related.map((product) => (
               <ProductCard key={product.id} product={product} />
@@ -205,6 +230,17 @@ export function ProductPage() {
           </div>
         </PageSection>
       )}
-    </>
+      {showQuickBuy && remaining > 0 && (
+        <aside className="product-quick-buy" aria-label="Compra rápida">
+          <span>
+            <small>Precio por unidad</small>
+            <strong>{money(Number(data.price))}</strong>
+          </span>
+          <button type="button" className="flow-button" onClick={addToCart}>
+            <CartIcon /> Agregar
+          </button>
+        </aside>
+      )}
+    </div>
   );
 }

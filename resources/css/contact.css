@@ -297,25 +297,6 @@
 .contact-form textarea {
   resize: vertical;
 }
-.contact-form .contact-consent {
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 10px;
-}
-.contact-consent input {
-  width: 16px;
-  height: 16px;
-  margin-top: 2px;
-  padding: 0;
-  accent-color: #00265d;
-}
-.contact-form .contact-consent span {
-  display: block;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 18px;
-  color: #434751;
-}
 .contact-submit {
   display: flex;
   align-items: center;

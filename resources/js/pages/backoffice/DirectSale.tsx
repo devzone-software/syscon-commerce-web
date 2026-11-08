@@ -1,24 +1,21 @@
+import { CustomerPicker } from '../../components/backoffice/CustomerPicker';
+import { SaleResult } from '../../components/backoffice/SaleResult';
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { PageHeader } from '../../components/backoffice/PageHeader';
 import { BillingFields } from '../../components/checkout/BillingFields';
 import {
   billingPayload,
-  invoiceFileUrl,
-  invoiceStatusLabels,
   invoiceTypeLabel,
-  taxPercent,
   validateBilling,
   type BillingForm,
 } from '../../lib/billing';
 import { addToCart, cartTotal, setCartQuantity } from '../../lib/cart';
 import { matchesQuery } from '../../lib/catalog';
-import { shortId, statusLabel } from '../../lib/orders';
 import {
   billingForCustomer,
   cashChange,
   paymentError,
-  paymentMethodLabel,
   paymentMethods,
   type SalePayment,
 } from '../../lib/sales';
@@ -34,148 +31,6 @@ const emptyBilling: BillingForm = {
   name: '',
   address: '',
 };
-
-/** Registered customer search; without one the sale goes to the counter account. */
-function CustomerPicker({
-  customer,
-  onPick,
-}: {
-  customer: CustomerMatch | null;
-  onPick: (customer: CustomerMatch | null) => void;
-}) {
-  const [q, setQ] = useState('');
-  const [results, setResults] = useState<CustomerMatch[] | null>(null);
-  const [error, setError] = useState('');
-  const search = async () => {
-    setError('');
-    if (q.trim().length < 2) return setError('Escribe al menos 2 caracteres.');
-    try {
-      setResults(await api.searchCustomers(q.trim()));
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  };
-  if (customer)
-    return (
-      <p className="notice">
-        Cliente: <strong>{customer.name ?? customer.email}</strong> · {customer.email}
-        {customer.documentNumber && ` · ${customer.documentNumber}`}.{' '}
-        <button type="button" className="link-button" onClick={() => onPick(null)}>
-          Cambiar a cliente de mostrador
-        </button>
-      </p>
-    );
-  return (
-    <div className="form-stack">
-      <p className="muted">
-        Sin cliente registrado la venta queda en la cuenta de mostrador (no recibe correos). Busca
-        un cliente para asociarle la compra y enviarle su comprobante.
-      </p>
-      <div className="bo-lookup">
-        <label className="field">
-          Buscar cliente registrado
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                search();
-              }
-            }}
-            placeholder="Correo, nombre o DNI/RUC"
-          />
-        </label>
-        <button type="button" className="button button-secondary" onClick={search}>
-          Buscar
-        </button>
-      </div>
-      {error && <small className="field-error">{error}</small>}
-      {results &&
-        (results.length ? (
-          <ul className="bo-simple-list">
-            {results.map((item) => (
-              <li key={item.id}>
-                <span>
-                  <strong>{item.name ?? item.email}</strong>
-                  <small>
-                    {item.email}
-                    {item.documentNumber && ` · ${item.documentType} ${item.documentNumber}`}
-                  </small>
-                </span>
-                <button type="button" className="link-button" onClick={() => onPick(item)}>
-                  Elegir
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="muted">Sin coincidencias.</p>
-        ))}
-    </div>
-  );
-}
-
-/** Outcome of the sale and of the optional receipt submission. */
-function SaleResult({
-  sale,
-  invoice,
-  invoiceError,
-  change,
-  onNew,
-}: {
-  sale: StoreSale;
-  invoice: Invoice | null;
-  invoiceError: string;
-  change: number;
-  onNew: () => void;
-}) {
-  return (
-    <section className="bo-card form-stack" aria-labelledby="sale-done-title">
-      <h2 id="sale-done-title">Venta registrada</h2>
-      <p className="notice success" role="status">
-        Pedido {shortId(sale.id)} cobrado con {paymentMethodLabel(sale.payment?.provider ?? '')} por{' '}
-        {money(Number(sale.total))} y entregado.
-        {change > 0 && ` Vuelto: ${money(change)}.`}
-      </p>
-      {sale.taxes && (
-        <p className="muted">
-          Op. gravada {money(Number(sale.taxes.taxableAmount))} · IGV {taxPercent(sale.taxes.rate)}{' '}
-          {money(Number(sale.taxes.taxAmount))}
-        </p>
-      )}
-      {invoice && (
-        <p className={invoice.status === 'ACCEPTED' ? 'notice success' : 'notice'}>
-          {invoiceTypeLabel(invoice.type)} {invoice.serialNumber}:{' '}
-          {statusLabel(invoiceStatusLabels, invoice.status)}
-          {invoice.sunatDescription && ` — ${invoice.sunatDescription}`}
-          {invoice.error && ` — ${invoice.error}`}{' '}
-          <a href={invoiceFileUrl(invoice.id, 'pdf')} target="_blank" rel="noopener">
-            Ver / imprimir PDF
-          </a>
-        </p>
-      )}
-      {invoiceError && (
-        <ErrorBox
-          message={`La venta se registró, pero el comprobante no: ${invoiceError}. Puedes emitirlo desde Comprobantes.`}
-        />
-      )}
-      <div className="form-actions">
-        <Link className="link-button" to={`/admin/pedidos?id=${sale.id}`}>
-          Ver pedido
-        </Link>
-        {!invoice && (
-          <Link className="link-button" to={`/admin/facturacion?pedido=${sale.id}`}>
-            Emitir comprobante
-          </Link>
-        )}
-        <button type="button" className="button button-primary" onClick={onNew}>
-          Nueva venta
-        </button>
-      </div>
-    </section>
-  );
-}
 
 export function DirectSale() {
   const catalog = useData(api.products);
@@ -203,6 +58,8 @@ export function DirectSale() {
   } | null>(null);
 
   const total = cartTotal(lines);
+  const cashOpen = cash.data?.status === 'OPEN';
+  const cashUnavailable = cash.loading || Boolean(cash.error) || !cashOpen;
   const matches =
     query.trim().length >= 2 && catalog.data
       ? catalog.data.filter((p) => p.active && matchesQuery(p, query)).slice(0, 8)
@@ -229,6 +86,8 @@ export function DirectSale() {
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setError('');
+    if (!cash.data || cash.loading || cash.error)
+      return setError('Abre una caja antes de cobrar esta venta.');
     const found = validateBilling(billing, total);
     setBillingErrors(found);
     if (!lines.length) return setError('Agrega al menos un producto.');
@@ -285,11 +144,13 @@ export function DirectSale() {
         title="Venta directa"
         description="Venta en tienda: el precio, el stock y el IGV los valida el sistema; el pago queda aprobado y el pedido entregado al registrar."
       />
-      {cash.data === null && !cash.loading && (
+      {cash.error ? (
+        <ErrorBox message="No pudimos comprobar el estado de la caja." retry={cash.reload} />
+      ) : !cash.loading && !cashOpen ? (
         <p className="notice error" role="alert">
           No tienes una caja abierta: ábrela en <Link to="/admin/caja">Caja</Link> antes de cobrar.
         </p>
-      )}
+      ) : null}
       <form onSubmit={submit} noValidate className="bo-detail-grid">
         <section className="bo-card form-stack" aria-labelledby="sale-products-title">
           <h2 id="sale-products-title">Productos</h2>
@@ -333,7 +194,7 @@ export function DirectSale() {
             </>
           )}
           {lines.length > 0 ? (
-            <div className="table-wrap">
+            <div className="table-wrap responsive-table is-entry">
               <table className="data-table">
                 <caption className="visually-hidden">Productos de la venta</caption>
                 <thead>
@@ -353,13 +214,13 @@ export function DirectSale() {
                 <tbody>
                   {lines.map((line) => (
                     <tr key={line.product.id}>
-                      <td>
+                      <td data-label="Producto">
                         <strong>{line.product.name}</strong>
                         <small>
                           {money(Number(line.product.price))} c/u · stock {line.product.stock}
                         </small>
                       </td>
-                      <td className="num">
+                      <td data-label="Cantidad" className="num">
                         <input
                           type="number"
                           min={1}
@@ -374,8 +235,10 @@ export function DirectSale() {
                           style={{ width: '5em' }}
                         />
                       </td>
-                      <td className="num">{money(Number(line.product.price) * line.quantity)}</td>
-                      <td className="num">
+                      <td data-label="Importe" className="num">
+                        {money(Number(line.product.price) * line.quantity)}
+                      </td>
+                      <td data-label="Quitar" className="num">
                         <button
                           type="button"
                           className="link-button"
@@ -411,6 +274,7 @@ export function DirectSale() {
           <h2 id="sale-customer-title">Cliente y comprobante</h2>
           <CustomerPicker customer={customer} onPick={pickCustomer} />
           <BillingFields
+            context="staff"
             type={billing.type}
             form={billing}
             errors={billingErrors}
@@ -469,14 +333,16 @@ export function DirectSale() {
           {payError && <small className="field-error">{payError}</small>}
           <label className="facet-option">
             <input type="checkbox" checked={issue} onChange={(e) => setIssue(e.target.checked)} />
-            <span>Emitir {invoiceTypeLabel(billing.type).toLowerCase()} y enviarla a SUNAT</span>
+            <span>
+              Solicitar emisión electrónica de {invoiceTypeLabel(billing.type).toLowerCase()}
+            </span>
           </label>
           {error && <ErrorBox message={error} />}
           <div className="form-actions">
             <button
               type="submit"
               className="button button-primary"
-              disabled={busy || !lines.length}
+              disabled={busy || !lines.length || cashUnavailable}
             >
               {busy ? 'Registrando…' : `Cobrar ${money(total)}`}
             </button>
