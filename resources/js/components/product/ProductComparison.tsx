@@ -1,3 +1,4 @@
+import { publicBrand, publicProductCode } from '../../lib/productPresentation';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { money } from '../../state';
@@ -29,8 +30,8 @@ export function ProductComparison({
   const keys = [...new Set([...left.keys(), ...right.keys()])];
   const rows = [
     ['Precio por unidad', money(Number(product.price)), money(Number(other.price))],
-    ['Marca', product.brand || 'No publicada', other.brand || 'No publicada'],
-    ['SKU', product.sku, other.sku],
+    ['Marca', publicBrand(product) || 'No publicada', publicBrand(other) || 'No publicada'],
+    ['Código', publicProductCode(product), publicProductCode(other)],
     [
       'Disponibilidad',
       product.stock > 0 ? 'Disponible' : 'Agotado',

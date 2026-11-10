@@ -102,9 +102,15 @@ export type OrderFilters = {
 };
 export type PaymentFilters = { status?: string; q?: string; page?: number };
 export const api = {
-  products: () => request<Product[]>('/catalog/products'),
+  products: async () =>
+    (await request<Product[]>('/catalog/products')).filter(
+      (product) => product.category !== 'Pruebas locales',
+    ),
   adminProducts: () => request<AdminProduct[]>('/admin/products'),
-  categories: () => request<string[]>('/catalog/categories'),
+  categories: async () =>
+    (await request<string[]>('/catalog/categories')).filter(
+      (category) => category !== 'Pruebas locales',
+    ),
   brands: () => request<string[]>('/catalog/brands'),
   product: (id: string) => request<Product>(`/product/${encodeURIComponent(id)}`),
   register: (profile: SignUp) =>

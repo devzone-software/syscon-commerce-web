@@ -9,7 +9,8 @@ import { deliveryMethodLabels } from '../../lib/delivery';
 import {
   formatDateTime,
   orderInboxTabs,
-  orderStatusLabels,
+  orderFilterLabels,
+  orderLabelsForDelivery,
   paymentStatusLabels,
   shortId,
   statusLabel,
@@ -64,7 +65,7 @@ export function OrdersAdmin() {
               aria-pressed={status === tab}
               onClick={() => update({ estado: tab })}
             >
-              {tab ? statusLabel(orderStatusLabels, tab) : 'Todos'}
+              {tab ? statusLabel(orderFilterLabels, tab) : 'Todos'}
               {data && <small>{tab ? (counts[tab] ?? 0) : all}</small>}
             </button>
           ))}
@@ -156,7 +157,10 @@ export function OrdersAdmin() {
                             {money(Number(order.total))}
                           </td>
                           <td data-label="Estado">
-                            <StatusBadge status={order.status} labels={orderStatusLabels} />
+                            <StatusBadge
+                              status={order.status}
+                              labels={orderLabelsForDelivery(order.deliveryMethod)}
+                            />
                             {order.expiresAt && (
                               <small>Vence {formatDateTime(order.expiresAt)}</small>
                             )}

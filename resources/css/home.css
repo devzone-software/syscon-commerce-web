@@ -445,15 +445,15 @@ input:focus-visible {
   bottom: 23px;
   padding: 2px 4px;
   border-radius: 2px;
-  background: #6ffbbe;
-  color: #002113;
+  background: var(--syscon-brand-primary);
+  color: var(--syscon-brand-primary);
   font-size: 10px;
   font-weight: 700;
   line-height: 15px;
 }
 .card-product-stock.out {
-  background: #ffdad6;
-  color: #93000a;
+  background: var(--syscon-brand-cyan-soft);
+  color: var(--syscon-brand-primary);
 }
 .card-product-category {
   font-size: 11px;

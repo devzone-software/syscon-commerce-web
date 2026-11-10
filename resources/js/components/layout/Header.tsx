@@ -12,17 +12,11 @@ import { catalogSearchQuery } from '../../lib/catalog';
 import { canUseBackoffice } from '../../lib/auth';
 import { money, useShop } from '../../state';
 import { CloseIcon, MenuIcon } from '../icons';
+import { AccountMenu } from './AccountMenu';
+import { storefront } from '../../lib/storefront';
 
 /** Company contact data shown in the top bar and the footer. */
-export const company = {
-  city: 'Juliaca, Puno, Perú',
-  phone: '(01) 748-2900',
-  phoneHref: 'tel:+5117482900',
-  email: 'contacto@gruposyscon.pe',
-  salesEmail: 'ventas@gruposyscon.pe',
-  whatsappLabel: '+51 987 654 321',
-  whatsappHref: 'https://wa.me/51987654321',
-};
+export const company = storefront.company;
 
 export function Brand() {
   return (
@@ -119,29 +113,7 @@ export function Header() {
             <button type="submit">Buscar</button>
           </form>
           <div className="store-actions">
-            <nav className="store-account" aria-label="Cuenta">
-              {user ? (
-                <>
-                  {staff ? (
-                    <Link to="/admin">Administración</Link>
-                  ) : (
-                    <>
-                      <Link to="/cuenta">Mi cuenta</Link>
-                      <Link to="/cuenta/pedidos">Mis pedidos</Link>
-                    </>
-                  )}
-                  <button type="button" onClick={signOut}>
-                    Salir
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link to="/registro">Crea tu cuenta</Link>
-                  <Link to="/ingresar">Ingresa</Link>
-                  <Link to="/cuenta/pedidos">Mis pedidos</Link>
-                </>
-              )}
-            </nav>
+            <AccountMenu />
             <Link
               to="/carrito"
               className="store-cart"

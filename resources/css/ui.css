@@ -144,14 +144,14 @@
   color: var(--syscon-warning);
 }
 .field input[aria-invalid='true'] {
-  border-color: #c9533f;
+  border-color: #123e73;
 }
 .button-danger {
-  background: #b3412f;
+  background: var(--syscon-brand-primary);
   color: #fff;
 }
 .button-danger:hover:not(:disabled) {
-  background: #97321f;
+  background: #001a42;
 }
 
 .bo-card.form-stack > h2 {

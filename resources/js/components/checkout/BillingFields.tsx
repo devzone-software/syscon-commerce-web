@@ -192,7 +192,7 @@ export function BillingFields({
       <p className="flow-note">
         {context === 'staff'
           ? 'Revisa los datos del comprador: se guardarán con la venta y se usarán para preparar su comprobante.'
-          : 'Estos datos se guardan con tu pedido para emitir el comprobante. Si luego cambias tu perfil, el pedido conserva los datos con los que compraste.'}
+          : 'Usaremos estos datos para emitir tu comprobante. Revísalos antes de confirmar.'}
       </p>
     </fieldset>
   );

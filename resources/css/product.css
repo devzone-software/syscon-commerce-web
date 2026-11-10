@@ -254,13 +254,13 @@
   margin: 0;
   font-size: 13px;
   line-height: 20px;
-  color: #1f7340;
+  color: var(--syscon-brand-primary);
   display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 .product-detail-stock.out {
-  color: #9a6700;
+  color: var(--syscon-brand-primary);
 }
 .product-detail-stock i {
   width: 8px;

@@ -131,7 +131,7 @@ const steps = [
   },
   {
     title: 'Acompañamiento Postventa',
-    text: 'Los envíos se coordinan por courier a nivel nacional. Instalación y soporte se ofrecen en la región Puno.',
+    text: 'Consulta las opciones de entrega habilitadas para tu pedido. Instalación y soporte se coordinan en la región Puno.',
     tag: 'Cobertura según servicio',
   },
 ];
@@ -187,8 +187,8 @@ export function About() {
           <h1 id="about-title">Conoce quiénes somos</h1>
           <p>
             Somos Grupo Syscon S.A.C., una empresa de Juliaca que atiende a instituciones,
-            microempresas y personas. Enviamos pedidos por courier a nivel nacional y coordinamos
-            servicios técnicos en la región Puno.
+            microempresas y personas. Consulta las opciones de entrega de tu pedido y los servicios
+            técnicos que se coordinan en la región Puno.
           </p>
           <div className="about-hero-actions">
             <a href="#historia" className="is-primary">
@@ -255,8 +255,8 @@ export function About() {
               </p>
               <p>
                 Atendemos a instituciones, microempresas y personas. Coordinamos instalación y
-                mantenimiento en Juliaca y la región Puno; los pedidos de otras regiones se envían
-                mediante courier.
+                mantenimiento en Juliaca y la región Puno. Para otras ubicaciones, consulta al
+                equipo antes de confirmar la compra.
               </p>
               <p>
                 Consulta disponibilidad, costo de entrega y condiciones del producto antes de
@@ -437,7 +437,7 @@ export function About() {
               <li>
                 <TruckIcon size={20} />
                 <strong>Envíos</strong>
-                <code>A nivel nacional</code>
+                <code>Según disponibilidad</code>
               </li>
               <li>
                 <CheckIcon size={20} />

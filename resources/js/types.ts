@@ -5,6 +5,7 @@ export type Product = {
   price: number;
   stock: number;
   imageUrl: string | null;
+  imageUrls?: string[];
   category: string | null;
   brand: string | null;
   active: boolean;
@@ -59,6 +60,8 @@ export type Order = {
   channel?: 'WEB' | 'STORE';
   /** Methods of payments actually approved for this order. Empty while unpaid. */
   paymentMethods?: string[];
+  /** Only the customer-facing progress code, without private errors or credentials. */
+  invoiceAutomation?: 'PENDING' | 'PROCESSING' | 'DONE' | 'REVIEW' | null;
   /** Null for orders created before billing data was captured. */
   billing?: Billing | null;
   /** Null for orders created before the delivery method was captured. */

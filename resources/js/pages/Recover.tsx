@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AuthLayout } from '../components/auth/AuthLayout';
 import { company } from '../components/layout/Header';
 import {
@@ -20,11 +20,12 @@ const recoveryMail = `mailto:${company.email}?subject=${encodeURIComponent(
  * page routes the request to support instead of pretending to send an email.
  */
 export function Recover() {
+  const location = useLocation();
   return (
     <AuthLayout
       eyebrow="Recupera tu acceso"
-      title="Recupera tu acceso a Grupo SYSCON"
-      text="Protegemos tu cuenta, tus pedidos y tus datos mientras restablecemos tu contraseña."
+      title="Recupera tu acceso"
+      text="La recuperación de acceso se coordina con el equipo de soporte de SYSCON."
       features={[
         {
           icon: <ShieldIcon size={16} />,
@@ -38,28 +39,6 @@ export function Recover() {
         { icon: <LockIcon size={16} />, text: 'No compartas tu contraseña con otras personas.' },
       ]}
       footnote="La recuperación se coordina con el equipo de soporte."
-      below={
-        <ul className="auth-assurance">
-          <li>
-            <ShieldIcon size={16} />
-            <span>
-              <strong>Cuenta SYSCON</strong>Recupera tu acceso para consultar tus pedidos
-            </span>
-          </li>
-          <li>
-            <LockIcon size={16} />
-            <span>
-              <strong>Acceso protegido</strong>Tu contraseña nunca se comparte
-            </span>
-          </li>
-          <li>
-            <HeadsetIcon size={16} />
-            <span>
-              <strong>Atención corporativa</strong>Consulta los canales vigentes de contacto.
-            </span>
-          </li>
-        </ul>
-      }
     >
       <div className="auth-step">
         <span className="auth-step-icon">
@@ -71,8 +50,9 @@ export function Recover() {
         </div>
       </div>
       <p className="auth-lead">
-        No te preocupes. Escríbenos desde el correo de tu cuenta o llámanos y nuestro equipo de
-        soporte verificará tu identidad para restablecer tu contraseña.
+        Esta opción prepara una consulta al equipo de soporte. No envía un enlace automático para
+        cambiar tu contraseña. Escríbenos desde el correo de tu cuenta para coordinar la
+        recuperación.
       </p>
       <div className="auth-fields">
         <a className="auth-submit" href={recoveryMail}>
@@ -83,7 +63,10 @@ export function Recover() {
         </a>
       </div>
       <p className="auth-switch">
-        ¿Recordaste tu contraseña? <Link to="/ingresar">Iniciar sesión</Link>
+        ¿Recordaste tu contraseña?{' '}
+        <Link to="/ingresar" state={location.state}>
+          Iniciar sesión
+        </Link>
       </p>
     </AuthLayout>
   );

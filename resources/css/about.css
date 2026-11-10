@@ -117,10 +117,10 @@
   border-radius: 50%;
 }
 .about-hero-flags .is-green {
-  background: #4edea3;
+  background: var(--syscon-brand-primary);
 }
 .about-hero-flags .is-cyan {
-  background: #2dbcfe;
+  background: var(--syscon-brand-cyan);
 }
 .about-hero figure {
   position: relative;
@@ -688,5 +688,121 @@
   .about-purpose article,
   .about-cta {
     padding: 28px 22px;
+  }
+}
+
+/* Match the storefront's navy and cyan system with a calmer institutional layout. */
+.about-page {
+  background: #f6f8fb;
+  color: #14243b;
+}
+.about-hero {
+  padding-top: 28px;
+}
+.about-pill {
+  border-radius: 999px;
+  background: #e8f5fb;
+  color: #063b67;
+}
+.about-hero h1 {
+  color: #001a42;
+}
+.about-hero-actions a,
+.about-identity,
+.about-stats li,
+.about-timeline li,
+.about-values li,
+.about-reasons li,
+.about-steps li,
+.about-purpose article {
+  border: 1px solid #dce4ee;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px #102d4c08;
+}
+.about-hero-actions a {
+  border-radius: 9px;
+}
+.about-hero-actions a.is-primary,
+.about-cta {
+  background: #001a42;
+}
+.about-cta h2 {
+  color: #fff;
+}
+.about-cta p:not(.about-eyebrow) {
+  color: #d8e7f7;
+}
+.about-cta .about-eyebrow {
+  color: #65d8f4;
+}
+.about-cta-actions a {
+  border: 1px solid #ffffff35;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #001a42;
+}
+.about-cta-actions a.is-primary {
+  border-color: #00a9d6;
+  background: #00a9d6;
+  color: #001a42;
+}
+.about-hero-flags .is-green,
+.about-hero-flags .is-cyan {
+  background: #00a9d6;
+}
+.about-hero figure img {
+  border-radius: 18px;
+  box-shadow: 0 16px 36px #001a421c;
+}
+.about-hero figure::after {
+  border-radius: 18px;
+}
+.about-hero figcaption {
+  border: 1px solid #dce4ee;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px #001a4218;
+}
+.about-stats li,
+.about-timeline li,
+.about-values li,
+.about-reasons li,
+.about-steps li,
+.about-purpose article {
+  background: #fff;
+}
+@media (max-width: 640px) {
+  .about-hero {
+    padding-top: 20px;
+  }
+  .about-hero figure img {
+    height: 260px;
+  }
+}
+.about-page .about-band > .container {
+  padding-block: 48px;
+}
+.about-page .about-cta {
+  padding: 48px;
+  border-radius: 18px;
+  box-shadow: 0 16px 36px #001a421c;
+}
+.about-page .about-cta h2 {
+  font-size: 32px;
+  line-height: 1.2;
+}
+.about-page .about-cta p:not(.about-eyebrow) {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.about-page .about-cta-actions {
+  max-width: 320px;
+}
+.about-page .about-cta-actions a {
+  justify-content: center;
+  width: 100%;
+}
+@media (max-width: 640px) {
+  .about-page .about-band > .container {
+    padding-block: 32px;
   }
 }

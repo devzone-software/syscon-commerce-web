@@ -3,7 +3,12 @@ import { Link } from 'react-router-dom';
 import { Pagination } from '../shared/Pagination';
 import { StatusBadge } from '../shared/StatusBadge';
 import { BILLABLE } from '../orders/OrderDocuments';
-import { formatDateTime, orderStatusLabels, shortId } from '../../lib/orders';
+import {
+  formatDateTime,
+  orderFilterLabels,
+  orderLabelsForDelivery,
+  shortId,
+} from '../../lib/orders';
 import { invoiceStatusLabels } from '../../lib/billing';
 import { api } from '../../services/api';
 import { money } from '../../state';
@@ -26,11 +31,13 @@ export function BillingOrderPicker() {
     setPage(1);
   };
   return (
-    <section className="bo-card" aria-labelledby="billing-orders-title" aria-busy={refreshing}>
-      <h2 id="billing-orders-title">Elige el pedido</h2>
-      <p className="muted">
-        Busca al cliente y revisa su compra. Seleccionar un pedido no emite ningún documento.
-      </p>
+    <section
+      className="bo-card billing-order-picker"
+      aria-labelledby="billing-orders-title"
+      aria-busy={refreshing}
+    >
+      <h2 id="billing-orders-title">Pedidos y comprobantes</h2>
+      <p className="muted">Busca un pedido pagado para revisar o preparar su comprobante.</p>
       <form className="bo-filters" onSubmit={submit}>
         <label className="field">
           Cliente, documento o pedido
@@ -53,7 +60,7 @@ export function BillingOrderPicker() {
           >
             {BILLABLE.map((value) => (
               <option key={value} value={value}>
-                {orderStatusLabels[value]}
+                {orderFilterLabels[value]}
               </option>
             ))}
           </select>
@@ -90,7 +97,10 @@ export function BillingOrderPicker() {
                     </div>
                     <div>
                       <strong>{money(Number(order.total))}</strong>
-                      <StatusBadge status={order.status} labels={orderStatusLabels} />
+                      <StatusBadge
+                        status={order.status}
+                        labels={orderLabelsForDelivery(order.deliveryMethod)}
+                      />
                       {order.invoice ? (
                         <>
                           <span>{order.invoice.serialNumber}</span>

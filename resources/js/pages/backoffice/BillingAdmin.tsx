@@ -31,15 +31,21 @@ export function BillingAdmin() {
     window.scrollTo({ top: 0 });
   };
   return (
-    <>
+    <div className="billing-workspace">
       <PageHeader
         title="Comprobantes"
         description="Prepara borradores desde pedidos pagados y consulta el resultado de su emisión."
         actions={
-          managesOrders && (
-            <Link className="button button-secondary" to="/admin/pedidos">
-              Ver pedidos
+          id || orderId ? (
+            <Link className="button button-secondary" to="/admin/facturacion">
+              Volver a comprobantes
             </Link>
+          ) : (
+            managesOrders && (
+              <Link className="button button-secondary" to="/admin/pedidos">
+                Ver pedidos
+              </Link>
+            )
           )
         }
       />
@@ -87,6 +93,6 @@ export function BillingAdmin() {
           </details>
         </>
       )}
-    </>
+    </div>
   );
 }

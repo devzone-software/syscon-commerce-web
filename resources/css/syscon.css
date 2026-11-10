@@ -296,3 +296,30 @@ textarea::placeholder {
   color: var(--syscon-text-secondary);
   opacity: 1;
 }
+
+/* SYSCON-only state colors: meaning is carried by labels, symbols and borders. */
+.status-badge.tone-warning,
+.status-badge.tone-info {
+  background: var(--syscon-brand-cyan-soft);
+  color: var(--syscon-brand-primary);
+}
+.status-badge.tone-danger {
+  background: #fff;
+  color: var(--syscon-brand-primary);
+  box-shadow: inset 0 0 0 1px var(--syscon-brand-primary);
+}
+.notice.success::before,
+.notice.error::before,
+.notice.warning::before {
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  left: 12px;
+  top: 14px;
+  color: #fff;
+  font: 700 11px/1 sans-serif;
+}
+.notice.success::before { content: '✓'; }
+.notice.error::before { content: '!'; border-radius: 3px; }
+.notice.warning::before { content: '!'; }

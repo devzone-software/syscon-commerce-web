@@ -41,7 +41,7 @@ export function OrderSummary({
   const total = subtotal + (shipping ?? 0);
   const shippingLabel =
     shipping === undefined
-      ? 'Se elige en el checkout'
+      ? 'Se calcula al finalizar'
       : shipping === null
         ? 'Por confirmar'
         : shipping === 0
@@ -63,9 +63,7 @@ export function OrderSummary({
           },
         ]}
       />
-      <p className="order-summary-note">
-        El precio y la disponibilidad se confirman al crear el pedido.
-      </p>
+      <p className="order-summary-note">Precio y disponibilidad se confirman al crear tu pedido.</p>
       {children}
     </div>
   );

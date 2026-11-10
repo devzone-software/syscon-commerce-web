@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { catalogSearchQuery } from '../../lib/catalog';
 import logo from '../../../images/header/logo-grupo-syscon.jpg';
 import { canUseBackoffice, displayName, initials } from '../../lib/auth';
@@ -28,7 +28,6 @@ export function AccountLayout({ title, children }: { title: string; children: Re
   const { user, count, logout } = useShop();
   const staff = canUseBackoffice(user);
   const navigate = useNavigate();
-  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [mobile, setMobile] = useState(() => window.matchMedia('(max-width: 960px)').matches);
   const sidebarRef = useRef<HTMLElement>(null);
@@ -76,10 +75,6 @@ export function AccountLayout({ title, children }: { title: string; children: Re
     };
   }, [open]);
   const [query, setQuery] = useState('');
-  useEffect(() => {
-    if (location.pathname === '/cuenta/productos')
-      setQuery(new URLSearchParams(location.search).get('q') ?? '');
-  }, [location.pathname, location.search]);
   const signOut = async () => {
     await logout();
     navigate('/');
@@ -87,11 +82,8 @@ export function AccountLayout({ title, children }: { title: string; children: Re
   const search = (event: FormEvent) => {
     event.preventDefault();
     navigate({
-      pathname: '/cuenta/productos',
-      search: catalogSearchQuery(
-        location.pathname === '/cuenta/productos' ? location.search : '',
-        query,
-      ),
+      pathname: '/catalogo',
+      search: catalogSearchQuery('', query),
     });
   };
 
@@ -143,7 +135,7 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           </div>
         )}
         <nav onClick={() => setOpen(false)}>
-          <p>Mi cuenta</p>
+          <p>{staff ? 'Compras personales' : 'Mi cuenta'}</p>
           <NavLink to="/cuenta" end>
             <GridIcon size={18} /> Resumen
           </NavLink>
@@ -153,9 +145,6 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           </NavLink>
           <NavLink to="/cuenta/carrito">
             <CartIcon size={18} /> Mi carrito
-          </NavLink>
-          <NavLink to="/cuenta/productos">
-            <SearchIcon size={18} /> Productos
           </NavLink>
           <p>Ayuda</p>
           <NavLink to="/cuenta/soporte">
@@ -184,7 +173,7 @@ export function AccountLayout({ title, children }: { title: string; children: Re
             <MenuIcon />
           </button>
           <p className="portal-crumb">
-            {staff ? 'Mis compras' : 'Mi cuenta'} <span aria-hidden="true">/</span>{' '}
+            {staff ? 'Compras personales' : 'Mi cuenta'} <span aria-hidden="true">/</span>{' '}
             <strong>{title}</strong>
           </p>
           <form className="portal-search" role="search" onSubmit={search}>
@@ -200,8 +189,8 @@ export function AccountLayout({ title, children }: { title: string; children: Re
               onChange={(event) => setQuery(event.target.value)}
             />
           </form>
-          <Link className="portal-store" to="/">
-            <StoreIcon size={16} /> Ir a la tienda
+          <Link className="portal-store" to="/catalogo">
+            <StoreIcon size={16} /> Ver productos
           </Link>
           <Link
             className="portal-icon"
@@ -222,9 +211,9 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           {staff && (
             <aside className="portal-context" aria-label="Área de compras personales">
               <span>
-                Estás en tu cuenta de compras. Aquí aparecen únicamente tus pedidos personales.
+                Compras personales: aquí ves tus propios pedidos. Para gestionar las ventas de
+                clientes, entra en Administración desde el menú.
               </span>
-              <Link to="/admin">Volver al panel de trabajo</Link>
             </aside>
           )}
           {children}

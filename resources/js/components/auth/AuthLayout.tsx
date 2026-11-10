@@ -1,9 +1,10 @@
 import { type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Header } from '../layout/Header';
 import { PageMain } from '../layout/PageMain';
-import { ArrowLeftIcon, ShieldIcon } from '../icons';
+import { ShieldIcon } from '../icons';
 import '../../../css/auth.css';
+import { ShoppingBackLink } from '../shared/ShoppingBackLink';
 
 export type AuthFeature = { icon: ReactNode; text: ReactNode };
 
@@ -27,11 +28,24 @@ export function AuthLayout({
   children: ReactNode;
   below?: ReactNode;
 }) {
+  const location = useLocation();
+  const state = location.state as { from?: unknown; cartPath?: unknown } | null;
+  const buying = state?.from === '/checkout';
+  const backTo = buying
+    ? state?.cartPath === '/cuenta/carrito'
+      ? '/cuenta/carrito'
+      : '/carrito'
+    : '/';
   return (
     <div className="auth-shell">
       <Header />
       <PageMain className="auth-main" resetKey={title}>
         <div className="container">
+          <div className="shopping-navigation">
+            <ShoppingBackLink to={backTo}>
+              {buying ? 'Volver al carrito' : 'Volver a la tienda'}
+            </ShoppingBackLink>
+          </div>
           <div className="auth-card">
             <aside className="auth-panel">
               <span className="auth-panel-eyebrow">
@@ -51,7 +65,14 @@ export function AuthLayout({
                 <ShieldIcon size={14} /> {footnote}
               </p>
             </aside>
-            <section className="auth-form">{children}</section>
+            <section className="auth-form">
+              {buying && (
+                <p className="notice" role="status">
+                  Tu carrito está guardado. Al ingresar continuarás con tu compra.
+                </p>
+              )}
+              {children}
+            </section>
           </div>
           {below}
         </div>
@@ -64,9 +85,6 @@ export function AuthLayout({
           <nav aria-label="Enlaces">
             <Link to="/contacto">Ayuda y contacto</Link>
             <Link to="/nosotros">Nosotros</Link>
-            <Link to="/" className="auth-footer-back">
-              <ArrowLeftIcon size={14} /> Volver a la tienda
-            </Link>
           </nav>
         </div>
       </footer>

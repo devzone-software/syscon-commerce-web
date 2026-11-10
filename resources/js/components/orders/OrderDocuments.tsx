@@ -8,22 +8,37 @@ import { useData, ErrorBox, Loading } from '../../ui';
 export const BILLABLE = ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
 
 /** Receipts of a paid order that the customer can open or download. */
-export function OrderDocuments({ orderId }: { orderId: string }) {
-  const { data, error, loading, reload } = useData(() => api.orderInvoices(orderId), [orderId]);
+export function OrderDocuments({
+  orderId,
+  automation,
+}: {
+  orderId: string;
+  automation?: string | null;
+}) {
+  const { data, error, loading, reload } = useData(
+    () => api.orderInvoices(orderId),
+    [orderId, automation],
+    { keepPreviousData: true },
+  );
   if (loading) return <Loading />;
   if (error) return <ErrorBox message={error} retry={reload} />;
   if (!data?.length)
     return (
-      <p className="flow-note">
-        Tu comprobante aparecerá aquí cuando sea emitido y aceptado por SUNAT.
-      </p>
+      <div className="customer-document-pending">
+        <p className="flow-note" role="status">
+          {automation === 'REVIEW'
+            ? 'Tu pago está confirmado. El comprobante necesita una revisión del equipo; te avisaremos cuando esté disponible.'
+            : automation === 'PENDING' || automation === 'PROCESSING'
+              ? 'Tu pago está confirmado. Estamos tramitando tu comprobante; aparecerá aquí cuando SUNAT confirme su aceptación.'
+              : 'Tu comprobante aparecerá aquí cuando sea emitido y aceptado por SUNAT.'}
+        </p>
+        <button type="button" className="link-button" onClick={reload}>
+          Consultar comprobante
+        </button>
+      </div>
     );
   return (
-    <div>
-      <p className="flow-note">
-        El comprobante tiene su propio proceso de emisión. Un pago confirmado no significa que el
-        documento ya esté disponible.
-      </p>
+    <div className="customer-order-documents">
       <ul className="document-list">
         {data.map((invoice) => (
           <li key={invoice.id}>

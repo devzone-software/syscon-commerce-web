@@ -1,6 +1,13 @@
-import { orderFlow, orderStatusLabels } from '../../lib/orders';
+import { orderFlow, orderLabelsForDelivery } from '../../lib/orders';
+import type { DeliveryMethod } from '../../types';
 
-export function OrderTimeline({ status }: { status: string }) {
+export function OrderTimeline({
+  status,
+  method,
+}: {
+  status: string;
+  method?: DeliveryMethod | null;
+}) {
   if (status === 'CANCELLED') return <p className="notice error">Este pedido fue cancelado.</p>;
   if (status === 'EXPIRED')
     return (
@@ -10,6 +17,7 @@ export function OrderTimeline({ status }: { status: string }) {
       </p>
     );
   const current = orderFlow.indexOf(status);
+  const labels = orderLabelsForDelivery(method);
   return (
     <ol className="order-timeline" aria-label="Estado del pedido">
       {orderFlow.map((step, index) => {
@@ -21,7 +29,7 @@ export function OrderTimeline({ status }: { status: string }) {
             aria-current={state === 'current' ? 'step' : undefined}
           >
             <span aria-hidden="true" />
-            {orderStatusLabels[step]}
+            {labels[step]}
           </li>
         );
       })}

@@ -1042,3 +1042,100 @@
     padding: 14px;
   }
 }
+.product-image-editor {
+  min-width: 0;
+  margin: 0;
+  padding: 20px;
+  border: 1px solid #dfe5ee;
+  border-radius: 12px;
+}
+.product-image-editor legend { padding: 0 8px; font-weight: 600; color: #00265d; }
+.product-image-editor-layout { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 20px; align-items: start; }
+.product-image-editor-preview { display: grid; place-items: center; min-height: 160px; padding: 12px; border-radius: 10px; background: #f4f7fb; color: #667389; text-align: center; font-size: 13px; overflow-wrap: anywhere; }
+.product-image-editor-preview img { width: 100%; height: 140px; object-fit: contain; }
+.product-image-editor-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.product-image-editor .field { min-width: 0; }
+@media (max-width: 600px) {
+  .product-image-editor { padding: 14px; }
+  .product-image-editor-layout { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+}
+.image-batch-list { list-style: none; padding: 0; margin: 0; }
+.image-batch-list > li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 12px; padding: 16px 0; border-bottom: 1px solid #e3e8ef; overflow-wrap: anywhere; }
+.image-batch-list > li > div { display: grid; gap: 5px; min-width: 0; }
+.image-batch-list > li > p { grid-column: 1 / -1; margin: 0; }
+.image-batch-list small { color: #596579; }
+@media (max-width: 600px) { .image-batch-list > li { grid-template-columns: minmax(0, 1fr); } }
+
+.product-gallery-editor { padding: 16px; border: 1px solid #c5d4e2; border-radius: 12px; min-width: 0; }
+.product-gallery-editor > label, .product-gallery-add label { display: grid; gap: 8px; }
+.product-gallery-add { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin: 16px 0; }
+.product-gallery-add label { flex: 1 1 220px; }
+.product-gallery-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; padding: 0; }
+.product-gallery-list li { border: 1px solid #dce6ee; border-radius: 10px; padding: 12px; min-width: 0; background: #fff; }
+.product-gallery-list img { width: 100%; height: 120px; object-fit: contain; }
+.product-gallery-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.product-gallery-actions button { border: 1px solid #c5d4e2; padding: 6px 10px; border-radius: 6px; color: #00265d; background: #fff; }
+.product-gallery-actions button:disabled { opacity: .4; }
+
+/* Billing workspace: emphasize document identity, amount and the next deliberate action. */
+.billing-workspace { display: grid; gap: 20px; }
+.billing-workspace > .bo-card { margin-block: 0; }
+.billing-workspace .bo-card { border: 1px solid #dfe7ef; border-radius: 12px; box-shadow: none; }
+.billing-workspace .invoice-workflow-help { padding: 14px 20px; background: #f6f9fc; }
+.invoice-workflow-help > summary { cursor: pointer; color: #526277; font-size: 13px; font-weight: 600; }
+.invoice-workflow-help p { font-size: 12px; line-height: 1.7; }
+.billing-workspace .billing-order-picker > h2 { margin-bottom: 6px; font-size: 20px; letter-spacing: -.025em; }
+.billing-workspace .billing-order-picker > .muted { font-size: 13px; }
+.billing-workspace .bo-filters { padding: 18px; margin-top: 20px; border: 1px solid #e5ebf1; border-radius: 10px; background: #f7f9fb; }
+.billing-workspace .bo-filters input, .billing-workspace .bo-filters select { background: #fff; border-color: #ccd8e4; border-radius: 7px; }
+.billing-workspace .billing-update { color: #617086; font-size: 12px; margin-block: 16px; }
+.billing-workspace .billing-order-list { gap: 0; }
+.billing-workspace .billing-order-list > li { padding: 20px 0; border: 0; border-bottom: 1px solid #e5ebf1; border-radius: 0; background: transparent; }
+.billing-workspace .billing-order-list > li:last-child { border-bottom: 0; }
+.billing-workspace .billing-order-list > li > div { gap: 6px; }
+.billing-workspace .billing-order-list small { color: #6b7a8d; font-size: 11px; }
+.billing-workspace .billing-order-actions .button { border-radius: 7px; min-height: 40px; font-size: 12px; }
+.billing-workspace .billing-order-actions .link-button { font-size: 12px; }
+.invoice-detail-panel .order-top { padding-bottom: 18px; border-bottom: 1px solid #e5ebf1; }
+.invoice-detail-panel .order-top h2 { font-size: 22px; letter-spacing: -.025em; }
+.invoice-amount-summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin: 20px 0; padding: 18px; border-radius: 10px; background: #f0f7fc; }
+.invoice-amount-summary span { font-size: 13px; color: #526277; }
+.invoice-amount-summary strong { font-size: 28px; line-height: 34px; letter-spacing: -.035em; color: #00265d; }
+.billing-workspace > .bo-disclosure { padding: 16px 20px; border: 1px solid #e1e8ef; border-radius: 10px; background: #fff; }
+.billing-workspace > .bo-disclosure > summary { font-size: 13px; font-weight: 600; color: #526277; cursor: pointer; }
+@media (max-width: 700px) {
+ .billing-workspace { gap: 14px; }
+ .billing-workspace .bo-filters { padding: 12px; }
+ .billing-workspace .billing-order-actions { width: 100%; }
+ .billing-workspace .billing-order-actions .button { width: 100%; }
+ .invoice-amount-summary { flex-wrap: wrap; padding: 14px; gap: 8px; }
+ .invoice-amount-summary strong { font-size: 24px; }
+ .invoice-detail-panel .order-top { flex-wrap: wrap; gap: 12px; }
+}
+
+.admin-order-detail { gap: 24px; }
+.admin-order-back { grid-column: 1 / -1; justify-self: start; padding: 10px 14px; background: #fff; border: 1px solid #d5e1ec; border-radius: 7px; color: #00265d; font-size: 12px; font-weight: 600; }
+.admin-order-detail > .bo-card { border: 1px solid #dfe7ef; border-radius: 12px; box-shadow: none; }
+.admin-order-detail .order-top { padding-bottom: 18px; border-bottom: 1px solid #e7edf3; }
+.admin-order-detail .order-top h2, .admin-order-detail > aside > h2 { font-size: 21px; letter-spacing: -.025em; }
+.admin-order-overview { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 22px 0 10px; }
+.admin-order-overview > div { display: flex; flex-direction: column; justify-content: center; gap: 7px; padding: 18px; background: #f5f8fb; border-radius: 9px; }
+.admin-order-overview span { font-size: 11px; color: #617086; }
+.admin-order-overview strong { font-size: 27px; letter-spacing: -.035em; color: #00265d; }
+.admin-order-overview b { font-size: 13px; font-weight: 600; color: #00265d; }
+.admin-order-detail .flow-subtitle { margin-top: 24px; font-size: 15px; letter-spacing: -.015em; }
+.admin-order-detail .info-rows > div { background: transparent; padding: 10px 0; min-height: 0; border-radius: 0; }
+.admin-order-detail .info-rows dt { font-size: 12px; color: #617086; font-weight: 400; }
+.admin-order-detail .info-rows dd { font-size: 13px; overflow-wrap: anywhere; }
+.admin-order-disclosure { margin-top: 22px; padding: 14px 0; border-top: 1px solid #e3eaf1; }
+.admin-order-disclosure > summary { color: #00265d; font-size: 13px; font-weight: 600; cursor: pointer; }
+.admin-order-disclosure[open] > summary { margin-bottom: 14px; }
+.admin-order-notifications .flow-subtitle { display: none; }
+.admin-order-detail aside .bo-simple-list > li { padding-block: 14px; border-color: #e5ebf1; }
+.admin-order-detail aside .bo-simple-list small { font-size: 11px; line-height: 18px; color: #617086; }
+.admin-order-detail aside .button { border-radius: 7px; }
+@media (max-width: 600px) {
+ .admin-order-overview { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+ .admin-order-overview > div { padding: 14px; }
+ .admin-order-detail .info-rows > div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+}

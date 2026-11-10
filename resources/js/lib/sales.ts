@@ -39,7 +39,10 @@ export function gatewayReturnNotice(orderStatus: string | null): {
   text: string;
 } {
   if (orderStatus && ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'].includes(orderStatus))
-    return { tone: 'success', text: 'Pago confirmado. Ya estamos preparando tu pedido.' };
+    return {
+      tone: 'success',
+      text: 'Tu pago está confirmado. Revisa el seguimiento para conocer el estado de tu pedido.',
+    };
   if (orderStatus === 'CANCELLED' || orderStatus === 'EXPIRED')
     return {
       tone: 'info',

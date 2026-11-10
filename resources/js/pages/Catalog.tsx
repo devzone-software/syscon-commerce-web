@@ -9,6 +9,7 @@ import { CatalogSidebar } from '../components/catalog/CatalogSidebar';
 import { ChatIcon, SearchIcon } from '../components/icons';
 import {
   catalogParams,
+  catalogPriceBounds,
   filterProducts,
   groupProducts,
   pageNumbers,
@@ -113,17 +114,15 @@ export function Catalog() {
 
   const facets = useMemo(() => {
     const products = data ?? [];
-    const prices = products.map((product) => Number(product.price));
     return {
       results: filterProducts(products, filters),
       categories: groupProducts(filterProducts(products, { ...filters, category: '' }), 'category'),
       total: filterProducts(products, { ...filters, category: '' }).length,
-      brands: groupProducts(filterProducts(products, { ...filters, brand: '' }), 'brand'),
+      brands: groupProducts(filterProducts(products, { ...filters, brand: '' }), 'brand').filter(
+        (brand) => !/^demo\b/i.test(brand.name),
+      ),
       inStock: filterProducts(products, { ...filters, onlyAvailable: true }).length,
-      bounds: [
-        Math.floor(prices.length ? Math.min(...prices) : 0),
-        Math.ceil(prices.length ? Math.max(...prices) : 0),
-      ] as [number, number],
+      bounds: catalogPriceBounds(products, filters),
     };
   }, [data, filters]);
   const { items, page, pages } = paginate(
@@ -169,7 +168,7 @@ export function Catalog() {
       <div className="catalog-head">
         <div>
           <h1>
-            Catálogo de Productos{' '}
+            Productos{' '}
             {(data || loading) && (
               <span
                 className={`catalog-total${loading ? ' is-loading' : ''}`}
@@ -179,33 +178,33 @@ export function Catalog() {
               </span>
             )}
           </h1>
-          <p>Explora nuestro catálogo de tecnología con precios actualizados.</p>
+          <p>Encuentra tecnología para tu trabajo y tu negocio.</p>
         </div>
       </div>
-      <div className="catalog-applied" role="group" aria-label="Filtros aplicados">
-        {chips.length > 0 ? (
-          <>
-            <span className="catalog-applied-label">
-              <img src={filterIcon} alt="" /> FILTROS APLICADOS:
-            </span>
-            {chips.map((chip) => (
-              <button
-                key={chip.label}
-                type="button"
-                onClick={() => update(Object.fromEntries(chip.keys.map((key) => [key, ''])))}
-                aria-label={`Quitar filtro ${chip.label}: ${chip.value}`}
-              >
-                {chip.label}: <strong>{chip.value}</strong> <img src={closeIcon} alt="" />
+      {chips.length > 0 && (
+        <div className="catalog-applied" role="group" aria-label="Filtros aplicados">
+          {chips.length > 0 ? (
+            <>
+              <span className="catalog-applied-label">
+                <img src={filterIcon} alt="" /> FILTROS APLICADOS:
+              </span>
+              {chips.map((chip) => (
+                <button
+                  key={chip.label}
+                  type="button"
+                  onClick={() => update(Object.fromEntries(chip.keys.map((key) => [key, ''])))}
+                  aria-label={`Quitar filtro ${chip.label}: ${chip.value}`}
+                >
+                  {chip.label}: <strong>{chip.value}</strong> <img src={closeIcon} alt="" />
+                </button>
+              ))}
+              <button type="button" className="catalog-applied-clear" onClick={clear}>
+                Limpiar todos
               </button>
-            ))}
-            <button type="button" className="catalog-applied-clear" onClick={clear}>
-              Limpiar todos
-            </button>
-          </>
-        ) : (
-          <span className="catalog-applied-empty">Sin filtros aplicados</span>
-        )}
-      </div>
+            </>
+          ) : null}
+        </div>
+      )}
 
       {loading ? (
         <CatalogLoading size={size} />

@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { cleanProduct, validateProduct, type ProductInput } from '../../lib/products';
 import { api } from '../../services/api';
 import { ErrorBox } from '../../ui';
+import { ProductImageEditor } from './ProductImageEditor';
 
 function Field({
   id,
@@ -211,16 +212,14 @@ export function ProductForm({
           </datalist>
         </Field>
       </div>
-      <Field id="product-image" label="URL de imagen" error={errors.imageUrl}>
-        <input
-          id="product-image"
-          type="url"
-          value={form.imageUrl ?? ''}
-          onChange={(e) => set({ imageUrl: e.target.value })}
-          aria-invalid={Boolean(errors.imageUrl)}
-          aria-describedby={describedBy('imageUrl')}
-        />
-      </Field>
+      <ProductImageEditor
+        value={form.imageUrl ?? ''}
+        original={initial.imageUrl ?? ''}
+        name={form.name}
+        error={errors.imageUrl}
+        disabled={busy}
+        onChange={(imageUrl) => set({ imageUrl: imageUrl || null })}
+      />
       <label className="facet-option">
         <input
           type="checkbox"

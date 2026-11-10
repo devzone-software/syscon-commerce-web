@@ -95,10 +95,10 @@ export function Categories() {
     const inCategory = (name: string) => products.filter((product) => product.category === name);
     return {
       categories,
-      brands: groupProducts(products, 'brand'),
+      brands: groupProducts(products, 'brand').filter((brand) => !/^demo\b/i.test(brand.name)),
       sample: (name: string) =>
         inCategory(name).find((product) => product.imageUrl) ?? inCategory(name)[0],
-      brandsOf: (name: string) => groupProducts(inCategory(name), 'brand'),
+      brandsOf: (name: string) => groupProducts(inCategory(name), 'brand').filter((brand) => !/^demo\b/i.test(brand.name)),
       inStock: (name: string) =>
         inCategory(name)
           .sort((a, b) => Number(b.stock > 0) - Number(a.stock > 0))

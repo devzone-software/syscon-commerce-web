@@ -1,28 +1,35 @@
+import { publicBrand, publicProductCode } from '../lib/productPresentation';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { money, useShop } from '../state';
 import { useConfirmAdd } from '../components/cart/AddToCartDialog';
-import { ProductImage } from '../components/ProductImage';
+import { ProductPhotoViewer } from '../components/product/ProductPhotoViewer';
 import { InfoRows } from '../components/cart/OrderSummary';
 import { PageSection } from '../components/layout/PageHero';
 import { QuantityStepper } from '../components/shared/QuantityStepper';
 import { DeliveryPreview } from '../components/product/DeliveryPreview';
 import { ProductComparison } from '../components/product/ProductComparison';
-import { CartIcon, HeadsetIcon, ReceiptIcon, ShieldIcon, TruckIcon } from '../components/icons';
+import { CartIcon, HeadsetIcon, ReceiptIcon, ShieldIcon } from '../components/icons';
 import { relatedProducts, productSpecifications, productInquiryUrl } from '../lib/catalog';
 import { useData, Loading, Empty, ProductCard } from '../ui';
 import '../../css/storefront.css';
+import { ShoppingBackLink } from '../components/shared/ShoppingBackLink';
 
 const perks = [
   { icon: <ReceiptIcon size={18} />, text: 'Boleta o factura electrónica con tu compra' },
   { icon: <ShieldIcon size={18} />, text: 'Consulta las condiciones de garantía por producto' },
-  { icon: <TruckIcon size={18} />, text: 'Recojo en tienda o envío coordinado' },
-  { icon: <HeadsetIcon size={18} />, text: 'Asesoría técnica antes y después de comprar' },
 ];
 
 export function ProductPage() {
   const { id = '' } = useParams();
+  const location = useLocation();
+  const requestedBack = (location.state as { from?: unknown } | null)?.from;
+  const backTo =
+    typeof requestedBack === 'string' &&
+    /^\/(?:catalogo|carrito|cuenta\/(?:productos|carrito))(?:\?|$)/.test(requestedBack)
+      ? requestedBack
+      : '/catalogo';
   const { data, loading, error, reload } = useData(() => api.product(id), [id]);
   const catalog = useData(api.products);
   const { cart } = useShop();
@@ -91,6 +98,11 @@ export function ProductPage() {
     <div className="product-view">
       <section className="product-hero">
         <div className="container">
+          {backTo.includes('carrito') && (
+            <div className="shopping-navigation">
+              <ShoppingBackLink to={backTo}>Volver al carrito</ShoppingBackLink>
+            </div>
+          )}
           <nav className="breadcrumb" aria-label="Ruta de navegación">
             <Link to="/">Inicio</Link> <span aria-hidden="true">/</span>{' '}
             <Link to="/catalogo">Productos</Link>
@@ -110,15 +122,15 @@ export function ProductPage() {
               <p className="product-detail-eyebrow">{data.category}</p>
               <h1>{data.name}</h1>
               <p className="product-detail-sub">
-                {[data.brand, `SKU ${data.sku}`].filter(Boolean).join(' · ')}
+                {[publicBrand(data), `Código ${publicProductCode(data)}`]
+                  .filter(Boolean)
+                  .join(' · ')}
               </p>
               <a className="product-info-link" href="#product-information">
                 Ver descripción y características
               </a>
             </header>
-            <div className="product-detail-media">
-              <ProductImage product={data} loading="eager" />
-            </div>
+            <ProductPhotoViewer key={data.id} product={data} />
             <div className="product-detail-info">
               <div className="product-price-row">
                 <p className="product-detail-price">{money(Number(data.price))}</p>
@@ -169,14 +181,20 @@ export function ProductPage() {
                 <HeadsetIcon size={16} /> Consultar este producto
               </Link>
               <DeliveryPreview />
-              <ul className="product-perks">
-                {perks.map(({ icon, text }) => (
-                  <li key={text}>
-                    {icon}
-                    {text}
-                  </li>
-                ))}
-              </ul>
+              <details className="product-purchase-details">
+                <summary>Comprobante y garantía</summary>
+                <ul className="product-perks">
+                  {perks.map(({ icon, text }) => (
+                    <li key={text}>
+                      {icon}
+                      {text}
+                    </li>
+                  ))}
+                </ul>
+              <Link className="product-info-link" to="/informacion-de-compra">
+                Ver información de compra y garantía
+              </Link>
+              </details>
             </div>
           </div>
         </div>
@@ -213,15 +231,15 @@ export function ProductPage() {
         )}
         <InfoRows
           rows={[
-            { label: 'Marca', value: data.brand || '—' },
+            { label: 'Marca', value: publicBrand(data) || '—' },
             { label: 'Categoría', value: data.category || '—' },
-            { label: 'SKU', value: data.sku },
+            { label: 'Código', value: publicProductCode(data) },
           ]}
         />
         <p className="flow-note">El precio y la disponibilidad se confirman al crear el pedido.</p>
       </PageSection>
       {related.length > 0 && (
-        <PageSection title={data.category ? `Más en ${data.category}` : `Más de ${data.brand}`}>
+        <PageSection title={data.category ? `Más en ${data.category}` : 'Productos relacionados'}>
           <ProductComparison product={data} alternatives={related} />
           <div className="featured-grid">
             {related.map((product) => (

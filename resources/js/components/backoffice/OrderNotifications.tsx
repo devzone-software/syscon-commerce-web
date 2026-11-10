@@ -1,13 +1,9 @@
 import { useState } from 'react';
-import {
-  formatDateTime,
-  notificationLabels,
-  notificationStatusLabels,
-  statusLabel,
-} from '../../lib/orders';
+import { formatDateTime, notificationLabels, statusLabel } from '../../lib/orders';
 import { api } from '../../services/api';
 import type { OrderNotification } from '../../types';
 import { ErrorBox } from '../../ui';
+import { notificationResult } from '../../lib/notifications';
 
 /** Customer emails with their delivery state; resending never repeats the order operation. */
 export function OrderNotifications({
@@ -36,6 +32,7 @@ export function OrderNotifications({
   return (
     <>
       <h3 className="flow-subtitle">Correos al cliente</h3>
+      <p className="flow-note notification-note">La recepción por el cliente no está verificada.</p>
       {notifications.length ? (
         <ul className="bo-simple-list">
           {notifications.map((item) => (
@@ -43,7 +40,7 @@ export function OrderNotifications({
               <span>
                 <strong>{statusLabel(notificationLabels, item.type)}</strong>
                 <small>
-                  {item.recipient} · {statusLabel(notificationStatusLabels, item.status)}
+                  {item.recipient} · {notificationResult(item)}
                   {item.sentAt && ` el ${formatDateTime(item.sentAt)}`}
                   {item.status === 'FAILED' &&
                     (item.nextAttemptAt
@@ -61,7 +58,7 @@ export function OrderNotifications({
                   disabled={Boolean(busy)}
                   onClick={() => resend(item.id)}
                 >
-                  {busy === item.id ? 'Enviando…' : 'Reenviar'}
+                  {busy === item.id ? 'Procesando…' : 'Reintentar aviso'}
                   <span className="visually-hidden">
                     {' '}
                     {statusLabel(notificationLabels, item.type)}

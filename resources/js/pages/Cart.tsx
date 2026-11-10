@@ -8,6 +8,7 @@ import { useShop } from '../state';
 import { Empty } from '../ui';
 import { AccountLayout } from '../components/account/AccountLayout';
 import { useAccountPath } from '../hooks/useAccountPath';
+import { ShoppingBackLink } from '../components/shared/ShoppingBackLink';
 
 const hero = (
   <PageHero
@@ -62,75 +63,82 @@ export function Cart({ account = false }: { account?: boolean }) {
   return (
     <>
       {heading}
-      <PageSection
-        title="Productos en tu carrito"
-        action={
-          confirmClear ? (
-            <div className="cart-clear-confirm" role="group" aria-label="Confirmar vaciado">
-              <span>¿Vaciar el carrito?</span>
-              <button type="button" className="link-button" onClick={clear}>
-                Sí, vaciar
+      <div className="container shopping-navigation">
+        <ShoppingBackLink to={accountPath('/catalogo')}>Seguir comprando</ShoppingBackLink>
+      </div>
+      <div className="container cart-layout">
+        <PageSection
+          title="Productos en tu carrito"
+          action={
+            confirmClear ? (
+              <div className="cart-clear-confirm" role="group" aria-label="Confirmar vaciado">
+                <span>¿Vaciar el carrito?</span>
+                <button type="button" className="link-button" onClick={clear}>
+                  Sí, vaciar
+                </button>
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={() => setConfirmClear(false)}
+                >
+                  Cancelar
+                </button>
+              </div>
+            ) : (
+              <button type="button" className="link-button" onClick={() => setConfirmClear(true)}>
+                Vaciar carrito
               </button>
-              <button type="button" className="link-button" onClick={() => setConfirmClear(false)}>
-                Cancelar
-              </button>
-            </div>
-          ) : (
-            <button type="button" className="link-button" onClick={() => setConfirmClear(true)}>
-              Vaciar carrito
-            </button>
-          )
-        }
-      >
-        {error && (
-          <p className="notice" role="status">
-            No se pudo verificar la disponibilidad actual: {error} Se validará nuevamente al crear
-            el pedido.
-          </p>
-        )}
-        <ul className="cart-lines">
-          {cart.map((line) => (
-            <CartLineItem
-              key={line.product.id}
-              line={line}
-              issue={issues.get(line.product.id)}
-              onQuantity={(quantity) => setQuantity(line.product.id, quantity)}
-              onRemove={() => setQuantity(line.product.id, 0)}
-            />
-          ))}
-        </ul>
-        <Link className="arrow-link cart-continue" to={accountPath('/catalogo')}>
-          ← Seguir comprando
-        </Link>
-      </PageSection>
-      <PageSection title="Resumen de compra" soft>
-        <OrderSummary lines={cart}>
-          {!user && (
-            <p className="flow-note">
-              Para confirmar el pedido necesitas iniciar sesión o crear una cuenta. Tu carrito se
-              conservará.
+            )
+          }
+        >
+          {error && (
+            <p className="notice" role="status">
+              No se pudo verificar la disponibilidad actual: {error} Se validará nuevamente al crear
+              el pedido.
             </p>
           )}
-          {issues.size > 0 && (
-            <p className="notice error" role="alert">
-              Revisa los productos marcados antes de continuar.
-            </p>
-          )}
-          {checking ? (
-            <button type="button" className="flow-button" disabled>
-              Verificando disponibilidad…
-            </button>
-          ) : issues.size > 0 ? (
-            <button type="button" className="flow-button" disabled>
-              Continuar al checkout
-            </button>
-          ) : (
-            <Link className="flow-button" to="/checkout">
-              {user ? 'Continuar al checkout' : 'Iniciar sesión para continuar'}
-            </Link>
-          )}
-        </OrderSummary>
-      </PageSection>
+          <ul className="cart-lines">
+            {cart.map((line) => (
+              <CartLineItem
+                key={line.product.id}
+                line={line}
+                issue={issues.get(line.product.id)}
+                onQuantity={(quantity) => setQuantity(line.product.id, quantity)}
+                onRemove={() => setQuantity(line.product.id, 0)}
+              />
+            ))}
+          </ul>
+        </PageSection>
+        <PageSection title="Resumen de compra" soft>
+          <OrderSummary lines={cart}>
+            {!user && (
+              <p className="flow-note">Inicia sesión para continuar. Conservaremos tu carrito.</p>
+            )}
+            {issues.size > 0 && (
+              <p className="notice error" role="alert">
+                Revisa los productos marcados antes de continuar.
+              </p>
+            )}
+            {checking ? (
+              <button type="button" className="flow-button" disabled>
+                Verificando disponibilidad…
+              </button>
+            ) : issues.size > 0 ? (
+              <button type="button" className="flow-button" disabled>
+                Continuar con la compra
+              </button>
+            ) : (
+              <Link
+                className="flow-button"
+                to="/checkout"
+                state={{ cartPath: accountPath('/carrito') }}
+              >
+                {user ? 'Continuar con la compra' : 'Iniciar sesión para continuar'}
+              </Link>
+            )}
+          </OrderSummary>
+        </PageSection>
+      </div>
     </>
   );
 }

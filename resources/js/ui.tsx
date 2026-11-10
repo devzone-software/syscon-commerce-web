@@ -1,10 +1,8 @@
+import { CatalogCard } from './components/catalog/CatalogCard';
 import { useEffect, useState, type ReactNode } from 'react';
-import { Link, Navigate, useLocation } from 'react-router-dom';
-import { money, useShop } from './state';
-import { useConfirmAdd } from './components/cart/AddToCartDialog';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useShop } from './state';
 import type { Product } from './types';
-import cartAddIcon from '../images/home/cart-add.svg';
-import { ProductImage } from './components/ProductImage';
 import { Footer } from './components/layout/Footer';
 import { Header } from './components/layout/Header';
 import { PageMain } from './components/layout/PageMain';
@@ -90,40 +88,8 @@ export function Empty({
  * Product card from the Figma home: image with availability, category, name, price and the
  * "Ver producto" / "Agregar" actions. `compact` is the smaller variant of the catalog grid.
  */
-export function ProductCard({ product, compact = false }: { product: Product; compact?: boolean }) {
-  const add = useConfirmAdd();
-  const available = product.stock > 0;
-  const details = [product.brand, `SKU ${product.sku}`].filter(Boolean).join(' · ');
-  const url = `/producto/${product.id}`;
-  return (
-    <article className={`card-product${compact ? ' is-compact' : ''}`}>
-      <Link to={url} className="card-product-media" tabIndex={-1} aria-hidden="true">
-        <ProductImage product={product} />
-        {!available && <span className="card-product-stock out">AGOTADO</span>}
-      </Link>
-      {product.category && <span className="card-product-category">{product.category}</span>}
-      <Link className="card-product-title" to={url}>
-        {product.name}
-      </Link>
-      <span className="card-product-meta">{details}</span>
-      <strong className="card-product-price">{money(Number(product.price))}</strong>
-      <div className="card-product-actions">
-        <Link className="card-product-view" to={url}>
-          {compact ? 'Ver' : 'Ver producto'}
-        </Link>
-        <button
-          type="button"
-          className="card-product-add"
-          onClick={() => add(product)}
-          disabled={!available}
-          aria-label={`Agregar ${product.name} al carrito`}
-        >
-          <img src={cartAddIcon} alt="" />
-          Agregar
-        </button>
-      </div>
-    </article>
-  );
+export function ProductCard({ product }: { product: Product; compact?: boolean }) {
+  return <CatalogCard product={product} />;
 }
 export function Layout({ children }: { children: ReactNode }) {
   return (
@@ -146,6 +112,13 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   return user ? (
     children
   ) : (
-    <Navigate to="/ingresar" replace state={{ from: location.pathname + location.search }} />
+    <Navigate
+      to="/ingresar"
+      replace
+      state={{
+        from: location.pathname + location.search,
+        cartPath: (location.state as { cartPath?: unknown } | null)?.cartPath,
+      }}
+    />
   );
 }

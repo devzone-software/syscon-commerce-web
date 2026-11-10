@@ -11,6 +11,8 @@ import {
   readFilters,
   productSpecifications,
   productInquiryUrl,
+  catalogPriceBounds,
+  cableLength,
 } from './catalog';
 
 const product = (id: string, patch: Partial<Product> = {}): Product => ({
@@ -31,6 +33,24 @@ const catalog = [
   product('3', { name: 'Switch 8 puertos', price: 90, category: 'Redes', brand: 'TP-Link' }),
 ];
 const base = readFilters(new URLSearchParams());
+
+describe('contextual product presentation', () => {
+  it('uses category and availability for prices without shrinking the range to an active price filter', () => {
+    expect(catalogPriceBounds(catalog, { ...base, category: 'Redes', minPrice: 100 })).toEqual([
+      90, 150,
+    ]);
+    expect(
+      catalogPriceBounds(catalog, { ...base, category: 'Redes', onlyAvailable: true }),
+    ).toEqual([90, 90]);
+    expect(catalogPriceBounds(catalog, { ...base, category: 'Missing' })).toEqual([0, 0]);
+  });
+  it('does not invent cable lengths from SKUs or other product categories', () => {
+    expect(cableLength({ category: 'Cables de red', name: 'Cable Cat 6 de 5 metros' })).toBe('5 m');
+    expect(cableLength({ category: 'Cables de red', name: 'Cable de 1.5m' })).toBe('1,5 m');
+    expect(cableLength({ category: 'Cables de red', name: 'Cable Cat 6' })).toBeNull();
+    expect(cableLength({ category: 'Memorias', name: 'Memoria 5 metros' })).toBeNull();
+  });
+});
 
 describe('published product information', () => {
   it('keeps free text and separates only complete label/value pairs', () => {
@@ -99,6 +119,7 @@ describe('catalog filters', () => {
     expect(filterProducts(catalog, filters).map((p) => p.id)).toEqual(['3']);
   });
   it('sorts by price and name without mutating the source', () => {
+    expect(filterProducts(catalog, base).map((p) => p.id)).toEqual(['1', '3', '2']);
     expect(filterProducts(catalog, { ...base, sort: 'precio-asc' }).map((p) => p.id)).toEqual([
       '3',
       '2',

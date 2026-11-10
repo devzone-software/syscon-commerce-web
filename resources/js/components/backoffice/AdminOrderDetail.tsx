@@ -17,7 +17,7 @@ import { deliveryRows } from '../../lib/delivery';
 import {
   allowedTransitions,
   formatDateTime,
-  orderStatusLabels,
+  orderLabelsForDelivery,
   paymentStatusLabels,
   shortId,
   statusLabel,
@@ -44,7 +44,9 @@ export function AdminOrderDetail({ id, onChanged }: { id: string; onChanged: () 
     setActionError('');
     try {
       await api.setOrderStatus(id, status);
-      setMessage(`Estado actualizado a “${statusLabel(orderStatusLabels, status)}”.`);
+      setMessage(
+        `Estado actualizado a “${statusLabel(orderLabelsForDelivery(data?.delivery?.method), status)}”.`,
+      );
       setConfirmCancel(false);
       reload();
       onChanged();
@@ -67,38 +69,59 @@ export function AdminOrderDetail({ id, onChanged }: { id: string; onChanged: () 
   const pendingPayment = data.payments.find((payment) => payment.status === 'PENDING');
 
   return (
-    <div className="bo-detail-grid">
+    <div className="bo-detail-grid admin-order-detail">
+      <Link className="admin-order-back" to="/admin/pedidos">
+        ← Volver a pedidos
+      </Link>
       <section className="bo-card" aria-labelledby="order-detail-title">
         <div className="order-top">
           <h2 id="order-detail-title">Pedido {shortId(data.id)}</h2>
-          <StatusBadge status={data.status} labels={orderStatusLabels} />
+          <StatusBadge
+            status={data.status}
+            labels={orderLabelsForDelivery(data.delivery?.method)}
+          />
         </div>
-        <OrderTimeline status={data.status} />
+        <OrderTimeline status={data.status} method={data.delivery?.method} />
+        <div className="admin-order-overview">
+          <div>
+            <span>Total del pedido</span>
+            <strong>{money(Number(data.total))}</strong>
+          </div>
+          <div>
+            <span>Registrado</span>
+            <b>{formatDateTime(data.createdAt ?? null)}</b>
+          </div>
+        </div>
+        {data.expiresAt && (
+          <p className="flow-note">Reserva hasta {formatDateTime(data.expiresAt)}</p>
+        )}
+        <h3 className="flow-subtitle">Cliente</h3>
         <InfoRows
           rows={[
-            { label: 'Registrado', value: formatDateTime(data.createdAt ?? null) },
-            ...(data.expiresAt
-              ? [{ label: 'Reserva vence', value: formatDateTime(data.expiresAt) }]
-              : []),
             {
-              label: 'Cliente',
+              label: 'Nombre y correo',
               value: data.customer
                 ? [data.customer.name, data.customer.email].filter(Boolean).join(' · ')
                 : '—',
             },
             ...(data.customer?.phone ? [{ label: 'Teléfono', value: data.customer.phone }] : []),
-            ...deliveryRows(data.delivery),
-            ...billingRows(data.billing),
-            { label: 'Total', value: money(Number(data.total)), tone: 'total' as const },
           ]}
         />
+        <h3 className="flow-subtitle">Entrega</h3>
+        <InfoRows rows={deliveryRows(data.delivery)} />
+        <details className="admin-order-disclosure">
+          <summary>Datos del comprobante</summary>
+          <InfoRows rows={billingRows(data.billing)} />
+        </details>
         <h3 className="flow-subtitle">Productos</h3>
         <OrderLines order={data} />
-        <h3 className="flow-subtitle">Historial</h3>
-        <OrderHistory events={data.events} />
+        <details className="admin-order-disclosure">
+          <summary>Historial del pedido</summary>
+          <OrderHistory events={data.events} method={data.delivery?.method} />
+        </details>
       </section>
       <aside className="bo-card" aria-labelledby="order-actions-title">
-        <h2 id="order-actions-title">Gestión</h2>
+        <h2 id="order-actions-title">Gestión del pedido</h2>
         {message && (
           <p className="notice success" role="status">
             {message}
@@ -180,11 +203,14 @@ export function AdminOrderDetail({ id, onChanged }: { id: string; onChanged: () 
         )}
 
         {data.notifications && (
-          <OrderNotifications
-            notifications={data.notifications}
-            canResend={can(user, permissions.ordersManage)}
-            onResent={reload}
-          />
+          <details className="admin-order-disclosure admin-order-notifications">
+            <summary>Avisos al cliente ({data.notifications?.length ?? 0})</summary>
+            <OrderNotifications
+              notifications={data.notifications}
+              canResend={can(user, permissions.ordersManage)}
+              onResent={reload}
+            />{' '}
+          </details>
         )}
 
         <h3 className="flow-subtitle">Estado</h3>
@@ -209,7 +235,7 @@ export function AdminOrderDetail({ id, onChanged }: { id: string; onChanged: () 
                 >
                   {busy === status
                     ? 'Actualizando…'
-                    : `Marcar como ${statusLabel(orderStatusLabels, status).toLowerCase()}`}
+                    : `Marcar como ${statusLabel(orderLabelsForDelivery(data?.delivery?.method), status).toLowerCase()}`}
                 </button>
               ))}
             {options.includes('CANCELLED') &&

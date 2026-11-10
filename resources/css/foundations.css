@@ -10,9 +10,10 @@
   --syscon-border-default: #e0e8f0;
   --syscon-text-primary: #111827;
   --syscon-text-secondary: #59616c;
-  --syscon-success: #177245;
-  --syscon-warning: #9a6700;
-  --syscon-danger: #b42318;
+  /* Corporate palette; labels, icons and borders distinguish operational states. */
+  --syscon-success: var(--syscon-brand-primary);
+  --syscon-warning: var(--syscon-brand-primary);
+  --syscon-danger: var(--syscon-brand-primary);
   /* Shared spacing scale: see docs/DISENO-INTERFAZ.md. */
   --syscon-space-1: 4px;
   --syscon-space-2: 8px;

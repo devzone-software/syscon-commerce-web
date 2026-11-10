@@ -30,4 +30,21 @@ describe('ProductImage', () => {
     expect(html).toContain('<small>TP-Link</small>');
     expect(html).not.toContain('Equipo');
   });
+  it('identifies reference photography without changing custom product images', () => {
+    const html = renderToStaticMarkup(
+      <ProductImage
+        product={{
+          ...product,
+          sku: 'DEMO-ADP-USB-ETH',
+          brand: 'Demo Linkora',
+          imageUrl: '/images/products/demo-adp-usb-eth.svg',
+        }}
+      />,
+    );
+    expect(html).toContain('product-photo-frame');
+    expect(html).toContain('/examples/catalog-photos/usb-ethernet.jpg');
+    expect(renderToStaticMarkup(<ProductImage product={product} />)).not.toContain(
+      'Foto referencial',
+    );
+  });
 });

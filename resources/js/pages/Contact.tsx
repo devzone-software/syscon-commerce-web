@@ -25,7 +25,6 @@ import '../../css/contact.css';
 const whatsapp = { label: company.whatsappLabel, href: company.whatsappHref };
 const address = company.city;
 const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(address)}`;
 
 /** Figma "Client / Contacto". The form opens the visitor's email client: the API has no inbox. */
 export function Contact() {
@@ -53,12 +52,10 @@ export function Contact() {
             <p className="contact-eyebrow">CANAL OFICIAL DE ATENCIÓN</p>
             <h1 id="contact-title">¿Cómo podemos ayudarte?</h1>
             <p className="contact-hero-lead">
-              Comunícate con el equipo para consultas comerciales, cotizaciones corporativas,
-              servicios técnicos o información sobre tus pedidos y comprobantes.
+              Ventas, cotizaciones, soporte técnico y consultas sobre tus pedidos.
             </p>
             <p className="contact-hero-note">
-              Estamos disponibles para ayudarte antes, durante y después de tu compra con atención
-              humana, rigurosa y personalizada.
+              Elige el canal que te resulte más cómodo.
             </p>
           </div>
           <ul>
@@ -82,7 +79,7 @@ export function Contact() {
             <i className="is-green">
               <ChatIcon size={22} />
             </i>
-            <p className="contact-eyebrow">LÍNEA DIRECTA 1-TO-1</p>
+            <p className="contact-eyebrow">ATENCIÓN COMERCIAL</p>
             <h2>WhatsApp</h2>
             <p>Escríbenos para consultar disponibilidad y solicitar una cotización.</p>
             <code>{whatsapp.label}</code>
@@ -94,7 +91,7 @@ export function Contact() {
             <i>
               <PhoneIcon size={22} />
             </i>
-            <p className="contact-eyebrow">CENTRAL TELEFÓNICA</p>
+            <p className="contact-eyebrow">ATENCIÓN TELEFÓNICA</p>
             <h2>Llamada Directa</h2>
             <p>Comunícate directamente con nuestro equipo de atención comercial y soporte.</p>
             <code>{company.phone}</code>
@@ -106,7 +103,7 @@ export function Contact() {
             <i>
               <MailIcon size={22} />
             </i>
-            <p className="contact-eyebrow">BANDEJA OFICIAL</p>
+            <p className="contact-eyebrow">CORREO</p>
             <h2>Correo Electrónico</h2>
             <p>Envíanos tu consulta, requerimientos o pliegos de licitaciones formales.</p>
             <code>{company.email}</code>
@@ -184,8 +181,9 @@ export function Contact() {
                   <SearchIcon size={20} /> Cobertura de atención
                 </h2>
                 <p>
-                  La venta por internet contempla envíos por courier a nivel nacional. La
-                  instalación y el soporte se coordinan en Juliaca y la región Puno.
+                  El checkout muestra las modalidades de entrega habilitadas. Para otras
+                  ubicaciones, consulta al equipo antes de confirmar tu compra. La instalación y el
+                  soporte se coordinan en Juliaca y la región Puno.
                 </p>
                 <p className="contact-eyebrow">Consulta por WhatsApp los horarios vigentes.</p>
               </section>
@@ -292,11 +290,8 @@ export function Contact() {
                 </div>
               </dl>
               <div className="contact-location-actions">
-                <a href={mapsUrl} target="_blank" rel="noreferrer" className="is-primary">
-                  Ver ciudad en Google Maps
-                </a>
-                <a href={wazeUrl} target="_blank" rel="noreferrer">
-                  Ver ciudad en Waze
+                <a href={mapsUrl} target="_blank" rel="noreferrer" className="link-button">
+                  Consultar referencia de la ciudad en Google Maps
                 </a>
               </div>
             </div>

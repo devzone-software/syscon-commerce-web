@@ -1,3 +1,4 @@
+import { publicProductCode } from '../../lib/productPresentation';
 import { taxPercent } from '../../lib/billing';
 import { money } from '../../state';
 import type { Order } from '../../types';
@@ -26,7 +27,7 @@ export function OrderLines({ order }: { order: Order }) {
             <tr key={item.productId}>
               <td data-label="Producto">
                 <strong>{item.name}</strong>
-                <small>SKU {item.sku}</small>
+                <small>Código {publicProductCode(item)}</small>
               </td>
               <td className="num" data-label="Cantidad">
                 {item.quantity}

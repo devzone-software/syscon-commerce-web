@@ -39,16 +39,8 @@ const emptySignUp: SignUp = {
 };
 
 const loginFeatures: AuthFeature[] = [
-  {
-    icon: <ListCheckIcon size={16} />,
-    text: 'Consulta el estado de tus pedidos desde tu cuenta.',
-  },
-  { icon: <ReceiptIcon size={16} />, text: 'Historial de compras y pagos en un solo lugar.' },
-  { icon: <BuildingIcon size={16} />, text: 'Compras con RUC y facturación electrónica.' },
-  {
-    icon: <HeadsetIcon size={16} />,
-    text: 'Contacto con nuestro equipo para consultas sobre tus compras.',
-  },
+  { icon: <ListCheckIcon size={16} />, text: 'Sigue tus pedidos y compras.' },
+  { icon: <ReceiptIcon size={16} />, text: 'Consulta tus boletas y facturas.' },
 ];
 
 const signUpFeatures: AuthFeature[] = [
@@ -146,7 +138,11 @@ export function Auth({ register = false }: { register?: boolean }) {
     const signedInUser = await api.me();
     await reloadUser();
     if (isNew) setCreated(true);
-    else navigate(loginDestination(signedInUser, requestedFrom), { replace: true });
+    else
+      navigate(loginDestination(signedInUser, requestedFrom), {
+        replace: true,
+        state: { cartPath: (location.state as { cartPath?: unknown } | null)?.cartPath },
+      });
   };
   const run = async (action: () => Promise<void>) => {
     setError('');
@@ -198,7 +194,7 @@ export function Auth({ register = false }: { register?: boolean }) {
         title="¡Bienvenido a Grupo SYSCON!"
         text="Tu cuenta está lista. Ya puedes comprar y seguir tus pedidos."
         features={signUpFeatures}
-        footnote="Datos tratados conforme a la Ley N° 29733"
+        footnote="Usa tus datos para crear y gestionar tu cuenta SYSCON."
       >
         <div className="auth-done" role="status">
           <span className="auth-done-icon">
@@ -209,7 +205,7 @@ export function Auth({ register = false }: { register?: boolean }) {
           <button
             type="button"
             className="auth-submit"
-            onClick={() => navigate(from, { replace: true })}
+            onClick={() => navigate(from, { replace: true, state: location.state })}
           >
             Continuar <ArrowRightIcon size={16} />
           </button>
@@ -220,14 +216,14 @@ export function Auth({ register = false }: { register?: boolean }) {
   if (!register)
     return (
       <AuthLayout
-        eyebrow="Acceso para empresas y clientes"
-        title="Bienvenido nuevamente a Grupo SYSCON"
-        text="Consulta tus compras de tecnología y el estado de tus pedidos desde tu cuenta."
+        eyebrow="TU CUENTA SYSCON"
+        title="Qué bueno verte de nuevo"
+        text="Ingresa para continuar tu compra o consultar tus pedidos."
         features={loginFeatures}
-        footnote="Conexión protegida · Cumplimiento Ley N° 29733"
+        footnote="Tu compra, en un solo lugar."
       >
         <h2>Iniciar sesión</h2>
-        <p className="auth-lead">Ingresa tus credenciales para acceder a tu panel.</p>
+        <p className="auth-lead">Usa el correo de tu cuenta.</p>
         {error && <ErrorBox message={error} />}
         {/* One sign-in for everyone: the account itself says if it is a company, a person or staff. */}
         <form onSubmit={submit} className="auth-fields">
@@ -247,7 +243,9 @@ export function Auth({ register = false }: { register?: boolean }) {
             autoComplete="current-password"
           />
           <div className="auth-row-end">
-            <Link to="/recuperar">¿Olvidaste tu contraseña?</Link>
+            <Link to="/recuperar" state={location.state}>
+              ¿Olvidaste tu contraseña?
+            </Link>
           </div>
           <button className="auth-submit" disabled={busy}>
             {busy ? 'Procesando…' : 'INICIAR SESIÓN'} <ArrowRightIcon size={16} />
@@ -257,7 +255,7 @@ export function Auth({ register = false }: { register?: boolean }) {
         <p className="auth-switch">
           ¿Aún no tienes una cuenta de cliente?{' '}
           <Link to="/registro" state={location.state}>
-            Crear cuenta corporativa o personal
+            Crear cuenta
           </Link>
         </p>
       </AuthLayout>
@@ -272,12 +270,12 @@ export function Auth({ register = false }: { register?: boolean }) {
       title="Únete a Grupo SYSCON"
       text="Crea tu cuenta para comprar, consultar tus pedidos y contactar con nuestro equipo."
       features={signUpFeatures}
-      footnote="Datos tratados conforme a la Ley N° 29733"
+      footnote="Usa tus datos para crear y gestionar tu cuenta SYSCON."
     >
       <div className="auth-title-row">
         <div>
           <h2>Crear una cuenta</h2>
-          <p className="auth-lead">Completa tus datos para comenzar tu experiencia tecnológica.</p>
+          <p className="auth-lead">Completa los datos de tu cuenta.</p>
         </div>
         <Segmented
           label="Tipo de cuenta"

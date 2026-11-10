@@ -10,6 +10,7 @@ import { InventoryAdmin } from './InventoryAdmin';
 import { OrdersAdmin } from './OrdersAdmin';
 import { PaymentsAdmin } from './PaymentsAdmin';
 import { ProductBulkAdmin } from './ProductBulkAdmin';
+import { ProductImagesAdmin } from './ProductImagesAdmin';
 import { ProductsAdmin } from './ProductsAdmin';
 import { PurchasesAdmin } from './PurchasesAdmin';
 import { ReportsAdmin } from './ReportsAdmin';
@@ -63,6 +64,15 @@ export const sections: Section[] = [
     group: 'Catálogo',
     permission: permissions.catalogWrite,
     element: <TaxonomyAdmin />,
+  },
+  {
+    path: 'imagenes',
+    description: 'Revisar y actualizar enlaces de imágenes por SKU.',
+    label: 'Imágenes por lote',
+    parent: 'productos',
+    group: 'Catálogo',
+    permission: permissions.catalogWrite,
+    element: <ProductImagesAdmin />,
   },
   {
     path: 'proveedores',

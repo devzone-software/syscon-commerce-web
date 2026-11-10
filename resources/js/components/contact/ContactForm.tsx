@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { ArrowRightIcon, MailIcon } from '../icons';
 import { company } from '../layout/Header';
 import { isEmail } from '../../lib/validation';
+import { storefront } from '../../lib/storefront';
 
 const subjects = [
   'Ventas y cotizaciones',
@@ -55,9 +56,13 @@ export function ContactForm() {
     <section id="formulario" className="contact-form" aria-labelledby="contact-form-title">
       <p className="contact-eyebrow">FORMULARIO DE CONTACTO</p>
       <h2 id="contact-form-title">Prepara tu consulta por correo</h2>
+      {!storefront.contactsVerified && (
+        <p className="flow-note">
+          Confirma los datos de contacto antes de compartir información sensible.
+        </p>
+      )}
       <p className="contact-form-lead">
-        Completa tu consulta. Se abrirá tu aplicación de correo con el mensaje preparado para que
-        puedas revisarlo y enviarlo a SYSCON.
+        Se abrirá tu aplicación de correo para que revises y envíes el mensaje.
       </p>
       <form onSubmit={submit}>
         <div className="contact-grid">
@@ -150,8 +155,7 @@ export function ContactForm() {
             Preparar correo <ArrowRightIcon size={16} />
           </button>
           <span>
-            <MailIcon size={13} /> Se abrirá tu correo; revisa el mensaje y envíalo si estás de
-            acuerdo.
+            <MailIcon size={13} /> Revisa el mensaje antes de enviarlo.
           </span>
         </div>
       </form>

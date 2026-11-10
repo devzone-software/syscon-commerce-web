@@ -149,12 +149,16 @@ export function InvoiceDetail({ id, notice }: { id: string; notice: string }) {
     }
   };
   return (
-    <section className="bo-card" aria-labelledby="invoice-detail-title">
+    <section className="bo-card invoice-detail-panel" aria-labelledby="invoice-detail-title">
       <div className="order-top">
         <h2 id="invoice-detail-title">
           {invoiceTypeLabel(data.type)} {data.serialNumber}
         </h2>
         <StatusBadge status={data.status} labels={invoiceStatusLabels} />
+      </div>
+      <div className="invoice-amount-summary">
+        <span>Importe del comprobante</span>
+        <strong>{money(Number(data.total))}</strong>
       </div>
       <dl className="detail-list">
         <div>

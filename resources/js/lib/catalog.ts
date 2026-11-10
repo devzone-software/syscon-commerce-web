@@ -69,6 +69,13 @@ export function lowestAvailablePrice(products: Product[]): number | null {
   return lowest;
 }
 
+/** Only show a length explicitly published in a cable's name. */
+export function cableLength(product: Pick<Product, 'category' | 'name'>): string | null {
+  if (product.category !== 'Cables de red') return null;
+  const match = product.name.match(/\b(\d+(?:[.,]\d+)?)\s*(?:metros?|m)\b/i);
+  return match ? `${match[1].replace('.', ',')} m` : null;
+}
+
 export type SortKey = 'relevancia' | 'precio-asc' | 'precio-desc' | 'nombre';
 export const sortOptions: { value: SortKey; label: string }[] = [
   { value: 'relevancia', label: 'Recomendados' },
@@ -156,10 +163,21 @@ export function filterProducts(products: Product[], filters: CatalogFilters): Pr
       (filters.maxPrice === null || Number(product.price) <= filters.maxPrice),
   );
   const byPrice = (a: Product, b: Product) => Number(a.price) - Number(b.price);
+  if (filters.sort === 'relevancia') {
+    result.sort((a, b) => Number(b.stock > 0) - Number(a.stock > 0));
+  }
   if (filters.sort === 'precio-asc') result.sort(byPrice);
   if (filters.sort === 'precio-desc') result.sort((a, b) => byPrice(b, a));
   if (filters.sort === 'nombre') result.sort((a, b) => a.name.localeCompare(b.name, 'es'));
   return result;
+}
+
+/** Contextual range excludes the price filter itself so a slider does not shrink while dragging. */
+export function catalogPriceBounds(products: Product[], filters: CatalogFilters): [number, number] {
+  const prices = filterProducts(products, { ...filters, minPrice: null, maxPrice: null })
+    .map((product) => Number(product.price))
+    .filter(Number.isFinite);
+  return prices.length ? [Math.floor(Math.min(...prices)), Math.ceil(Math.max(...prices))] : [0, 0];
 }
 
 export function paginate<T>(items: T[], requestedPage: number, size: number) {

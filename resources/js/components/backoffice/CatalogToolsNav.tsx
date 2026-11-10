@@ -8,6 +8,7 @@ export function CatalogToolsNav() {
         Productos
       </NavLink>
       <NavLink to="/admin/carga-masiva">Importar / exportar</NavLink>
+      <NavLink to="/admin/imagenes">Imágenes por lote</NavLink>
       <NavLink to="/admin/categorias">Categorías y marcas</NavLink>
     </nav>
   );
