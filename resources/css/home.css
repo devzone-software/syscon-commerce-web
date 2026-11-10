@@ -3,37 +3,7 @@
  * Imported at the top of app.css, so it uses its own class names instead of
  * overriding the legacy rules declared there.
  */
-:root {
-  /* SYSCON design system (Figma "01 — Design System" · Foundations). */
-  --syscon-brand-primary: #00265d;
-  --syscon-brand-dark: #0c131f;
-  --syscon-surface-default: #ffffff;
-  --syscon-surface-soft: #f6faff;
-  --syscon-border-default: #e0e8f0;
-  --syscon-text-primary: #111827;
-  --syscon-text-secondary: #59616c;
-  --syscon-success: #177245;
-  --syscon-warning: #9a6700;
-  --syscon-danger: #b42318;
-  --syscon-radius-sm: 8px;
-  --syscon-radius-md: 12px;
-  --syscon-radius-lg: 16px;
 
-  --store-ink: var(--syscon-text-primary);
-  --store-ink-soft: #3d4654;
-  --store-muted: var(--syscon-text-secondary);
-  --store-line: var(--syscon-border-default);
-  --store-surface: var(--syscon-surface-default);
-  --store-soft: var(--syscon-surface-soft);
-  --store-brand: var(--syscon-brand-primary);
-  --store-brand-strong: #001a42;
-  --store-navy: var(--syscon-brand-dark);
-  --store-header: var(--syscon-surface-default);
-  --store-radius: var(--syscon-radius-md);
-  /* Catalog banner: navy band under the white header. */
-  --store-banner: linear-gradient(90deg, #0c131f 0%, #00265d 60%, #0b3a82 100%);
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-}
 
 .visually-hidden {
   position: absolute;
@@ -475,15 +445,15 @@ input:focus-visible {
   bottom: 23px;
   padding: 2px 4px;
   border-radius: 2px;
-  background: #6ffbbe;
-  color: #002113;
+  background: var(--syscon-brand-primary);
+  color: var(--syscon-brand-primary);
   font-size: 10px;
   font-weight: 700;
   line-height: 15px;
 }
 .card-product-stock.out {
-  background: #ffdad6;
-  color: #93000a;
+  background: var(--syscon-brand-cyan-soft);
+  color: var(--syscon-brand-primary);
 }
 .card-product-category {
   font-size: 11px;

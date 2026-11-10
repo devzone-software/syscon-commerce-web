@@ -1,3 +1,4 @@
+import { publicBrand, publicProductCode } from '../../lib/productPresentation';
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useAccountPath } from '../../hooks/useAccountPath';
@@ -62,7 +63,7 @@ function AddToCartDialog({ request, onClose }: { request: Request; onClose: () =
     setAdded(quantity);
   };
   const price = Number(product.price);
-  const details = [product.category, product.brand].filter(Boolean).join(' · ');
+  const details = [product.category, publicBrand(product)].filter(Boolean).join(' · ');
 
   return (
     <dialog
@@ -101,7 +102,7 @@ function AddToCartDialog({ request, onClose }: { request: Request; onClose: () =
           <div>
             {details && <p className="add-dialog-cat">{details}</p>}
             <h3>{product.name}</h3>
-            <code>SKU: {product.sku}</code>
+            <code>Código: {publicProductCode(product)}</code>
             {inCart > 0 && (
               <p className="add-dialog-stock">
                 <i aria-hidden="true" />

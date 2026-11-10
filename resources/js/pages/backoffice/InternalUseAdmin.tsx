@@ -153,7 +153,7 @@ export function InternalUseAdmin() {
   return (
     <>
       <PageHeader
-        title="Uso interno"
+        title="Retiros para uso interno"
         description="Productos del inventario que se toman para uso de la empresa y dejan de estar a la venta."
       />
       {products.loading ? (

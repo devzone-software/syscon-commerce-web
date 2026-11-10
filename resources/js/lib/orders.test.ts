@@ -1,14 +1,37 @@
 import { describe, expect, it } from 'vitest';
 import {
   accountSummary,
+  customerOrderHint,
   allowedTransitions,
   orderProgress,
   orderStatusLabels,
+  orderLabelsForDelivery,
   statusLabel,
   statusTone,
 } from './orders';
 
 describe('order states', () => {
+  it('uses pickup instructions and labels without changing delivery orders', () => {
+    expect(orderLabelsForDelivery('PICKUP').SHIPPED).toBe('Listo para recoger');
+    expect(orderLabelsForDelivery('PICKUP').DELIVERED).toBe('Retirado');
+    expect(orderLabelsForDelivery('DELIVERY').SHIPPED).toBe('Enviado');
+    expect(orderLabelsForDelivery(null).SHIPPED).toBe('Enviado');
+    expect(customerOrderHint('PAID', 'PICKUP')).toContain('Espera a que figure');
+    expect(customerOrderHint('SHIPPED', 'PICKUP')).toContain('listo para recoger');
+    expect(customerOrderHint('DELIVERED', 'PICKUP')).toContain('retirado');
+    expect(customerOrderHint('PAYMENT_PENDING', 'PICKUP')).toContain('completar el pago');
+    expect(customerOrderHint('CANCELLED', 'PICKUP')).toContain('cancelado');
+    expect(customerOrderHint('SHIPPED', 'DELIVERY')).toContain('enviado');
+  });
+  it('explains next steps without presenting unknown or pending states as paid', () => {
+    expect(customerOrderHint('PAYMENT_PENDING')).toContain('completar el pago');
+    expect(customerOrderHint('PAID')).toContain('pago está confirmado');
+    expect(customerOrderHint('EXPIRED')).toContain('reserva venció');
+    expect(customerOrderHint('CANCELLED')).toContain('pedido está cancelado');
+    expect(customerOrderHint('NEW_STATE')).toBe(
+      'Consulta el estado informado y contacta al equipo si necesitas ayuda.',
+    );
+  });
   it('mirrors the order-service transitions', () => {
     expect(allowedTransitions('PAYMENT_PENDING')).toEqual(['CANCELLED']);
     expect(allowedTransitions('PAID')).toEqual(['PROCESSING']);

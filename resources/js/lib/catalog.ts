@@ -2,6 +2,24 @@ import type { Product } from '../types';
 
 export type CatalogGroup = { name: string; count: number };
 
+/** Preserve free text while separating published "label: value" characteristics. */
+export function productSpecifications(value?: string | null) {
+  return (value ?? '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((text) => {
+      const colon = text.indexOf(':');
+      const label = text.slice(0, colon).trim();
+      const value = text.slice(colon + 1).trim();
+      return colon > 0 && value ? { text, label, value } : { text, label: null, value: text };
+    });
+}
+
+export function productInquiryUrl(product: Pick<Product, 'name' | 'sku'>) {
+  return `/contacto?${new URLSearchParams({ producto: product.name, sku: product.sku })}#formulario`;
+}
+
 /** Groups the catalog by category or brand, most populated first. */
 export function groupProducts(products: Product[], key: 'category' | 'brand'): CatalogGroup[] {
   const counts = new Map<string, number>();
@@ -32,6 +50,30 @@ export function pickFeatured(products: Product[], limit: number): Product[] {
     }
   }
   return [...firstOfCategory, ...rest].slice(0, limit);
+}
+
+/** Lowest current price among purchasable products; this is not a promotional discount. */
+export function lowestAvailablePrice(products: Product[]): number | null {
+  let lowest: number | null = null;
+  for (const product of products) {
+    const price = Number(product.price);
+    if (
+      product.active &&
+      product.stock > 0 &&
+      Number.isFinite(price) &&
+      price >= 0 &&
+      (lowest === null || price < lowest)
+    )
+      lowest = price;
+  }
+  return lowest;
+}
+
+/** Only show a length explicitly published in a cable's name. */
+export function cableLength(product: Pick<Product, 'category' | 'name'>): string | null {
+  if (product.category !== 'Cables de red') return null;
+  const match = product.name.match(/\b(\d+(?:[.,]\d+)?)\s*(?:metros?|m)\b/i);
+  return match ? `${match[1].replace('.', ',')} m` : null;
 }
 
 export type SortKey = 'relevancia' | 'precio-asc' | 'precio-desc' | 'nombre';
@@ -121,10 +163,21 @@ export function filterProducts(products: Product[], filters: CatalogFilters): Pr
       (filters.maxPrice === null || Number(product.price) <= filters.maxPrice),
   );
   const byPrice = (a: Product, b: Product) => Number(a.price) - Number(b.price);
+  if (filters.sort === 'relevancia') {
+    result.sort((a, b) => Number(b.stock > 0) - Number(a.stock > 0));
+  }
   if (filters.sort === 'precio-asc') result.sort(byPrice);
   if (filters.sort === 'precio-desc') result.sort((a, b) => byPrice(b, a));
   if (filters.sort === 'nombre') result.sort((a, b) => a.name.localeCompare(b.name, 'es'));
   return result;
+}
+
+/** Contextual range excludes the price filter itself so a slider does not shrink while dragging. */
+export function catalogPriceBounds(products: Product[], filters: CatalogFilters): [number, number] {
+  const prices = filterProducts(products, { ...filters, minPrice: null, maxPrice: null })
+    .map((product) => Number(product.price))
+    .filter(Number.isFinite);
+  return prices.length ? [Math.floor(Math.min(...prices)), Math.ceil(Math.max(...prices))] : [0, 0];
 }
 
 export function paginate<T>(items: T[], requestedPage: number, size: number) {

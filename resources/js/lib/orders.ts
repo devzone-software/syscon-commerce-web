@@ -1,4 +1,4 @@
-import type { Order } from '../types';
+import type { DeliveryMethod, Order } from '../types';
 
 /** Order and payment states defined by order-service and payment-service. */
 export const orderStatusLabels: Record<string, string> = {
@@ -11,6 +11,52 @@ export const orderStatusLabels: Record<string, string> = {
   CANCELLED: 'Cancelado',
   EXPIRED: 'Vencido',
 };
+
+const customerOrderHints: Record<string, string> = {
+  PAYMENT_PENDING:
+    'Tu siguiente paso es completar el pago. La confirmación en línea depende de la pasarela; los pagos manuales los verifica el equipo.',
+  PAID: 'El pago está confirmado. El equipo coordinará la preparación y entrega del pedido.',
+  PROCESSING:
+    'Tu pedido está en preparación. Puedes consultar la modalidad de entrega registrada abajo.',
+  SHIPPED:
+    'Tu pedido figura como enviado. Si necesitas información del despacho, consulta con el equipo.',
+  DELIVERED:
+    'Tu pedido figura como entregado. Puedes revisar los productos y comprobantes o consultar por soporte.',
+  EXPIRED:
+    'La reserva venció. Revisa la disponibilidad actual en el catálogo antes de crear otro pedido.',
+  CANCELLED:
+    'El pedido está cancelado. Si realizaste un abono, consulta su situación con el equipo.',
+};
+
+/** The same operational steps represent dispatch or pickup, according to the order. */
+export const orderLabelsForDelivery = (method?: DeliveryMethod | null) =>
+  method === 'PICKUP'
+    ? { ...orderStatusLabels, SHIPPED: 'Listo para recoger', DELIVERED: 'Retirado' }
+    : orderStatusLabels;
+
+/** Filters group pickup and delivery orders under the same stored operational state. */
+export const orderFilterLabels: Record<string, string> = {
+  ...orderStatusLabels,
+  SHIPPED: 'Enviado / listo para recoger',
+  DELIVERED: 'Entregado / retirado',
+};
+
+export function customerOrderHint(status: string, method?: DeliveryMethod | null) {
+  if (method === 'PICKUP') {
+    if (status === 'PAID')
+      return 'Tu pago está confirmado. El equipo preparará tu pedido para retiro en tienda. Espera a que figure como listo para recoger antes de acercarte.';
+    if (status === 'PROCESSING')
+      return 'Tu pago está confirmado. Estamos preparando tu pedido para retiro en tienda. Espera a que figure como listo para recoger antes de acercarte.';
+    if (status === 'SHIPPED')
+      return 'Tu pedido está listo para recoger. Revisa los datos de retiro o consulta con el equipo la dirección y el horario antes de acercarte.';
+    if (status === 'DELIVERED')
+      return 'Tu pedido figura como retirado. Puedes descargar tu comprobante o consultar con soporte.';
+  }
+  return (
+    customerOrderHints[status] ??
+    'Consulta el estado informado y contacta al equipo si necesitas ayuda.'
+  );
+}
 
 /** Tabs of the backoffice orders inbox, in working order; '' lists every state. */
 export const orderInboxTabs = [
@@ -59,7 +105,7 @@ export const orderEventLabels: Record<string, string> = {
   INVOICE_ACCEPTED: 'Comprobante aceptado por SUNAT',
   CREDIT_NOTE_ACCEPTED: 'Nota de crédito aceptada',
   DEBIT_NOTE_ACCEPTED: 'Nota de débito aceptada',
-  NOTIFICATION_RESENT: 'Correo reenviado',
+  NOTIFICATION_RESENT: 'Reintento de aviso',
   PAYMENT_REJECTED: 'Pago en línea rechazado',
   PAYMENT_REFUND_REQUIRED: 'Pago recibido tras cancelar: requiere devolución',
   PAYMENT_DUPLICATE_REFUND_REQUIRED: 'Cobro duplicado: requiere devolución',
@@ -76,7 +122,7 @@ export const notificationLabels: Record<string, string> = {
 export const notificationStatusLabels: Record<string, string> = {
   PENDING: 'Pendiente',
   SENDING: 'Enviando',
-  SENT: 'Enviado',
+  SENT: 'Procesado',
   FAILED: 'Falló',
 };
 

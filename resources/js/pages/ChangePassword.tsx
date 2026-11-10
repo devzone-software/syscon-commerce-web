@@ -1,11 +1,12 @@
 import { useState, type FormEvent } from 'react';
 import { AuthLayout } from '../components/auth/AuthLayout';
+import { PasswordRequirements } from '../components/auth/PasswordRequirements';
 import { ArrowRightIcon, KeyIcon, LockIcon, ShieldIcon } from '../components/icons';
-import { MIN_PASSWORD, passwordChecks } from '../lib/auth';
+import { MIN_PASSWORD } from '../lib/auth';
 import { api } from '../services/api';
 import { useShop } from '../state';
 import { ErrorBox } from '../ui';
-import { PasswordInput } from './Auth';
+import { PasswordInput } from '../components/auth/AuthFields';
 
 /**
  * Shown instead of any page while the account has a temporary password from the superadmin:
@@ -18,7 +19,6 @@ export function ChangePassword() {
   const [confirmation, setConfirmation] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const strength = passwordChecks(next);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -89,26 +89,10 @@ export function ChangePassword() {
             minLength={MIN_PASSWORD}
           />
         </div>
-        <div className="auth-strength" aria-live="polite">
-          <div className="auth-strength-head">
-            <span>
-              FORTALEZA DE CONTRASEÑA:{' '}
-              {strength.strength && <b className={`is-${strength.passed}`}>{strength.strength}</b>}
-            </span>
-          </div>
-          <div className="auth-strength-bars" aria-hidden="true">
-            {strength.checks.map((_, index) => (
-              <i key={index} className={index < strength.passed ? 'is-on' : undefined} />
-            ))}
-          </div>
-          <ul>
-            {strength.checks.map((check) => (
-              <li key={check.label} className={check.ok ? 'is-ok' : undefined}>
-                {check.label}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <PasswordRequirements
+          value={next}
+          matches={confirmation.length > 0 && next === confirmation}
+        />
         <button className="auth-submit" disabled={busy}>
           {busy ? 'Guardando…' : 'GUARDAR CONTRASEÑA'} <ArrowRightIcon size={16} />
         </button>

@@ -89,7 +89,7 @@ export function ActivityAdmin() {
             <p className="catalog-count">
               {data.total === 1 ? '1 acción' : `${data.total} acciones`}
             </p>
-            <div className="table-wrap">
+            <div className="table-wrap responsive-table">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -103,26 +103,26 @@ export function ActivityAdmin() {
                 <tbody>
                   {data.items.map((entry) => (
                     <tr key={entry.id}>
-                      <td>{formatDateTime(entry.at)}</td>
-                      <td>
+                      <td data-label="Fecha">{formatDateTime(entry.at)}</td>
+                      <td data-label="Persona">
                         <strong>{entry.name ?? entry.email}</strong>
                         <small>
                           {entry.name && `${entry.email} · `}
                           {roleLabel(`ROLE_${entry.role}`)}
                         </small>
                       </td>
-                      <td>
+                      <td data-label="Acción">
                         {entry.action}
                         <small>
                           {entry.method} {entry.path}
                         </small>
                       </td>
-                      <td>
+                      <td data-label="Resultado">
                         <span className={`status-badge tone-${entry.ok ? 'success' : 'danger'}`}>
                           {entry.ok ? 'Aplicada' : `Rechazada (${entry.status})`}
                         </span>
                       </td>
-                      <td>{entry.ip ?? '—'}</td>
+                      <td data-label="IP">{entry.ip ?? '—'}</td>
                     </tr>
                   ))}
                 </tbody>

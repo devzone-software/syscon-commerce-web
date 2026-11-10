@@ -1,8 +1,10 @@
+import { UserIcon } from '../components/icons';
 import { useEffect, useRef, useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { InfoRows, OrderSummary } from '../components/cart/OrderSummary';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { OrderSummary } from '../components/cart/OrderSummary';
 import { BillingFields } from '../components/checkout/BillingFields';
 import { DeliveryFields } from '../components/checkout/DeliveryFields';
+import { PurchaseReview } from '../components/checkout/PurchaseReview';
 import { PageHero, PageSection } from '../components/layout/PageHero';
 import { useCartReview } from '../hooks/useCartReview';
 import { displayName } from '../lib/auth';
@@ -27,25 +29,49 @@ import { api } from '../services/api';
 import { money, useShop } from '../state';
 import type { DeliveryOptions, Payment, Profile } from '../types';
 import { ErrorBox, useData } from '../ui';
+import { ShoppingBackLink } from '../components/shared/ShoppingBackLink';
 
 export function Checkout() {
   const { cart, clear, user } = useShop();
   const { issues, checking } = useCartReview();
   const navigate = useNavigate();
+  const location = useLocation();
+  const cartPath =
+    (location.state as { cartPath?: string } | null)?.cartPath === '/cuenta/carrito'
+      ? '/cuenta/carrito'
+      : '/carrito';
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const methods = useData(api.paymentMethods);
   const gateway = onlineGateway(methods.data?.gateways);
   const [provider, setProvider] = useState<'MANUAL' | OnlineGateway>('MANUAL');
+  const methodsReady = !methods.loading && !methods.error && Boolean(methods.data);
+  const providerAvailable =
+    methodsReady &&
+    (provider === 'MANUAL'
+      ? methods.data?.manual === true
+      : methods.data?.gateways.includes(provider) === true);
+  useEffect(() => {
+    if (!methodsReady || providerAvailable) return;
+    if (methods.data?.manual) setProvider('MANUAL');
+    else if (gateway) setProvider(gateway.provider);
+  }, [methodsReady, providerAvailable, methods.data, gateway?.provider]);
   const [forms, setForms] = useState(() => initialForms(user));
   const [type, setType] = useState<BillingForm['type']>('03');
   const [delivery, setDelivery] = useState<DeliveryForm>(() =>
     deliveryFromProfile({ firstName: user?.firstName ?? null, lastName: user?.lastName ?? null }),
   );
-  const [options, setOptions] = useState<DeliveryOptions | null>(null);
-  const [optionsError, setOptionsError] = useState('');
+  const deliveryOptions = useData<DeliveryOptions>(api.deliveryOptions);
+  const options = deliveryOptions.data;
   const edited = useRef(false);
-  const [showErrors, setShowErrors] = useState(false);
+  const [validationAttempt, setValidationAttempt] = useState(0);
+  const showErrors = validationAttempt > 0;
+  const checkoutRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!validationAttempt) return;
+    const field = checkoutRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+    field?.focus();
+  }, [validationAttempt]);
 
   // Prefill from the stored profile unless the customer already started typing.
   useEffect(() => {
@@ -59,10 +85,6 @@ export function Checkout() {
         setDelivery(deliveryFromProfile(profile));
       })
       .catch(() => undefined);
-    api
-      .deliveryOptions()
-      .then((value) => active && setOptions(value))
-      .catch((e) => active && setOptionsError((e as Error).message));
     return () => {
       active = false;
     };
@@ -85,8 +107,9 @@ export function Checkout() {
   };
 
   const submit = async () => {
+    if (busy || blocked) return;
     if (invalid) {
-      setShowErrors(true);
+      setValidationAttempt((attempt) => attempt + 1);
       return;
     }
     setBusy(true);
@@ -122,122 +145,196 @@ export function Checkout() {
     }
   };
 
-  if (!cart.length && !busy) return <Navigate to="/carrito" replace />;
-  const blocked = checking || issues.size > 0 || !options;
+  if (!cart.length && !busy) return <Navigate to={cartPath} replace />;
+  const blocked =
+    !providerAvailable ||
+    checking ||
+    issues.size > 0 ||
+    shipping === null ||
+    !options ||
+    deliveryOptions.loading ||
+    Boolean(deliveryOptions.error);
 
   return (
     <>
       <PageHero
-        eyebrow="CHECKOUT SEGURO"
+        eyebrow="TU COMPRA"
         title="Finaliza tu compra"
         text="Elige la entrega y el comprobante, revisa los productos y confirma tu pedido."
       />
-      <PageSection title="Datos de compra">
-        <InfoRows
-          rows={[
-            { label: 'Cliente', value: user ? displayName(user) : '—' },
-            { label: 'Correo electrónico', value: user?.email ?? '—' },
-          ]}
-        />
-        <p className="flow-note">
-          El pedido quedará vinculado a tu cuenta y podrás seguirlo desde “Mis pedidos”.
-        </p>
-        <h3 className="flow-subtitle">Entrega</h3>
-        {optionsError ? (
-          <ErrorBox message={`No pudimos cargar las opciones de entrega. ${optionsError}`} />
-        ) : (
-          <DeliveryFields
-            form={delivery}
-            options={options}
-            errors={showErrors ? deliveryErrors : {}}
-            onChange={updateDelivery}
-          />
-        )}
-        <h3 className="flow-subtitle">Comprobante de pago</h3>
-        <BillingFields
-          type={type}
-          form={billing}
-          errors={showErrors ? billingErrors : {}}
-          onType={(value) => {
-            edited.current = true;
-            setType(value);
-          }}
-          onChange={updateBilling}
-        />
-        {showErrors && invalid && (
-          <p className="notice error" role="alert">
-            Revisa los datos de entrega y del comprobante antes de confirmar.
-          </p>
-        )}
-        <h3 className="flow-subtitle">Productos</h3>
-        <ul className="checkout-lines">
-          {cart.map(({ product, quantity }) => {
-            const issue = issues.get(product.id);
-            return (
-              <li key={product.id} className="checkout-line">
-                <span>
-                  {product.name} × {quantity}
-                  {issue && <small className="cart-line-issue">{issueMessages[issue]}</small>}
-                </span>
-                <strong>{money(Number(product.price) * quantity)}</strong>
-              </li>
-            );
-          })}
-        </ul>
-        <Link className="link-button" to="/carrito">
-          Editar carrito
-        </Link>
-        <h3 className="flow-subtitle">Método de pago</h3>
-        <label className="payment-option">
-          <input
-            type="radio"
-            name="payment"
-            checked={provider === 'MANUAL'}
-            onChange={() => setProvider('MANUAL')}
-          />
-          <span>
-            <strong>Pago manual: transferencia bancaria o pago coordinado con un asesor</strong>
-            Tras crear el pedido se registra una solicitud de pago. Un asesor la confirma cuando
-            verifica el pago.
-          </span>
-        </label>
-        {gateway && (
-          <label className="payment-option">
-            <input
-              type="radio"
-              name="payment"
-              checked={provider === gateway.provider}
-              onChange={() => setProvider(gateway.provider)}
-            />
+      <div className="container shopping-navigation">
+        <ShoppingBackLink to={cartPath}>Volver al carrito</ShoppingBackLink>
+      </div>
+      <div className="container checkout-layout" ref={checkoutRef}>
+        <PageSection title="Datos de compra">
+          <div className="checkout-identity">
             <span>
-              <strong>{gateway.label}</strong>Después de registrar el pedido te llevaremos a la
-              página de pago.
+              <UserIcon size={21} />
             </span>
-          </label>
-        )}
-        {methods.error && (
-          <p className="flow-note">
-            No pudimos consultar el pago en línea. Puedes registrar el pedido con pago manual.
-          </p>
-        )}
-        {error && <ErrorBox message={error} />}
-      </PageSection>
-      <PageSection title="Resumen del pedido" soft>
-        <OrderSummary lines={cart} totalLabel="Total a pagar" shipping={shipping}>
-          {issues.size > 0 && (
+            <div>
+              <strong>{user ? displayName(user) : 'Mi cuenta'}</strong>
+              <small>{user?.email}</small>
+            </div>
+          </div>
+          <h3 className="checkout-step-title">
+            <span>1</span> Entrega
+          </h3>
+          {deliveryOptions.error ? (
+            <ErrorBox
+              message={`No pudimos cargar las opciones de entrega. ${deliveryOptions.error}`}
+              retry={deliveryOptions.reload}
+            />
+          ) : (
+            <DeliveryFields
+              form={delivery}
+              options={options}
+              errors={showErrors ? deliveryErrors : {}}
+              onChange={updateDelivery}
+            />
+          )}
+          <h3 className="checkout-step-title">
+            <span>2</span> Comprobante
+          </h3>
+          <BillingFields
+            type={type}
+            form={billing}
+            errors={showErrors ? billingErrors : {}}
+            onType={(value) => {
+              edited.current = true;
+              setType(value);
+            }}
+            onChange={updateBilling}
+          />
+          {showErrors && invalid && (
             <p className="notice error" role="alert">
-              Hay productos que requieren atención. <Link to="/carrito">Revisar carrito</Link>
+              Revisa los datos de entrega y del comprobante antes de confirmar.
             </p>
           )}
-          <button type="button" className="flow-button" disabled={busy || blocked} onClick={submit}>
-            {busy
-              ? 'Creando pedido…'
-              : checking || !options
-                ? 'Verificando disponibilidad…'
-                : 'Confirmar compra'}
-          </button>
-        </OrderSummary>
-      </PageSection>
+          <details className="checkout-product-review" open={issues.size > 0 || undefined}>
+            <summary>Productos del pedido ({cart.length})</summary>
+            <ul className="checkout-lines">
+              {cart.map(({ product, quantity }) => {
+                const issue = issues.get(product.id);
+                return (
+                  <li key={product.id} className="checkout-line">
+                    <span>
+                      {product.name} × {quantity}
+                      {issue && <small className="cart-line-issue">{issueMessages[issue]}</small>}
+                    </span>
+                    <strong>{money(Number(product.price) * quantity)}</strong>
+                  </li>
+                );
+              })}
+            </ul>
+            <Link className="link-button" to={cartPath}>
+              Editar carrito
+            </Link>
+          </details>
+          <h3 className="checkout-step-title">
+            <span>3</span> Método de pago
+          </h3>
+          {methods.loading ? (
+            <p className="flow-note" role="status">
+              Consultando medios de pago…
+            </p>
+          ) : methods.error ? (
+            <ErrorBox
+              message={`No pudimos consultar los medios de pago. ${methods.error}`}
+              retry={methods.reload}
+            />
+          ) : !methods.data?.manual && !gateway ? (
+            <p className="notice" role="status">
+              No hay medios de pago disponibles. Reintenta la consulta o contacta con SYSCON.
+              <button type="button" className="link-button" onClick={methods.reload}>
+                Reintentar
+              </button>
+            </p>
+          ) : null}
+          {methodsReady && methods.data?.manual && (
+            <label className="payment-option">
+              <input
+                type="radio"
+                name="payment"
+                checked={provider === 'MANUAL'}
+                onChange={() => setProvider('MANUAL')}
+              />
+              <span>
+                <strong>Transferencia o pago con asesor</strong>
+                Crea el pedido y coordina el pago con SYSCON. El personal verificará el abono.
+              </span>
+            </label>
+          )}
+          {methodsReady && gateway && (
+            <label className="payment-option">
+              <input
+                type="radio"
+                name="payment"
+                checked={provider === gateway.provider}
+                onChange={() => setProvider(gateway.provider)}
+              />
+              <span>
+                <strong>{gateway.label}</strong>Después de registrar el pedido te llevaremos a la
+                página de pago.
+              </span>
+            </label>
+          )}
+          {error && <ErrorBox message={error} />}
+        </PageSection>
+        <PageSection title="Resumen del pedido" soft>
+          <OrderSummary lines={cart} totalLabel="Total a pagar" shipping={shipping}>
+            <PurchaseReview
+              delivery={delivery}
+              billingType={type}
+              billingName={billing.name}
+              provider={provider}
+            />
+            <p className="flow-note purchase-conditions-link">
+              <Link to="/informacion-de-compra" target="_blank" rel="noopener">
+                Entrega y condiciones de compra
+                <span className="visually-hidden"> (se abre en otra pestaña)</span>
+              </Link>
+            </p>
+            {options && !deliveryOptions.loading && !deliveryOptions.error && shipping === null && (
+              <div className="notice" role="status">
+                No hay una tarifa disponible para esta entrega. Elige otra modalidad o{' '}
+                <Link to="/contacto">consulta con SYSCON</Link> antes de confirmar.{' '}
+                <button type="button" className="link-button" onClick={deliveryOptions.reload}>
+                  Consultar tarifas de nuevo
+                </button>
+              </div>
+            )}
+            {issues.size > 0 && (
+              <p className="notice error" role="alert">
+                Hay productos que requieren atención. <Link to={cartPath}>Revisar carrito</Link>
+              </p>
+            )}
+            <button
+              type="button"
+              className="flow-button"
+              disabled={busy || blocked}
+              onClick={submit}
+            >
+              {busy
+                ? 'Creando pedido…'
+                : !providerAvailable
+                  ? methods.loading
+                    ? 'Consultando medios de pago…'
+                    : 'Consulta los medios de pago para continuar'
+                  : deliveryOptions.error
+                    ? 'Entrega no disponible: reintenta la consulta'
+                    : checking || deliveryOptions.loading || !options
+                      ? 'Verificando disponibilidad…'
+                      : shipping === null
+                        ? 'Elige una entrega con tarifa disponible'
+                        : provider === 'MANUAL'
+                          ? 'Confirmar pedido'
+                          : provider === 'MERCADOPAGO'
+                            ? 'Continuar a Mercado Pago'
+                            : 'Continuar al pago de prueba'}
+            </button>
+          </OrderSummary>
+        </PageSection>
+      </div>
     </>
   );
 }

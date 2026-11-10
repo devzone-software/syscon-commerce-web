@@ -79,8 +79,8 @@ function Summary({ data }: { data: SalesSummary }) {
         </p>
       </section>
 
-      <div className="bo-detail-grid">
-        <section className="bo-card" aria-labelledby="by-day-title">
+      <div className="bo-detail-grid sales-report-breakdown">
+        <section className="bo-card sales-report-days" aria-labelledby="by-day-title">
           <h2 id="by-day-title">Ventas por día</h2>
           <div className="table-wrap">
             <table className="data-table">
@@ -143,9 +143,9 @@ function Summary({ data }: { data: SalesSummary }) {
             </table>
           </div>
         </section>
-        <section className="bo-card" aria-labelledby="documents-title">
+        <section className="bo-card sales-report-documents" aria-labelledby="documents-title">
           <h2 id="documents-title">Comprobantes generados</h2>
-          <div className="table-wrap">
+          <div className="table-wrap responsive-table sales-report-table">
             <table className="data-table">
               <thead>
                 <tr>
@@ -163,13 +163,15 @@ function Summary({ data }: { data: SalesSummary }) {
               <tbody>
                 {data.invoices.map((row) => (
                   <tr key={row.type}>
-                    <td>{invoiceTypeLabel(row.type)}</td>
+                    <td data-label="Tipo">{invoiceTypeLabel(row.type)}</td>
                     {Object.keys(invoiceStatusLabels).map((status) => (
-                      <td key={status} className="num">
+                      <td key={status} className="num" data-label={invoiceStatusLabels[status]}>
                         {row.byStatus[status] ?? 0}
                       </td>
                     ))}
-                    <td className="num">{money(Number(row.acceptedTotal))}</td>
+                    <td className="num" data-label="Total aceptado">
+                      {money(Number(row.acceptedTotal))}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -208,7 +210,7 @@ function SalesTable({
     );
   return (
     <>
-      <div className="table-wrap">
+      <div className="table-wrap responsive-table sales-report-table">
         <table className="data-table">
           <caption className="visually-hidden">Ventas del período</caption>
           <thead>
@@ -232,20 +234,24 @@ function SalesTable({
           <tbody>
             {data.items.map((row) => (
               <tr key={row.orderId}>
-                <td>{formatDateTime(row.paidAt)}</td>
-                <td>
+                <td data-label="Pago confirmado">{formatDateTime(row.paidAt)}</td>
+                <td data-label="Pedido">
                   <Link className="link-button" to={`/admin/pedidos?id=${row.orderId}`}>
                     {shortId(row.orderId)}
                   </Link>
                   <small>{statusLabel(orderStatusLabels, row.status)}</small>
                 </td>
-                <td>
+                <td data-label="Cliente">
                   {row.billingName ?? row.customerEmail}
                   {row.billingDocument && <small>{row.billingDocument}</small>}
                 </td>
-                <td className="num">{money(Number(row.total))}</td>
-                <td className="num">{money(Number(row.paidAmount))}</td>
-                <td>
+                <td className="num" data-label="Total">
+                  {money(Number(row.total))}
+                </td>
+                <td className="num" data-label="Pago aprobado">
+                  {money(Number(row.paidAmount))}
+                </td>
+                <td data-label="Comprobantes">
                   {row.invoices.length
                     ? row.invoices.map((invoice) => (
                         <small key={invoice.id}>
@@ -255,8 +261,10 @@ function SalesTable({
                       ))
                     : '—'}
                 </td>
-                <td className="num">{money(Number(row.netInvoiced))}</td>
-                <td>
+                <td className="num" data-label="Facturado neto">
+                  {money(Number(row.netInvoiced))}
+                </td>
+                <td data-label="Conciliación">
                   {row.reconciled ? (
                     <span className="muted">Concilia</span>
                   ) : (

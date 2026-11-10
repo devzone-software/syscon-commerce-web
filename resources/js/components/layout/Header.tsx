@@ -12,13 +12,11 @@ import { catalogSearchQuery } from '../../lib/catalog';
 import { canUseBackoffice } from '../../lib/auth';
 import { money, useShop } from '../../state';
 import { CloseIcon, MenuIcon } from '../icons';
+import { AccountMenu } from './AccountMenu';
+import { storefront } from '../../lib/storefront';
 
 /** Company contact data shown in the top bar and the footer. */
-export const company = {
-  phone: '(01) 748-2900',
-  phoneHref: 'tel:+5117482900',
-  email: 'contacto@gruposyscon.pe',
-};
+export const company = storefront.company;
 
 export function Brand() {
   return (
@@ -115,29 +113,7 @@ export function Header() {
             <button type="submit">Buscar</button>
           </form>
           <div className="store-actions">
-            <nav className="store-account" aria-label="Cuenta">
-              {user ? (
-                <>
-                  {staff ? (
-                    <Link to="/admin">Administración</Link>
-                  ) : (
-                    <>
-                      <Link to="/cuenta">Mi cuenta</Link>
-                      <Link to="/cuenta/pedidos">Mis compras</Link>
-                    </>
-                  )}
-                  <button type="button" onClick={signOut}>
-                    Salir
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link to="/registro">Crea tu cuenta</Link>
-                  <Link to="/ingresar">Ingresa</Link>
-                  <Link to="/cuenta/pedidos">Mis compras</Link>
-                </>
-              )}
-            </nav>
+            <AccountMenu />
             <Link
               to="/carrito"
               className="store-cart"
@@ -196,7 +172,7 @@ export function Header() {
                     <NavLink to="/cuenta" end>
                       Mi cuenta
                     </NavLink>
-                    <NavLink to="/cuenta/pedidos">Mis compras</NavLink>
+                    <NavLink to="/cuenta/pedidos">Mis pedidos</NavLink>
                   </>
                 )}
                 <button type="button" onClick={signOut}>
@@ -207,7 +183,7 @@ export function Header() {
               <>
                 <NavLink to="/ingresar">Iniciar sesión</NavLink>
                 <NavLink to="/registro">Crear cuenta</NavLink>
-                <NavLink to="/cuenta/pedidos">Mis compras</NavLink>
+                <NavLink to="/cuenta/pedidos">Mis pedidos</NavLink>
               </>
             )}
           </div>

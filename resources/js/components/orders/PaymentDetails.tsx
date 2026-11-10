@@ -8,12 +8,14 @@ export function PaymentDetails({ payment }: { payment: Payment }) {
   return (
     <>
       <dl className="detail-list">
-        <div>
-          <dt>Solicitud de pago</dt>
-          <dd>
-            <code>{payment.id}</code>
-          </dd>
-        </div>
+        {payment.status === 'PENDING' && (
+          <div>
+            <dt>Solicitud de pago</dt>
+            <dd>
+              <code>{payment.id}</code>
+            </dd>
+          </div>
+        )}
         <div>
           <dt>Método</dt>
           <dd>{paymentMethodLabel(payment.provider)}</dd>
@@ -44,7 +46,7 @@ export function PaymentDetails({ payment }: { payment: Payment }) {
           </div>
         )}
       </dl>
-      {payment.instructions && (
+      {payment.status === 'PENDING' && payment.instructions && (
         <div className="payment-instructions">
           <strong>Cómo pagar</strong>
           <p>{payment.instructions}</p>

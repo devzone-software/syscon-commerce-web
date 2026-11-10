@@ -8,6 +8,7 @@ import {
   type CatalogFilters,
   type CatalogGroup,
 } from '../../lib/catalog';
+import { money } from '../../state';
 import { ArrowRightIcon, CloseIcon, HeadsetIcon, SearchIcon } from '../icons';
 import '../../../css/products.css';
 import { useAccountPath } from '../../hooks/useAccountPath';
@@ -76,10 +77,14 @@ export function CatalogSidebar({
   onClose: () => void;
 }) {
   const [brandQuery, setBrandQuery] = useState('');
+  const [allCategories, setAllCategories] = useState(false);
+  const visibleCategories = allCategories
+    ? categories
+    : categories.filter((category, index) => index < 5 || category.name === filters.category);
   const accountPath = useAccountPath();
   const [min, max] = priceBounds;
-  const low = filters.minPrice ?? min;
-  const high = filters.maxPrice ?? max;
+  const low = Math.max(min, Math.min(max, filters.minPrice ?? min));
+  const high = Math.max(low, Math.max(min, Math.min(max, filters.maxPrice ?? max)));
   const span = Math.max(max - min, 1);
   const shownBrands = brands.filter((brand) =>
     normalize(brand.name).includes(normalize(brandQuery)),
@@ -118,7 +123,7 @@ export function CatalogSidebar({
             strong
             onChange={() => onChange({ [catalogParams.category]: '' })}
           />
-          {categories.map((category) => (
+          {visibleCategories.map((category) => (
             <Option
               key={category.name}
               label={category.name}
@@ -131,8 +136,23 @@ export function CatalogSidebar({
               }
             />
           ))}
+          {categories.length > 5 && (
+            <button
+              type="button"
+              className="side-show-categories"
+              aria-expanded={allCategories}
+              onClick={() => setAllCategories(!allCategories)}
+            >
+              {allCategories
+                ? 'Ver menos categorías'
+                : `Ver todas las categorías (${categories.length})`}
+            </button>
+          )}
         </Block>
-        <Block title="Rango de Precio (S/)">
+        <Block title="Precio">
+          <p className="side-price-summary">
+            {money(filters.minPrice ?? min)} – {money(filters.maxPrice ?? max)}
+          </p>
           <div
             className="side-range"
             style={{
@@ -161,38 +181,41 @@ export function CatalogSidebar({
               }
             />
           </div>
-          <div className="side-price">
-            <label>
-              MÍNIMO
-              <span>
-                S/
-                <input
-                  type="number"
-                  min={0}
-                  value={filters.minPrice ?? ''}
-                  placeholder={String(min)}
-                  onChange={(event) =>
-                    onChange({ [catalogParams.minPrice]: event.target.value }, true)
-                  }
-                />
-              </span>
-            </label>
-            <label>
-              MÁXIMO
-              <span>
-                S/
-                <input
-                  type="number"
-                  min={0}
-                  value={filters.maxPrice ?? ''}
-                  placeholder={String(max)}
-                  onChange={(event) =>
-                    onChange({ [catalogParams.maxPrice]: event.target.value }, true)
-                  }
-                />
-              </span>
-            </label>
-          </div>
+          <details className="side-price-manual">
+            <summary>Escribir un rango</summary>
+            <div className="side-price">
+              <label>
+                MÍNIMO
+                <span>
+                  S/
+                  <input
+                    type="number"
+                    min={0}
+                    value={filters.minPrice ?? ''}
+                    placeholder={String(min)}
+                    onChange={(event) =>
+                      onChange({ [catalogParams.minPrice]: event.target.value }, true)
+                    }
+                  />
+                </span>
+              </label>
+              <label>
+                MÁXIMO
+                <span>
+                  S/
+                  <input
+                    type="number"
+                    min={0}
+                    value={filters.maxPrice ?? ''}
+                    placeholder={String(max)}
+                    onChange={(event) =>
+                      onChange({ [catalogParams.maxPrice]: event.target.value }, true)
+                    }
+                  />
+                </span>
+              </label>
+            </div>
+          </details>
         </Block>
         {(brands.length > 0 || filters.brand) && (
           <Block title="Marca">

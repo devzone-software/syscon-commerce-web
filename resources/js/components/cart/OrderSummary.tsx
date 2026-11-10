@@ -23,7 +23,7 @@ export function InfoRows({
 
 /**
  * Totals shared by the cart and the checkout; the backend confirms the final amount.
- * `shipping`: omitted in the cart (chosen later), null while loading, otherwise the cost.
+ * `shipping`: omitted in the cart, null when no confirmed cost is available, otherwise the cost.
  */
 export function OrderSummary({
   lines,
@@ -41,9 +41,9 @@ export function OrderSummary({
   const total = subtotal + (shipping ?? 0);
   const shippingLabel =
     shipping === undefined
-      ? 'Se elige en el checkout'
+      ? 'Se calcula al finalizar'
       : shipping === null
-        ? '…'
+        ? 'Por confirmar'
         : shipping === 0
           ? 'Gratis'
           : money(shipping);
@@ -56,12 +56,14 @@ export function OrderSummary({
             value: money(subtotal),
           },
           { label: 'Envío', value: shippingLabel },
-          { label: totalLabel, value: money(total), tone: 'total' },
+          {
+            label: shipping === undefined ? 'Productos, sin envío' : totalLabel,
+            value: shipping === null ? 'Por confirmar' : money(total),
+            tone: 'total',
+          },
         ]}
       />
-      <p className="order-summary-note">
-        El precio y la disponibilidad se confirman al crear el pedido.
-      </p>
+      <p className="order-summary-note">Precio y disponibilidad se confirman al crear tu pedido.</p>
       {children}
     </div>
   );

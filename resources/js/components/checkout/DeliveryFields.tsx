@@ -1,11 +1,11 @@
-import { deliveryMethodLabels, type DeliveryForm } from '../../lib/delivery';
+import { deliveryMethodLabels, deliveryCost, type DeliveryForm } from '../../lib/delivery';
 import { money } from '../../state';
 import type { DeliveryMethod, DeliveryOptions } from '../../types';
 
 type Errors = Partial<Record<keyof DeliveryForm, string>>;
 
-const costLabel = (cost: string | null | undefined) =>
-  cost == null ? 'No disponible' : Number(cost) === 0 ? 'Gratis' : money(Number(cost));
+const costLabel = (cost: number | null) =>
+  cost === null ? 'No disponible' : cost === 0 ? 'Gratis' : money(cost);
 
 /** Pickup or home delivery, with the costs the platform publishes, and the contact who receives. */
 export function DeliveryFields({
@@ -30,27 +30,24 @@ export function DeliveryFields({
         {errors[key]}
       </p>
     );
-  const choices: { value: DeliveryMethod; text: string; cost?: string | null; enabled: boolean }[] =
-    [
-      {
-        value: 'PICKUP',
-        text: options?.pickup.address
-          ? options.pickup.address + (options.pickup.hours ? ' · ' + options.pickup.hours : '')
-          : 'Te indicaremos la tienda y el horario al confirmar el pedido.',
-        cost: options?.pickup.cost,
-        enabled: true,
-      },
-      {
-        value: 'DELIVERY',
-        text: options?.delivery.enabled
-          ? options.delivery.areas
-            ? 'Cobertura: ' + options.delivery.areas
-            : 'Llevamos tu pedido a la dirección que indiques.'
-          : 'No disponible por ahora.',
-        cost: options?.delivery.cost,
-        enabled: Boolean(options?.delivery.enabled),
-      },
-    ];
+  const choices: { value: DeliveryMethod; text: string; enabled: boolean }[] = [
+    {
+      value: 'PICKUP',
+      text: options?.pickup.address
+        ? options.pickup.address + (options.pickup.hours ? ' · ' + options.pickup.hours : '')
+        : 'Te indicaremos la tienda y el horario al confirmar el pedido.',
+      enabled: Boolean(options?.pickup.enabled),
+    },
+    {
+      value: 'DELIVERY',
+      text: options?.delivery.enabled
+        ? options.delivery.areas
+          ? 'Cobertura: ' + options.delivery.areas
+          : 'Llevamos tu pedido a la dirección que indiques.'
+        : 'No disponible por ahora.',
+      enabled: Boolean(options?.delivery.enabled),
+    },
+  ];
 
   return (
     <fieldset className="billing-fields">
@@ -69,12 +66,15 @@ export function DeliveryFields({
               value={choice.value}
               checked={form.method === choice.value}
               disabled={!choice.enabled}
+              {...fieldProps('method')}
               onChange={() => onChange({ method: choice.value })}
             />
             <span>
               <strong>
                 {deliveryMethodLabels[choice.value]}
-                <em className="billing-option-cost">{options ? costLabel(choice.cost) : '…'}</em>
+                <em className="billing-option-cost">
+                  {options ? costLabel(deliveryCost(choice.value, options)) : '…'}
+                </em>
               </strong>
               {choice.text}
             </span>
@@ -82,9 +82,12 @@ export function DeliveryFields({
         ))}
       </div>
       {fieldError('method')}
+      <p className="flow-note">
+        Usaremos el celular para coordinar la entrega o el retiro de tu pedido.
+      </p>
       <div className="field-row">
         <label className="field">
-          {home ? 'Quién recibe' : 'Quién retira'}
+          {home ? 'Quién recibe (obligatorio)' : 'Quién retira (obligatorio)'}
           <input
             value={form.contactName}
             onChange={(event) => onChange({ contactName: event.target.value })}
@@ -96,7 +99,7 @@ export function DeliveryFields({
           {fieldError('contactName')}
         </label>
         <label className="field">
-          Celular de contacto
+          Celular de contacto (obligatorio)
           <input
             value={form.contactPhone}
             onChange={(event) => onChange({ contactPhone: event.target.value })}
@@ -113,19 +116,19 @@ export function DeliveryFields({
         <>
           <div className="field-row">
             <label className="field">
-              Dirección de entrega
+              Dirección completa de entrega (obligatorio)
               <input
                 value={form.address}
                 onChange={(event) => onChange({ address: event.target.value })}
                 maxLength={255}
                 autoComplete="street-address"
-                placeholder="Av., calle, número, dpto."
+                placeholder="Calle, número, dpto., provincia y departamento"
                 {...fieldProps('address')}
               />
               {fieldError('address')}
             </label>
             <label className="field">
-              Distrito
+              Distrito (obligatorio)
               <input
                 value={form.district}
                 onChange={(event) => onChange({ district: event.target.value })}

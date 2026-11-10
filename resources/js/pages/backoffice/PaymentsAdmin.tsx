@@ -1,23 +1,23 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PageHeader } from '../../components/backoffice/PageHeader';
+import { PaymentList } from '../../components/backoffice/PaymentList';
 import { PaymentDetails } from '../../components/orders/PaymentDetails';
 import { Pagination } from '../../components/shared/Pagination';
-import { StatusBadge } from '../../components/shared/StatusBadge';
 import { can, permissions } from '../../lib/auth';
-import {
-  formatDateTime,
-  orderStatusLabels,
-  paymentStatusLabels,
-  shortId,
-  statusLabel,
-} from '../../lib/orders';
+import { shortId } from '../../lib/orders';
 import { api } from '../../services/api';
-import { money, useShop } from '../../state';
+import { useShop } from '../../state';
 import type { Payment } from '../../types';
 import { useData, Empty, ErrorBox, Loading } from '../../ui';
 
-const paymentTabs = ['PENDING', 'APPROVED', 'REJECTED', 'REFUND_REQUIRED', 'CANCELLED'];
+const paymentTabs = [
+  { value: 'PENDING', label: 'Pendientes' },
+  { value: 'APPROVED', label: 'Confirmados' },
+  { value: 'REJECTED', label: 'Rechazados' },
+  { value: 'REFUND_REQUIRED', label: 'Por devolver' },
+  { value: 'CANCELLED', label: 'Anulados' },
+];
 
 function PaymentDetail({ id, onChanged }: { id: string; onChanged: () => void }) {
   const { user } = useShop();
@@ -99,7 +99,9 @@ function PaymentDetail({ id, onChanged }: { id: string; onChanged: () => void })
               ? 'Este pago ya fue confirmado.'
               : data.status === 'CANCELLED'
                 ? 'Este pago se anuló porque su pedido fue cancelado o venció.'
-                : 'Este pago no admite confirmación manual.'}
+                : data.status === 'REFUND_REQUIRED'
+                  ? 'Hay un cobro que requiere devolución. Revisa el movimiento con el proveedor; este estado no confirma que el dinero se haya devuelto.'
+                  : 'Este pago no admite confirmación manual. Su estado se consulta con el proveedor.'}
           </p>
         )}
       </aside>
@@ -108,15 +110,17 @@ function PaymentDetail({ id, onChanged }: { id: string; onChanged: () => void })
 }
 
 export function PaymentsAdmin() {
+  const methods = useData(api.paymentMethods);
   const [params, setParams] = useSearchParams();
   const id = params.get('id') ?? '';
   const status = params.get('estado') || 'PENDING';
   const q = params.get('q') ?? '';
   const page = Number(params.get('pagina') || 1);
   const [search, setSearch] = useState(q);
-  const { data, loading, error, reload } = useData(
+  const { data, loading, refreshing, error, reload } = useData(
     () => api.adminPayments({ status, q, page }),
     [status, q, page],
+    { keepPreviousData: true },
   );
 
   const update = (changes: Record<string, string>) => {
@@ -137,22 +141,61 @@ export function PaymentsAdmin() {
     <>
       <PageHeader
         title="Pagos"
-        description="Solicitudes de pago manual por verificar, las más antiguas primero. Confirma solo después de comprobar el abono en el banco."
+        description="Consulta pagos y confirma los abonos manuales después de verificarlos en el banco."
       />
+      {methods.error ? (
+        <ErrorBox
+          message={`No se pudieron consultar los medios habilitados: ${methods.error}`}
+          retry={methods.reload}
+        />
+      ) : methods.data ? (
+        <details className="bo-disclosure payment-methods">
+          <summary>Medios de pago habilitados</summary>
+          <p className="notice">
+            {methods.data.manual &&
+              'Pago manual habilitado: requiere revisión del abono por el personal. '}
+            {methods.data.gateways.includes('MERCADOPAGO')
+              ? 'Mercado Pago está habilitado para este entorno; sus pagos se confirman consultando al proveedor.'
+              : 'Mercado Pago no está habilitado en este entorno.'}
+            {methods.data.gateways.includes('SANDBOX') &&
+              ' El simulador de pagos de prueba está habilitado; no realiza cobros reales.'}
+          </p>
+        </details>
+      ) : null}
       {id && <PaymentDetail key={id} id={id} onChanged={reload} />}
-      <section className="bo-card" aria-labelledby="payments-count">
-        <div className="bo-tabs" role="group" aria-label="Estado del pago">
+      <section className="bo-card" aria-labelledby="payments-count" aria-busy={refreshing}>
+        {refreshing && (
+          <p role="status" className="visually-hidden">
+            Actualizando pagos…
+          </p>
+        )}
+        <div className="bo-tabs payment-tabs" role="group" aria-label="Estado del pago">
           {paymentTabs.map((tab) => (
             <button
-              key={tab}
+              key={tab.value}
               type="button"
-              aria-pressed={status === tab}
-              onClick={() => update({ estado: tab === 'PENDING' ? '' : tab })}
+              aria-pressed={status === tab.value}
+              onClick={() => update({ estado: tab.value === 'PENDING' ? '' : tab.value })}
             >
-              {statusLabel(paymentStatusLabels, tab)}
+              {tab.label}
             </button>
           ))}
         </div>
+        <label className="field payment-state-select">
+          Estado del pago
+          <select
+            value={status}
+            onChange={(event) =>
+              update({ estado: event.target.value === 'PENDING' ? '' : event.target.value })
+            }
+          >
+            {paymentTabs.map((tab) => (
+              <option key={tab.value} value={tab.value}>
+                {tab.label}
+              </option>
+            ))}
+          </select>
+        </label>
         <form className="bo-filters bo-filters-compact" onSubmit={submitSearch}>
           <label className="field">
             Buscar
@@ -177,70 +220,14 @@ export function PaymentsAdmin() {
                 {data.total} {data.total === 1 ? 'pago' : 'pagos'}
               </p>
               {data.items.length ? (
-                <div className="table-wrap">
-                  <table className="data-table">
-                    <thead>
-                      <tr>
-                        <th scope="col">Solicitud</th>
-                        <th scope="col">Cliente</th>
-                        <th scope="col" className="num">
-                          Monto
-                        </th>
-                        <th scope="col">Pedido</th>
-                        <th scope="col">{status === 'APPROVED' ? 'Referencia' : 'Estado'}</th>
-                        <th scope="col">
-                          <span className="visually-hidden">Acciones</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.items.map((payment) => (
-                        <tr
-                          key={payment.id}
-                          className={payment.id === id ? 'bo-row-active' : undefined}
-                        >
-                          <td>
-                            <strong>#{shortId(payment.id)}</strong>
-                            <small>{formatDateTime(payment.createdAt ?? null)}</small>
-                          </td>
-                          <td>{payment.customerEmail}</td>
-                          <td className="num">{money(Number(payment.amount))}</td>
-                          <td>
-                            <strong>#{shortId(payment.orderId)}</strong>
-                            <small>
-                              {statusLabel(orderStatusLabels, payment.orderStatus)}
-                              {payment.orderExpiresAt &&
-                                ` · vence ${formatDateTime(payment.orderExpiresAt)}`}
-                            </small>
-                          </td>
-                          <td>
-                            {status === 'APPROVED' ? (
-                              <>
-                                {payment.externalReference}
-                                <small>{formatDateTime(payment.confirmedAt ?? null)}</small>
-                              </>
-                            ) : (
-                              <StatusBadge status={payment.status} labels={paymentStatusLabels} />
-                            )}
-                          </td>
-                          <td className="num">
-                            <button
-                              type="button"
-                              className="link-button"
-                              onClick={() => {
-                                update({ id: payment.id, pagina: params.get('pagina') ?? '' });
-                                window.scrollTo({ top: 0 });
-                              }}
-                            >
-                              {payment.status === 'PENDING' ? 'Verificar' : 'Ver'}
-                              <span className="visually-hidden"> pago {shortId(payment.id)}</span>
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <PaymentList
+                  payments={data.items}
+                  selectedId={id}
+                  onSelect={(payment) => {
+                    update({ id: payment.id, pagina: params.get('pagina') ?? '' });
+                    window.scrollTo({ top: 0 });
+                  }}
+                />
               ) : (
                 <Empty
                   title="Sin pagos"

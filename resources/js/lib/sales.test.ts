@@ -50,6 +50,14 @@ describe('direct sale payment', () => {
 });
 
 describe('gateway return', () => {
+  it('does not infer preparation from a payment or from a fulfilled order', () => {
+    for (const state of ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED']) {
+      const notice = gatewayReturnNotice(state);
+      expect(notice.tone).toBe('success');
+      expect(notice.text).toContain('pago está confirmado');
+      expect(notice.text).not.toContain('preparando');
+    }
+  });
   it('only confirms when the backend reports the order as paid', () => {
     expect(gatewayReturnNotice('PAID').tone).toBe('success');
     expect(gatewayReturnNotice('PAYMENT_PENDING').tone).toBe('info');

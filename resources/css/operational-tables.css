@@ -1,0 +1,120 @@
+.supplier-format summary {
+  cursor: pointer;
+  padding: 12px 0;
+  font-weight: 600;
+}
+.supplier-format p {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+/* Entry forms remain usable before the mobile card breakpoint. */
+.responsive-table.is-entry .data-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+.responsive-table.is-entry .data-table th:first-child {
+  width: 38%;
+}
+.responsive-table.is-entry input,
+.responsive-table.is-entry select {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+}
+@media (max-width: 900px) {
+  .order-lines .data-table tbody td {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    min-width: 0;
+    padding: 10px 0;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .order-lines .data-table tbody td:first-child,
+  .order-lines .data-table tbody td:last-child {
+    grid-column: 1 / -1;
+  }
+  .order-lines .data-table tfoot th,
+  .order-lines .data-table tfoot td {
+    min-width: 0;
+    width: auto;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .table-wrap.responsive-table {
+    overflow: visible;
+  }
+  .responsive-table .data-table {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+  .responsive-table .data-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .responsive-table .data-table tbody {
+    display: grid;
+    gap: 16px;
+  }
+  .responsive-table .data-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 16px;
+    padding: 12px;
+    border: 1px solid #dbe4ee;
+    border-radius: 12px;
+    background: #fff;
+  }
+  .bo-main .responsive-table .data-table tbody td {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    min-width: 0;
+    width: auto;
+    padding: 10px 0;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    border: 0;
+  }
+  .responsive-table .data-table tbody td::before {
+    content: attr(data-label);
+    font-size: 12px;
+    font-weight: 600;
+    color: #526477;
+  }
+  .bo-main .responsive-table .data-table td > * {
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .responsive-table .data-table td .form-actions {
+    flex-wrap: wrap;
+  }
+  .responsive-table .data-table td button {
+    min-height: 40px;
+  }
+  .bo-main .responsive-table .data-table tbody td:first-child,
+  .bo-main .responsive-table .data-table tbody td:last-child {
+    grid-column: 1 / -1;
+  }
+  .responsive-table .data-table tfoot {
+    display: block;
+    padding: 16px 0;
+  }
+  .responsive-table .data-table tfoot tr {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+}

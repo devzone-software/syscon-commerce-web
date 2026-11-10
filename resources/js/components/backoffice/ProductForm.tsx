@@ -1,7 +1,8 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
+import { useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { cleanProduct, validateProduct, type ProductInput } from '../../lib/products';
 import { api } from '../../services/api';
 import { ErrorBox } from '../../ui';
+import { ProductImageEditor } from './ProductImageEditor';
 
 function Field({
   id,
@@ -43,7 +44,7 @@ export function ProductForm({
   editing: boolean;
   categories: string[];
   brands: string[];
-  /** Published SKUs: saving a new product with one of them updates that product. */
+  /** Existing SKUs, including inactive products: saving one updates that product. */
   existingSkus?: string[];
   onSaved: (message: string) => void;
   onCancel: () => void;
@@ -52,6 +53,7 @@ export function ProductForm({
   const [errors, setErrors] = useState<ReturnType<typeof validateProduct>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
   const set = (patch: Partial<ProductInput>) => setForm((current) => ({ ...current, ...patch }));
   const describedBy = (id: keyof ProductInput) => (errors[id] ? `product-${id}-error` : undefined);
   const overwrites = !editing && existingSkus.includes(form.sku.trim());
@@ -61,7 +63,14 @@ export function ProductForm({
     const product = cleanProduct(form);
     const found = validateProduct(product);
     setErrors(found);
-    if (Object.keys(found).length) return;
+    if (Object.keys(found).length) {
+      requestAnimationFrame(() => {
+        const invalid = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+        invalid?.focus({ preventScroll: true });
+        invalid?.scrollIntoView({ block: 'center', behavior: 'instant' });
+      });
+      return;
+    }
     setBusy(true);
     setError('');
     try {
@@ -76,6 +85,7 @@ export function ProductForm({
 
   return (
     <form
+      ref={formRef}
       className="bo-card form-stack"
       onSubmit={submit}
       noValidate
@@ -84,7 +94,8 @@ export function ProductForm({
       <h2 id="product-form-title">{editing ? `Editar ${initial.name}` : 'Nuevo producto'}</h2>
       <p className="notice">
         El SKU identifica al producto. El stock físico incluye las unidades reservadas; no puede ser
-        inferior a esas reservas. Para entradas y retiros, usa Compras o Uso interno.
+        inferior a esas reservas. Para entradas y retiros, usa Compras a proveedores o Retiros para
+        uso interno.
       </p>
       {error && <ErrorBox message={error} />}
       <div className="field-row">
@@ -100,7 +111,8 @@ export function ProductForm({
           />
           {overwrites && (
             <small id="product-sku-exists" className="field-warning" role="status">
-              Ya existe un producto publicado con este SKU: al guardar se reemplazarán sus datos.
+              Ya existe un producto con este SKU, publicado o inactivo: al guardar se reemplazarán
+              sus datos.
             </small>
           )}
         </Field>
@@ -200,16 +212,14 @@ export function ProductForm({
           </datalist>
         </Field>
       </div>
-      <Field id="product-image" label="URL de imagen" error={errors.imageUrl}>
-        <input
-          id="product-image"
-          type="url"
-          value={form.imageUrl ?? ''}
-          onChange={(e) => set({ imageUrl: e.target.value })}
-          aria-invalid={Boolean(errors.imageUrl)}
-          aria-describedby={describedBy('imageUrl')}
-        />
-      </Field>
+      <ProductImageEditor
+        value={form.imageUrl ?? ''}
+        original={initial.imageUrl ?? ''}
+        name={form.name}
+        error={errors.imageUrl}
+        disabled={busy}
+        onChange={(imageUrl) => set({ imageUrl: imageUrl || null })}
+      />
       <label className="facet-option">
         <input
           type="checkbox"

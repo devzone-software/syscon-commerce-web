@@ -50,7 +50,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #177245;
+  background: var(--syscon-brand-primary);
 }
 
 /* Hero */
@@ -311,7 +311,7 @@
   background: linear-gradient(135deg, #00658d 0%, #0d3b82 100%);
 }
 .category-campaigns .is-green {
-  background: linear-gradient(135deg, #00381f 0%, #0b4f5c 100%);
+  background: linear-gradient(135deg, var(--syscon-brand-primary) 0%, #0b4f5c 100%);
 }
 .category-campaigns li > span {
   padding: 3px 10px;
@@ -322,8 +322,8 @@
   letter-spacing: 0.05em;
 }
 .category-campaigns .is-green > span {
-  background: #6ffbbe;
-  color: #002113;
+  background: var(--syscon-brand-primary);
+  color: var(--syscon-brand-primary);
 }
 .category-campaigns h3 {
   margin: 0;
@@ -437,8 +437,8 @@
   font-weight: 700;
 }
 .showcase-card-top .is-ok {
-  background: #6ffbbe;
-  color: #002113;
+  background: var(--syscon-brand-primary);
+  color: var(--syscon-brand-primary);
 }
 .showcase-card-top .is-ok::before {
   content: '● ';

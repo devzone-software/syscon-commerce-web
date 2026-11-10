@@ -6,7 +6,8 @@ import {
   displayName,
   initials,
   loginDestination,
-  passwordChecks,
+  MIN_PASSWORD,
+  passwordRequirementStatus,
   roleLabel,
   safeRedirect,
 } from './auth';
@@ -81,12 +82,11 @@ describe('user identity from the e-mail', () => {
   });
 });
 
-describe('password strength', () => {
-  it('rates the password with the four rules shown in the sign up form', () => {
-    expect(passwordChecks('').strength).toBe('');
-    expect(passwordChecks('abc').strength).toBe('Débil');
-    expect(passwordChecks('abcdefghijkl1').passed).toBe(2);
-    expect(passwordChecks('TechSyscon2026!').strength).toBe('Fuerte');
-    expect(passwordChecks('TechSyscon2026!').checks.every((check) => check.ok)).toBe(true);
+describe('password requirements', () => {
+  it('shows only the minimum length enforced by the server', () => {
+    expect(MIN_PASSWORD).toBe(12);
+    expect(passwordRequirementStatus('').complete).toBe(false);
+    expect(passwordRequirementStatus('short').remaining).toBe(7);
+    expect(passwordRequirementStatus('abcdefghijkl')).toEqual({ remaining: 0, complete: true });
   });
 });

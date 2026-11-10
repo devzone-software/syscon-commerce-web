@@ -67,6 +67,19 @@ describe('delivery', () => {
     expect(deliveryCost('DELIVERY', options)).toBe(15);
     expect(deliveryCost('DELIVERY', null)).toBeNull();
   });
+  it('does not treat an unknown, invalid or disabled delivery rate as free', () => {
+    for (const cost of [null, '', ' ', '-1', 'NaN', 'Infinity', 'por cotizar']) {
+      const unavailable = { ...options, delivery: { ...options.delivery, cost } };
+      expect(deliveryCost('DELIVERY', unavailable)).toBeNull();
+      expect(validateDelivery(home, unavailable).method).toBeDefined();
+    }
+    expect(
+      deliveryCost('DELIVERY', { ...options, delivery: { ...options.delivery, cost: '0.00' } }),
+    ).toBe(0);
+    expect(
+      deliveryCost('PICKUP', { ...options, pickup: { ...options.pickup, enabled: false } }),
+    ).toBeNull();
+  });
   it('prefills the contact from the profile and describes old orders', () => {
     expect(
       deliveryFromProfile({ firstName: 'Ana', lastName: 'Quispe', phone: '987654321' }),

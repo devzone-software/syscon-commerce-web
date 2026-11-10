@@ -20,7 +20,9 @@ export function BillingFields({
   errors,
   onType,
   onChange,
+  context = 'checkout',
 }: {
+  context?: 'checkout' | 'staff';
   type: BillingForm['type'];
   form: BillingForm;
   errors: Partial<Record<keyof BillingForm, string>>;
@@ -83,7 +85,7 @@ export function BillingFields({
       <div className={`field-row${factura ? ' is-single' : ''}`}>
         {factura ? (
           <label className="field">
-            RUC
+            RUC (obligatorio)
             <input
               value={form.documentNumber}
               onChange={(event) => onChange({ documentNumber: event.target.value })}
@@ -133,7 +135,7 @@ export function BillingFields({
               </p>
             ) : (
               <label className="field">
-                Número de documento
+                Número de documento (obligatorio)
                 <input
                   value={form.documentNumber}
                   onChange={(event) => onChange({ documentNumber: event.target.value })}
@@ -150,7 +152,11 @@ export function BillingFields({
         )}
       </div>
       <label className="field">
-        {factura ? 'Razón social' : 'Nombre completo'}
+        {factura
+          ? 'Razón social (obligatorio)'
+          : form.documentType === '0'
+            ? 'Nombre completo (opcional)'
+            : 'Nombre completo (obligatorio)'}
         <input
           value={form.name}
           onChange={(event) => onChange({ name: event.target.value })}
@@ -184,8 +190,9 @@ export function BillingFields({
         </label>
       )}
       <p className="flow-note">
-        Estos datos se guardan con tu pedido para emitir el comprobante. Si luego cambias tu perfil,
-        el pedido conserva los datos con los que compraste.
+        {context === 'staff'
+          ? 'Revisa los datos del comprador: se guardarán con la venta y se usarán para preparar su comprobante.'
+          : 'Usaremos estos datos para emitir tu comprobante. Revísalos antes de confirmar.'}
       </p>
     </fieldset>
   );

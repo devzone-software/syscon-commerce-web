@@ -1,0 +1,92 @@
+{
+  "purpose": "Local reference photography for demo SKUs. Manufacturer images retain their original rights; these are not exact product model claims.",
+  "date": "2026-11-10",
+  "images": [
+    {
+      "file": "usb-ethernet.jpg",
+      "source": "https://static.tp-link.com/1_large_1557038845349f.jpg"
+    },
+    {
+      "file": "usb-wifi.jpg",
+      "source": "https://static.tp-link.com/Archer-T4U(UN)3.0_01_large_1528979690833v.jpg"
+    },
+    {
+      "file": "access-point.png",
+      "source": "https://static.tp-link.com/upload/image-line/EAP650_UN_1.0_large_20230821091756x.png"
+    },
+    {
+      "file": "camera-indoor.jpg",
+      "source": "https://static.tp-link.com/upload/image-line/01_large_20230817224004v.jpg"
+    },
+    {
+      "file": "nic.jpg",
+      "source": "https://static.tp-link.com/res/images/products/large/TG-3468(UN)2.0-01.jpg"
+    },
+    {
+      "file": "router-wifi.jpg",
+      "source": "https://static.tp-link.com/upload/image-line/1_large_20240529030144h.jpg"
+    },
+    {
+      "file": "router-business.jpg",
+      "source": "https://static.tp-link.com/upload/image-line/ER605_UN_2.30_overview_01_large_20250919060139b.jpg"
+    },
+    {
+      "file": "switch-24.jpg",
+      "source": "https://static.tp-link.com/TL-SG3428_UN_2.0_01_large_1610956416747l.jpg"
+    },
+    {
+      "file": "ups.jpg",
+      "source": "https://download.se.com/files?p_Doc_Ref=SPD_CENZ-AV3MSY_A_H&p_File_Type=rendition_1500_jpg"
+    },
+    {
+      "file": "connector.jpg",
+      "source": "https://media.startech.com/cms/products/main/crj45c6str50.main.jpg"
+    },
+    {
+      "file": "patch-panel.jpg",
+      "source": "https://media.startech.com/cms/products/main/c6panel24.main.jpg"
+    },
+    {
+      "file": "rack.jpg",
+      "source": "https://media.startech.com/cms/products/main/rk619wall.main.jpg"
+    },
+    {
+      "file": "keyboard.png",
+      "source": "https://resource.logitech.com/content/dam/logitech/en/products/keyboards/k120/gallery/k120-gallery-01-new.png"
+    },
+    {
+      "file": "mouse.png",
+      "source": "https://resource.logitech.com/content/dam/logitech/en/products/mice/b100/gallery/b100-blackcharcoal-gallery-1.png"
+    },
+    {
+      "file": "camera-outdoor.jpg",
+      "source": "https://static.tp-link.com/VIGIC300HP02large_1614828402533Q.jpg"
+    },
+    {
+      "file": "ssd-sata.jpg",
+      "source": "https://media.kingston.com/kingston/product/ktc-product-ssd-a400-sa400s37-480gb-1-zm-lg.jpg"
+    },
+    {
+      "file": "ssd-nvme.jpg",
+      "source": "https://media.kingston.com/kingston/product/ktc-product-ssd-snv2s-1000g-1-zm-lg.jpg"
+    },
+    {
+      "file": "organizer.jpg",
+      "source": "https://media.startech.com/cms/products/main/cablmanagerh.main.jpg"
+    },
+    {
+      "file": "cable.jpg",
+      "source": "https://media.startech.com/cms/pdfs/c6patch3bl_datasheet.pdf",
+      "note": "Original JPEG embedded on page 1; extracted without editing."
+    },
+    {
+      "file": "ram.png",
+      "source": "https://www.corsair.com/us/en/p/memory/cmk16gx4m2b3200c16/vengeancea-lpx-16gb-2-x-8gb-ddr4-dram-3200mhz-c16-memory-kit-black-cmk16gx4m2b3200c16",
+      "image": "https://res.cloudinary.com/corsair-pwa/image/upload/products/Memory/CMK16GX4M2B3200C16/Gallery/VENG_LPX_BLK_00.png"
+    },
+    {
+      "file": "../product-photos/tl-sg108.jpg",
+      "source": "https://www.tp-link.com/us/business-networking/soho-switch-unmanaged/tl-sg108/"
+    }
+  ]
+}

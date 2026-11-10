@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { publicBrand } from '../../lib/productPresentation';
+import { Link, useLocation } from 'react-router-dom';
 import { issueMessages, type CartIssue } from '../../lib/cart';
 import { money } from '../../state';
 import type { CartLine } from '../../types';
@@ -17,11 +18,14 @@ export function CartLineItem({
   onRemove: () => void;
 }) {
   const { product, quantity } = line;
+  const location = useLocation();
+  const returnState = { from: location.pathname + location.search };
   const blocked = issue === 'unavailable' || issue === 'out-of-stock';
   return (
     <li className={`cart-line${issue ? ' has-issue' : ''}`}>
       <Link
         to={`/producto/${product.id}`}
+        state={returnState}
         className="cart-line-media"
         tabIndex={-1}
         aria-hidden="true"
@@ -29,13 +33,11 @@ export function CartLineItem({
         <ProductImage product={product} />
       </Link>
       <div className="cart-line-info">
-        {product.brand && <span className="card-product-brand">{product.brand}</span>}
-        <Link to={`/producto/${product.id}`} className="cart-line-name">
+        {publicBrand(product) && <span className="card-product-brand">{publicBrand(product)}</span>}
+        <Link to={`/producto/${product.id}`} state={returnState} className="cart-line-name">
           {product.name}
         </Link>
-        <span className="cart-line-meta">
-          SKU {product.sku} · {money(Number(product.price))} c/u
-        </span>
+        <span className="cart-line-meta">{money(Number(product.price))} por unidad</span>
         {issue && (
           <p className="cart-line-issue" role="alert">
             {issueMessages[issue]}

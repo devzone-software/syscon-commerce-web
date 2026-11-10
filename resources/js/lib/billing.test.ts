@@ -215,6 +215,8 @@ describe('invoice files', () => {
   it('never presents drafts, rejections or tests as valid documents', () => {
     expect(invoiceValidity('DRAFT', true)).toMatch(/Borrador/);
     expect(invoiceValidity('FAILED', false)).toMatch(/sin valor/);
+    expect(invoiceValidity('FAILED', false)).not.toMatch(/sin enviar|Borrador/);
+    expect(invoiceValidity('UNKNOWN', false)).toMatch(/Estado sin confirmar/);
     expect(invoiceValidity('REJECTED', false)).toMatch(/Rechazado/);
     expect(invoiceValidity('ACCEPTED', true)).toMatch(/prueba/);
     expect(invoiceValidity('ACCEPTED', false)).toBe('Comprobante aceptado por SUNAT.');

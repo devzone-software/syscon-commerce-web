@@ -1,6 +1,6 @@
 import { StrictMode, lazy, Suspense, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { StateProvider, useShop } from './state';
 import { AddToCartProvider } from './components/cart/AddToCartDialog';
 import { Layout, Loading, RequireAuth } from './ui';
@@ -43,6 +43,14 @@ const Offers = lazy(() => import('./pages/Offers').then((module) => ({ default: 
 const Contact = lazy(() =>
   import('./pages/Contact').then((module) => ({ default: module.Contact })),
 );
+const PurchaseInformation = lazy(() =>
+  import('./pages/PurchaseInformation').then((module) => ({ default: module.PurchaseInformation })),
+);
+const CatalogPhotoProposal = lazy(() =>
+  import('./pages/CatalogPhotoProposal').then((module) => ({
+    default: module.CatalogPhotoProposal,
+  })),
+);
 const ChangePassword = lazy(() =>
   import('./pages/ChangePassword').then((module) => ({ default: module.ChangePassword })),
 );
@@ -79,6 +87,8 @@ function StoreRoutes() {
           <Route path="/categorias" element={<Categories />} />
           <Route path="/ofertas" element={<Offers />} />
           <Route path="/contacto" element={<Contact />} />
+          <Route path="/informacion-de-compra" element={<PurchaseInformation />} />
+          <Route path="/propuesta-fotos" element={<CatalogPhotoProposal />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
@@ -90,6 +100,11 @@ function StoreRoutes() {
 function PasswordGate({ children }: { children: ReactNode }) {
   const { user } = useShop();
   return user?.mustChangePassword ? <ChangePassword /> : children;
+}
+
+function CatalogRedirect() {
+  const { search, hash } = useLocation();
+  return <Navigate to={{ pathname: '/catalogo', search, hash }} replace />;
 }
 
 function App() {
@@ -115,7 +130,6 @@ function App() {
                 <Route path="/recuperar" element={<Recover />} />
                 {/* The customer portal has its own sidebar layout (Figma "Client / Mi cuenta"). */}
                 {[
-                  { path: '/cuenta/productos', title: 'Productos', page: <Catalog /> },
                   { path: '/cuenta/soporte', title: 'Ayuda y contacto', page: <Contact /> },
                   { path: '/cuenta/nosotros', title: 'Sobre SYSCON', page: <About /> },
                 ].map(({ path, title, page }) => (
@@ -125,13 +139,7 @@ function App() {
                     element={
                       <RequireAuth>
                         <AccountLayout title={title}>
-                          <div
-                            className={
-                              path === '/cuenta/productos' ? 'portal-catalog' : 'portal-page'
-                            }
-                          >
-                            {page}
-                          </div>
+                          <div className="portal-page">{page}</div>
                         </AccountLayout>
                       </RequireAuth>
                     }
@@ -169,6 +177,7 @@ function App() {
                     </RequireAuth>
                   }
                 />
+                <Route path="/cuenta/productos" element={<CatalogRedirect />} />
                 <Route path="*" element={<StoreRoutes />} />
               </Routes>
             </PasswordGate>

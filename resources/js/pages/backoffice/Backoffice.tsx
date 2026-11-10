@@ -1,3 +1,4 @@
+import { AccessOverview } from '../../components/backoffice/AccessOverview';
 import {
   useEffect,
   useRef,
@@ -5,13 +6,12 @@ import {
   type CSSProperties,
   type KeyboardEvent,
   type PointerEvent,
-  type ReactElement,
 } from 'react';
 import { Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Brand } from '../../components/layout/Header';
 import { PageMain } from '../../components/layout/PageMain';
 import { CloseIcon, ExpandIcon, MenuIcon, ShrinkIcon, SidebarIcon } from '../../components/icons';
-import { can, canUseBackoffice, permissions, roleLabel, type Permission } from '../../lib/auth';
+import { can, canUseBackoffice, roleLabel } from '../../lib/auth';
 import {
   clampWidth,
   loadLayout,
@@ -21,148 +21,8 @@ import {
 } from '../../lib/backofficeLayout';
 import { useShop } from '../../state';
 import { Empty } from '../../ui';
-import { ActivityAdmin } from './ActivityAdmin';
-import { BillingAdmin } from './BillingAdmin';
-import { CashRegister } from './CashRegister';
-import { Dashboard } from './Dashboard';
-import { DirectSale } from './DirectSale';
-import { InternalUseAdmin } from './InternalUseAdmin';
-import { InventoryAdmin } from './InventoryAdmin';
-import { OrdersAdmin } from './OrdersAdmin';
-import { PaymentsAdmin } from './PaymentsAdmin';
-import { ProductBulkAdmin } from './ProductBulkAdmin';
-import { ProductsAdmin } from './ProductsAdmin';
-import { PurchasesAdmin } from './PurchasesAdmin';
-import { ReportsAdmin } from './ReportsAdmin';
-import { SalesReport } from './SalesReport';
-import { SuppliersAdmin } from './SuppliersAdmin';
-import { TaxonomyAdmin } from './TaxonomyAdmin';
-import { UsersAdmin } from './UsersAdmin';
+import { sections } from './sections';
 import '../../../css/backoffice.css';
-
-type Section = {
-  path: string;
-  label: string;
-  group: string;
-  permission?: Permission;
-  element: ReactElement;
-};
-
-/** Only sections backed by existing APIs are listed; see docs/API-NECESARIAS.md. */
-const sections: Section[] = [
-  { path: '', label: 'Panel', group: 'General', element: <Dashboard /> },
-  {
-    path: 'productos',
-    label: 'Productos',
-    group: 'Catálogo',
-    permission: permissions.catalogWrite,
-    element: <ProductsAdmin />,
-  },
-  {
-    path: 'carga-masiva',
-    label: 'Carga masiva',
-    group: 'Catálogo',
-    permission: permissions.catalogWrite,
-    element: <ProductBulkAdmin />,
-  },
-  {
-    path: 'categorias',
-    label: 'Categorías y marcas',
-    group: 'Catálogo',
-    permission: permissions.catalogWrite,
-    element: <TaxonomyAdmin />,
-  },
-  {
-    path: 'proveedores',
-    label: 'Proveedores',
-    group: 'Catálogo',
-    permission: permissions.suppliersManage,
-    element: <SuppliersAdmin />,
-  },
-  {
-    path: 'existencias',
-    label: 'Existencias',
-    group: 'Inventario',
-    permission: permissions.catalogWrite,
-    element: <InventoryAdmin />,
-  },
-  {
-    path: 'compras',
-    label: 'Compras al por mayor',
-    group: 'Inventario',
-    permission: permissions.inventoryManage,
-    element: <PurchasesAdmin />,
-  },
-  {
-    path: 'uso-interno',
-    label: 'Uso interno',
-    group: 'Inventario',
-    permission: permissions.inventoryManage,
-    element: <InternalUseAdmin />,
-  },
-  {
-    path: 'pedidos',
-    label: 'Pedidos',
-    group: 'Ventas',
-    permission: permissions.ordersManage,
-    element: <OrdersAdmin />,
-  },
-  {
-    path: 'venta-directa',
-    label: 'Venta directa',
-    group: 'Ventas',
-    permission: permissions.salesCreate,
-    element: <DirectSale />,
-  },
-  {
-    path: 'caja',
-    label: 'Caja',
-    group: 'Ventas',
-    permission: permissions.cashManage,
-    element: <CashRegister />,
-  },
-  {
-    path: 'pagos',
-    label: 'Pagos',
-    group: 'Ventas',
-    permission: permissions.paymentsConfirm,
-    element: <PaymentsAdmin />,
-  },
-  {
-    path: 'facturacion',
-    label: 'Comprobantes',
-    group: 'Facturación',
-    permission: permissions.invoicesSubmit,
-    element: <BillingAdmin />,
-  },
-  {
-    path: 'reportes/ventas',
-    label: 'Ventas y conciliación',
-    group: 'Reportes',
-    permission: permissions.reportsView,
-    element: <SalesReport />,
-  },
-  {
-    path: 'reportes',
-    label: 'Catálogo e inventario',
-    group: 'Reportes',
-    element: <ReportsAdmin />,
-  },
-  {
-    path: 'usuarios',
-    label: 'Usuarios',
-    group: 'Seguridad',
-    permission: permissions.usersManage,
-    element: <UsersAdmin />,
-  },
-  {
-    path: 'actividad',
-    label: 'Actividad del personal',
-    group: 'Seguridad',
-    permission: permissions.auditView,
-    element: <ActivityAdmin />,
-  },
-];
 
 export function Backoffice() {
   const { user, logout } = useShop();
@@ -225,7 +85,7 @@ export function Backoffice() {
       <div className="container page">
         <Empty
           title="Acceso restringido"
-          text="Tu cuenta no tiene permisos para el backoffice."
+          text="Tu cuenta no tiene permisos para la administración."
           action={
             <Link className="button button-primary" to="/">
               Volver a la tienda
@@ -238,7 +98,12 @@ export function Backoffice() {
   const allowed = sections.filter(
     (section) => !section.permission || can(user, section.permission),
   );
-  const groups = [...new Set(allowed.map((section) => section.group))];
+  const requestedSection = sections.find(
+    (section) => `/admin/${section.path}` === location.pathname,
+  );
+  const navigation = allowed.filter((section) => !section.parent);
+  const currentSection = allowed.find((section) => `/admin/${section.path}` === location.pathname);
+  const groups = [...new Set(navigation.map((section) => section.group))];
   const signOut = async () => {
     await logout();
     navigate('/');
@@ -269,7 +134,7 @@ export function Backoffice() {
           <SidebarIcon />
         </button>
         <Brand />
-        <span className="bo-topbar-tag">Backoffice</span>
+        <span className="bo-topbar-tag">Administración</span>
         <div className="bo-topbar-user">
           <span>
             {user?.email}
@@ -291,7 +156,7 @@ export function Backoffice() {
             Ver tienda
           </Link>
           <Link to="/cuenta" className="link-button">
-            Área de cliente
+            Mis compras personales
           </Link>
           <button type="button" className="link-button" onClick={signOut}>
             Salir
@@ -306,24 +171,36 @@ export function Backoffice() {
           ref={sidebarRef}
           id="bo-sidebar"
           className={`bo-sidebar${menuOpen ? ' is-open' : ''}`}
-          aria-label="Backoffice"
+          aria-label="Administración"
+          onClick={(event) => {
+            if (event.target instanceof Element && event.target.closest('a')) setMenuOpen(false);
+          }}
         >
           {groups.map((group) => (
             <div key={group} className="bo-nav-group">
               <span>{group}</span>
-              {allowed
+              {navigation
                 .filter((section) => section.group === group)
                 .map((section) => (
                   <NavLink
                     key={section.path}
                     to={section.path ? `/admin/${section.path}` : '/admin'}
                     end
+                    className={({ isActive }) =>
+                      isActive || currentSection?.parent === section.path ? 'active' : undefined
+                    }
                   >
                     {section.label}
                   </NavLink>
                 ))}
             </div>
           ))}
+          <div className="bo-nav-group">
+            <span>Tu cuenta</span>
+            <NavLink to="/admin/mi-acceso" end>
+              Mi acceso
+            </NavLink>
+          </div>
         </nav>
         {!layout.collapsed && (
           <div
@@ -347,6 +224,7 @@ export function Backoffice() {
         )}
         <PageMain className="bo-main">
           <Routes>
+            <Route path="mi-acceso" element={<AccessOverview sections={allowed} />} />
             {allowed.map((section) => (
               <Route
                 key={section.path}
@@ -359,8 +237,16 @@ export function Backoffice() {
               path="*"
               element={
                 <Empty
-                  title="Sección no disponible"
-                  text="La sección no existe o tu cuenta no tiene permiso para verla."
+                  title={
+                    requestedSection
+                      ? `Acceso no habilitado: ${requestedSection.label}`
+                      : 'Sección no disponible'
+                  }
+                  text={
+                    requestedSection
+                      ? 'Esta tarea no está habilitada para tu cuenta. Si la necesitas para tu trabajo, consulta a la administración de SYSCON.'
+                      : 'No encontramos esta sección. Puedes continuar desde el panel.'
+                  }
                   action={
                     <Link className="button button-primary" to="/admin">
                       Ir al panel

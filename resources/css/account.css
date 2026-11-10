@@ -31,6 +31,16 @@
   height: 50px;
   object-fit: contain;
 }
+.portal-sidebar-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.portal-sidebar-close,
+.portal-menu-scrim {
+  display: none;
+}
 .portal-user {
   display: flex;
   align-items: center;
@@ -61,7 +71,7 @@
   height: 10px;
   border: 2px solid #f0f3ff;
   border-radius: 50%;
-  background: #177245;
+  background: var(--syscon-brand-primary);
 }
 .portal-user > div {
   display: flex;
@@ -89,8 +99,8 @@
   margin-top: 4px;
   padding: 2px 8px;
   border-radius: 3px;
-  background: #6ffbbe;
-  color: #002113;
+  background: var(--syscon-brand-cyan-soft);
+  color: var(--syscon-brand-primary);
   font-size: 11px;
   font-style: normal;
   font-weight: 700;
@@ -181,7 +191,7 @@
 }
 .portal-crumb span {
   margin: 0 6px;
-  color: #8a93a3;
+  color: var(--syscon-text-secondary);
 }
 .portal-crumb strong {
   font-weight: 500;
@@ -246,7 +256,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #b42318;
+  background: var(--syscon-brand-primary);
 }
 .portal-logo {
   display: none;
@@ -255,12 +265,32 @@
   height: 32px;
   object-fit: contain;
 }
+.portal-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.portal-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border: 1px solid #cbdcf0;
+  border-radius: 8px;
+  background: #eef5fc;
+  color: #15375a;
+  font-size: 13px;
+  line-height: 1.5;
+}
 .portal-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  padding: 24px;
+  gap: var(--syscon-space-8);
+  padding: var(--syscon-page-gutter);
 }
 .portal-cart {
   display: flex;
@@ -310,58 +340,8 @@
   width: 100%;
   max-width: none;
 }
-.portal-catalog {
-  min-width: 0;
-}
-.portal-catalog .catalog-page {
-  width: 100%;
-}
-.portal-catalog .catalog-bar > div {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  width: 100%;
-  min-width: 0;
-}
-.portal-catalog .browser-select {
-  flex-direction: column;
-  align-items: stretch;
-  min-width: 0;
-}
-.portal-catalog .browser-select select {
-  width: 100%;
-  min-width: 0;
-}
-.portal-catalog .catalog-help {
-  flex-direction: column;
-  align-items: flex-start;
-}
-.portal-catalog .catalog-help-actions {
-  flex-wrap: wrap;
-  max-width: 100%;
-  margin-left: 0;
-}
-@media (max-width: 560px) {
-  .portal-catalog .catalog-bar > div {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-@media (max-width: 1400px) {
-  .portal-catalog .catalog-body {
-    grid-template-columns: 240px minmax(0, 1fr);
-    gap: 24px;
-  }
-  .portal-catalog .catalog-cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media (max-width: 860px) {
-  .portal-catalog .catalog-body {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
 /* These shared store pages adapt to the space left by the account sidebar. */
 @container portal-page (max-width: 1100px) {
-  .portal-page .offers-hero,
   .portal-page .about-cta,
   .portal-page .contact-hero,
   .portal-page .contact-whatsapp,
@@ -369,10 +349,6 @@
     flex-direction: column;
     align-items: flex-start;
   }
-  .portal-page .offers-hero figure {
-    flex-basis: auto;
-  }
-  .portal-page .offers-spotlight-body,
   .portal-page .about-hero,
   .portal-page .about-identity,
   .portal-page .about-trust .container,
@@ -380,10 +356,6 @@
   .portal-page .contact-location {
     grid-template-columns: minmax(0, 1fr);
   }
-  .portal-page .offers-grid,
-  .portal-page .offers-ending ul,
-  .portal-page .offers-trust ul,
-  .portal-page .offers-filters-row,
   .portal-page .about-stats,
   .portal-page .about-steps,
   .portal-page .about-timeline,
@@ -393,15 +365,8 @@
   .portal-page .contact-areas ul {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .portal-page .offers-filters-row p {
-    justify-self: start;
-  }
 }
 @container portal-page (max-width: 640px) {
-  .portal-page .offers-grid,
-  .portal-page .offers-ending ul,
-  .portal-page .offers-trust ul,
-  .portal-page .offers-filters-row,
   .portal-page .about-stats,
   .portal-page .about-steps,
   .portal-page .about-timeline,
@@ -609,21 +574,21 @@
   color: #00658d;
 }
 .portal-kpis i.is-green {
-  background: #6ffbbe;
-  color: #002113;
+  background: var(--syscon-brand-primary);
+  color: var(--syscon-brand-primary);
 }
 .portal-kpis i.is-red {
-  background: #ffdad6;
-  color: #93000a;
+  background: var(--syscon-brand-cyan-soft);
+  color: var(--syscon-brand-primary);
 }
 
 /* Generic portal card */
 .portal-card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px;
-  border-radius: 8px;
+  gap: var(--syscon-space-4);
+  padding: var(--syscon-card-padding);
+  border-radius: var(--syscon-radius-md);
   background: #fff;
   box-shadow: 0 1px 2px #0000000d;
 }
@@ -887,7 +852,7 @@
   color: #00265d;
 }
 .portal-ops i.is-dark {
-  background: #00381f;
+  background: var(--syscon-brand-primary);
 }
 .portal-ops span {
   display: flex;
@@ -913,6 +878,25 @@
   }
 }
 @media (max-width: 960px) {
+  .portal-menu-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    border: 0;
+    background: #08234766;
+  }
+  .portal-sidebar-close {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 8px;
+    background: #eef5fc;
+    color: #15375a;
+  }
   .portal:not(.is-menu-open) .portal-logo {
     display: block;
   }
@@ -923,7 +907,7 @@
     position: fixed;
     inset: 0 auto 0 0;
     z-index: 40;
-    width: 296px;
+    width: min(296px, calc(100vw - 24px));
     transform: translateX(-100%);
     transition: transform 0.2s;
   }
@@ -998,4 +982,81 @@
     font-size: 22px;
     line-height: 28px;
   }
+}
+
+/* Keep the account header in a predictable order on narrow screens. */
+@media (max-width: 640px) {
+  .portal-topbar {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px 44px;
+    gap: 8px;
+  }
+  .portal-menu {
+    grid-column: 1;
+    grid-row: 1;
+    width: 44px;
+    height: 44px;
+  }
+  .portal-logo {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .portal-topbar > .portal-icon {
+    grid-column: 3;
+    grid-row: 1;
+    width: 44px;
+    height: 44px;
+  }
+  .portal-topbar > .portal-icon[aria-label='Ayuda'] {
+    grid-column: 4;
+  }
+  .portal-topbar > .portal-store {
+    display: none;
+  }
+  .portal-search {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .portal-crumb {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
+.customer-dashboard { display: grid; gap: 24px; min-width: 0; }
+.customer-dashboard .portal-welcome { padding: 24px 0 8px; background: transparent; box-shadow: none; }
+.customer-dashboard .portal-welcome h1 { margin: 0 0 8px; font-size: 30px; line-height: 38px; letter-spacing: -.035em; }
+.customer-dashboard .portal-welcome > div > p { font-size: 14px; line-height: 22px; color: #617086; }
+.customer-shortcuts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.customer-shortcuts > a { display: flex; align-items: center; gap: 14px; padding: 20px; background: #fff; border: 1px solid #dfe7ef; border-radius: 12px; color: #00265d; min-width: 0; }
+.customer-shortcuts > a:hover { border-color: #9acfe0; background: #f7fbfd; }
+.customer-shortcuts > a > svg { flex-shrink: 0; }
+.customer-shortcuts > a > svg:last-child { margin-left: auto; width: 17px; }
+.customer-shortcuts span { display: grid; gap: 5px; min-width: 0; }
+.customer-shortcuts strong { font-size: 14px; font-weight: 600; }
+.customer-shortcuts small { font-size: 11px; color: #617086; }
+.customer-dashboard .portal-kpis { gap: 14px; }
+.customer-dashboard .portal-kpis > li { padding: 18px; border: 1px solid #e4eaf1; border-radius: 10px; box-shadow: none; background: #fff; }
+.customer-dashboard .portal-kpis strong { font-size: 26px; letter-spacing: -.035em; color: #00265d; }
+.customer-dashboard .portal-kpis i { background: #e6f7fc; color: #00658d; }
+.customer-dashboard .portal-card { border: 1px solid #dfe7ef; border-radius: 12px; box-shadow: none; }
+.customer-dashboard .portal-card h2 { font-size: 19px; letter-spacing: -.025em; }
+.customer-dashboard .portal-card-head p { color: #617086; font-size: 12px; }
+.customer-dashboard .portal-items-title { text-transform: none; font-size: 13px; letter-spacing: 0; }
+.customer-dashboard .portal-items { padding: 0; border: 0; background: transparent; }
+.customer-dashboard .portal-items li { padding: 10px 0; border-bottom: 1px solid #e7edf3; color: #617086; font-size: 12px; }
+.customer-dashboard .portal-items li strong { font-size: 13px; color: #00265d; }
+.customer-dashboard .portal-order-facts { border: 0; background: #f5f8fb; border-radius: 10px; }
+.customer-shortcuts a:focus-visible { outline: 2px solid #00a6d2; outline-offset: 3px; }
+@media (max-width: 1100px) {
+ .customer-shortcuts { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+ .customer-shortcuts > a { padding: 16px; }
+}
+@media (max-width: 600px) {
+ .customer-dashboard { gap: 18px; }
+ .customer-dashboard .portal-welcome h1 { font-size: 26px; line-height: 32px; }
 }

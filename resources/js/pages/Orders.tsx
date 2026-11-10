@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AccountLayout } from '../components/account/AccountLayout';
-import { orderStatusLabels, statusLabel } from '../lib/orders';
+import { orderFilterLabels, statusLabel } from '../lib/orders';
 import { api } from '../services/api';
 import { useData, ErrorBox, Loading, Empty } from '../ui';
 import { OrdersTable } from '../components/orders/OrdersTable';
@@ -29,7 +29,7 @@ export function Orders() {
                 <option value="">Todos</option>
                 {statuses.map((value) => (
                   <option key={value} value={value}>
-                    {statusLabel(orderStatusLabels, value)}
+                    {statusLabel(orderFilterLabels, value)}
                   </option>
                 ))}
               </select>
@@ -47,7 +47,7 @@ export function Orders() {
             title="Aún no tienes pedidos"
             text="Cuando completes una compra aparecerá aquí."
             action={
-              <Link className="button button-primary" to="/cuenta/productos">
+              <Link className="button button-primary" to="/catalogo">
                 Explorar productos
               </Link>
             }

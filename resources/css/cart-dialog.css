@@ -46,7 +46,7 @@
   color: #00265d;
 }
 .add-dialog-head h2 svg {
-  color: #1f8a5b;
+  color: var(--syscon-brand-primary);
 }
 .add-dialog-close {
   display: grid;
@@ -109,7 +109,7 @@
   margin: 8px 0 0;
   font-size: 12px;
   font-weight: 600;
-  color: #1f8a5b;
+  color: var(--syscon-brand-primary);
 }
 .add-dialog-stock i {
   width: 7px;
@@ -118,7 +118,7 @@
   background: currentColor;
 }
 .add-dialog-stock.is-out {
-  color: #b4473a;
+  color: var(--syscon-brand-primary);
 }
 .add-dialog-summary {
   display: grid;
