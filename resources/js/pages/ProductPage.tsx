@@ -10,7 +10,12 @@ import { QuantityStepper } from '../components/shared/QuantityStepper';
 import { DeliveryPreview } from '../components/product/DeliveryPreview';
 import { ProductComparison } from '../components/product/ProductComparison';
 import { CartIcon, HeadsetIcon, ReceiptIcon, ShieldIcon, TruckIcon } from '../components/icons';
-import { relatedProducts, productSpecifications, productInquiryUrl } from '../lib/catalog';
+import {
+  lengthVariants,
+  relatedProducts,
+  productSpecifications,
+  productInquiryUrl,
+} from '../lib/catalog';
 import { useData, Loading, Empty, ProductCard } from '../ui';
 import '../../css/storefront.css';
 
@@ -39,6 +44,13 @@ export function ProductPage() {
     () => (data && catalog.data ? relatedProducts(data, catalog.data) : []),
     [data, catalog.data],
   );
+
+  const lengths = useMemo(
+    () => (data && catalog.data ? lengthVariants(data, catalog.data) : []),
+    [data, catalog.data],
+  );
+  const metersLabel = (meters: number) =>
+    `${meters.toLocaleString('es-PE')} ${meters === 1 ? 'metro' : 'metros'}`;
 
   useEffect(() => {
     const target = buyRef.current;
@@ -129,6 +141,40 @@ export function ProductPage() {
               <p className="product-price-note">
                 Precio por unidad. La entrega se elige en el checkout.
               </p>
+              {lengths.length > 0 && (
+                <fieldset className="product-lengths">
+                  <legend>
+                    ¿Cuántos metros necesitas?{' '}
+                    <strong>
+                      {metersLabel(
+                        lengths.find(({ product }) => product.id === data.id)?.meters ?? 0,
+                      )}
+                    </strong>
+                  </legend>
+                  <div className="product-lengths-options">
+                    {lengths.map(({ product, meters }) => (
+                      <Link
+                        key={product.id}
+                        to={`/producto/${product.id}`}
+                        replace
+                        className={`product-length${product.id === data.id ? ' is-current' : ''}${
+                          product.stock < 1 ? ' is-out' : ''
+                        }`}
+                        aria-current={product.id === data.id ? 'true' : undefined}
+                        aria-label={`${metersLabel(meters)}, ${money(Number(product.price))}${
+                          product.stock < 1 ? ', agotado' : ''
+                        }`}
+                      >
+                        <strong>{meters.toLocaleString('es-PE')} m</strong>
+                        <small>{money(Number(product.price))}</small>
+                      </Link>
+                    ))}
+                  </div>
+                  <Link className="product-lengths-other" to={inquiryUrl}>
+                    ¿Necesitas otra medida? Cotízala con un asesor
+                  </Link>
+                </fieldset>
+              )}
               {specifications.length > 0 && (
                 <ul
                   className="product-highlights"

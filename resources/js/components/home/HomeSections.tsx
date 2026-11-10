@@ -11,7 +11,7 @@ import trustBoltIcon from '../../../images/home/trust-bolt.svg';
 import trustLockIcon from '../../../images/home/trust-lock.svg';
 import trustShieldIcon from '../../../images/home/trust-shield.svg';
 import trustSupportIcon from '../../../images/home/trust-support.svg';
-import { catalogParams, type CatalogGroup } from '../../lib/catalog';
+import { catalogParams, normalize, type CatalogGroup } from '../../lib/catalog';
 import { categoryIcon } from '../../lib/categoryIcon';
 import type { Product } from '../../types';
 import { money } from '../../state';
@@ -334,6 +334,97 @@ export function B2BBanner() {
       <Link className="b2b-banner-cta" to="/contacto">
         <img src={b2bMailIcon} alt="" /> Solicitar Cotización
       </Link>
+    </section>
+  );
+}
+
+/** Short line under each category card; the catalog categories are free text. */
+const categoryBlurbs: [RegExp, string][] = [
+  [/cable/, 'Elige los metros que necesitas para tu instalación.'],
+  [/access point|wifi|wi-fi/, 'Wi-Fi estable para oficinas y hogares.'],
+  [/conect|adaptador/, 'Adaptadores y tarjetas para conectar tus equipos.'],
+  [/accesorio/, 'Conectores, patch panels y todo para tu cableado.'],
+  [/camara|vigilan|segur/, 'Videovigilancia para tu casa o negocio.'],
+  [/periferic/, 'Teclados, mouse y accesorios para tu escritorio.'],
+  [/memoria|ram/, 'Más velocidad para tu computadora.'],
+  [/rack/, 'Orden y protección para tus equipos de red.'],
+  [/router/, 'Conexión a internet rápida y segura.'],
+  [/switch/, 'Más puertos para crecer tu red.'],
+  [/almacen|disco|ssd/, 'Discos SSD para guardar y respaldar tus datos.'],
+  [/energ|ups/, 'Protege tus equipos ante cortes de luz.'],
+  [/comput|laptop/, 'Equipos para trabajar y estudiar.'],
+  [/software|licenc/, 'Licencias originales para tu empresa.'],
+];
+
+const categoryBlurb = (name: string) =>
+  categoryBlurbs.find(([pattern]) => pattern.test(normalize(name)))?.[1] ??
+  `Descubre nuestros productos de ${name.toLowerCase()}.`;
+
+/**
+ * Category cards laid over the bottom of the hero banner (Mercado Libre style), in a row
+ * that scrolls sideways with the arrows, by touch or with the keyboard.
+ */
+export function CategoryCarousel({ categories }: { categories: CatalogGroup[] }) {
+  const rail = useRef<HTMLUListElement>(null);
+  const [edges, setEdges] = useState({ start: true, end: false });
+  const update = () => {
+    const el = rail.current;
+    if (!el) return;
+    setEdges({
+      start: el.scrollLeft <= 4,
+      end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 4,
+    });
+  };
+  useEffect(() => {
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, [categories.length]);
+  const move = (direction: 1 | -1) =>
+    rail.current?.scrollBy({
+      left: direction * rail.current.clientWidth * 0.8,
+      behavior: 'smooth',
+    });
+
+  return (
+    <section className="home-category-rail" aria-labelledby="home-categories">
+      <h2 id="home-categories" className="visually-hidden">
+        Nuestras categorías
+      </h2>
+      <ul ref={rail} onScroll={update}>
+        {categories.map((category) => (
+          <li key={category.name}>
+            <Link to={`/catalogo?${catalogParams.category}=${encodeURIComponent(category.name)}`}>
+              <strong>{category.name}</strong>
+              <span className="home-category-rail-icon">
+                <img src={categoryIcon(category.name)} alt="" />
+              </span>
+              <p>{categoryBlurb(category.name)}</p>
+              <span className="home-category-rail-cta">Ver productos</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      {!edges.start && (
+        <button
+          type="button"
+          className="home-category-rail-arrow is-prev"
+          aria-label="Ver categorías anteriores"
+          onClick={() => move(-1)}
+        >
+          <ChevronLeftIcon size={22} />
+        </button>
+      )}
+      {!edges.end && (
+        <button
+          type="button"
+          className="home-category-rail-arrow is-next"
+          aria-label="Ver más categorías"
+          onClick={() => move(1)}
+        >
+          <ChevronRightIcon size={22} />
+        </button>
+      )}
     </section>
   );
 }

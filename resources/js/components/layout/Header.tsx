@@ -26,14 +26,18 @@ export const company = {
 
 export function Brand() {
   return (
-    <Link to="/" className="brand" aria-label="Grupo SYSCON Tecnología Informática, ir al inicio">
+    <Link
+      to="/"
+      className="brand"
+      aria-label="Grupo SYSCON Tecnología Informática, ir al inicio"
+      title="Ir al inicio"
+    >
       <img className="brand-image" src={logo} alt="" width={158} height={44} />
     </Link>
   );
 }
 
 const mainLinks = [
-  { to: '/', label: 'Inicio', end: true },
   { to: '/catalogo', label: 'Productos' },
   { to: '/categorias', label: 'Categorías' },
   { to: '/nosotros', label: 'Nosotros' },
@@ -173,7 +177,7 @@ export function Header() {
         <div className="container store-navbar-row">
           <nav className="store-nav" aria-label="Navegación principal">
             {mainLinks.map((link) => (
-              <NavLink key={link.to} to={link.to} end={link.end}>
+              <NavLink key={link.to} to={link.to}>
                 {link.label}
               </NavLink>
             ))}
@@ -184,7 +188,7 @@ export function Header() {
         <nav className="container" aria-label="Menú">
           <div className="store-menu-main">
             {mainLinks.map((link) => (
-              <NavLink key={link.to} to={link.to} end={link.end}>
+              <NavLink key={link.to} to={link.to}>
                 {link.label}
               </NavLink>
             ))}

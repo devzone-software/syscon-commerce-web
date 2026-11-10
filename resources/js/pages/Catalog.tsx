@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import boxIcon from '../../images/catalog/box.svg';
-import closeIcon from '../../images/catalog/close.svg';
 import filterIcon from '../../images/catalog/filter.svg';
 import homeIcon from '../../images/catalog/home.svg';
 import { CatalogCard } from '../components/catalog/CatalogCard';
@@ -9,11 +8,13 @@ import { CatalogSidebar } from '../components/catalog/CatalogSidebar';
 import { ChatIcon, SearchIcon } from '../components/icons';
 import {
   catalogParams,
+  catalogSearchQuery,
   filterProducts,
   groupProducts,
   pageNumbers,
   paginate,
   readFilters,
+  relatedSearches,
   sortOptions,
   type CatalogFilters,
 } from '../lib/catalog';
@@ -117,9 +118,7 @@ export function Catalog() {
     return {
       results: filterProducts(products, filters),
       categories: groupProducts(filterProducts(products, { ...filters, category: '' }), 'category'),
-      total: filterProducts(products, { ...filters, category: '' }).length,
       brands: groupProducts(filterProducts(products, { ...filters, brand: '' }), 'brand'),
-      inStock: filterProducts(products, { ...filters, onlyAvailable: true }).length,
       bounds: [
         Math.floor(prices.length ? Math.min(...prices) : 0),
         Math.ceil(prices.length ? Math.max(...prices) : 0),
@@ -154,6 +153,7 @@ export function Catalog() {
     window.scrollTo({ top: 0 });
   };
   const chips = appliedFilters(filters);
+  const related = useMemo(() => relatedSearches(data ?? [], filters.query), [data, filters.query]);
 
   return (
     <div className="container catalog-page">
@@ -182,30 +182,18 @@ export function Catalog() {
           <p>Explora nuestro catálogo de tecnología con precios actualizados.</p>
         </div>
       </div>
-      <div className="catalog-applied" role="group" aria-label="Filtros aplicados">
-        {chips.length > 0 ? (
-          <>
-            <span className="catalog-applied-label">
-              <img src={filterIcon} alt="" /> FILTROS APLICADOS:
-            </span>
-            {chips.map((chip) => (
-              <button
-                key={chip.label}
-                type="button"
-                onClick={() => update(Object.fromEntries(chip.keys.map((key) => [key, ''])))}
-                aria-label={`Quitar filtro ${chip.label}: ${chip.value}`}
-              >
-                {chip.label}: <strong>{chip.value}</strong> <img src={closeIcon} alt="" />
-              </button>
+      {related.length > 0 && (
+        <nav className="catalog-related" aria-label="Búsquedas relacionadas">
+          <strong>Búsquedas relacionadas:</strong>
+          <ul>
+            {related.map((term) => (
+              <li key={term}>
+                <Link to={`/catalogo${catalogSearchQuery('', term)}`}>{term}</Link>
+              </li>
             ))}
-            <button type="button" className="catalog-applied-clear" onClick={clear}>
-              Limpiar todos
-            </button>
-          </>
-        ) : (
-          <span className="catalog-applied-empty">Sin filtros aplicados</span>
-        )}
-      </div>
+          </ul>
+        </nav>
+      )}
 
       {loading ? (
         <CatalogLoading size={size} />
@@ -222,8 +210,6 @@ export function Catalog() {
             filters={filters}
             categories={facets.categories}
             brands={facets.brands}
-            total={facets.total}
-            inStock={facets.inStock}
             priceBounds={facets.bounds}
             results={facets.results.length}
             open={filtersOpen}

@@ -25,13 +25,11 @@ function Block({ title, children }: { title: string; children: ReactNode }) {
 
 function Option({
   label,
-  count,
   checked,
   onChange,
   strong,
 }: {
   label: ReactNode;
-  count?: number;
   checked: boolean;
   onChange: () => void;
   strong?: boolean;
@@ -40,7 +38,6 @@ function Option({
     <label className={`side-option${checked ? ' is-checked' : ''}${strong ? ' is-strong' : ''}`}>
       <input type="checkbox" checked={checked} onChange={onChange} />
       <span>{label}</span>
-      {count !== undefined && <small>{count}</small>}
     </label>
   );
 }
@@ -54,8 +51,6 @@ export function CatalogSidebar({
   filters,
   categories,
   brands,
-  total,
-  inStock,
   priceBounds,
   results,
   open,
@@ -66,8 +61,6 @@ export function CatalogSidebar({
   filters: CatalogFilters;
   categories: CatalogGroup[];
   brands: CatalogGroup[];
-  total: number;
-  inStock: number;
   priceBounds: [number, number];
   results: number;
   open: boolean;
@@ -113,7 +106,6 @@ export function CatalogSidebar({
         <Block title="Categorías">
           <Option
             label="Todos"
-            count={total}
             checked={!filters.category}
             strong
             onChange={() => onChange({ [catalogParams.category]: '' })}
@@ -122,7 +114,6 @@ export function CatalogSidebar({
             <Option
               key={category.name}
               label={category.name}
-              count={category.count}
               checked={filters.category === category.name}
               onChange={() =>
                 onChange({
@@ -211,7 +202,6 @@ export function CatalogSidebar({
                 <Option
                   key={brand.name}
                   label={brand.name}
-                  count={brand.count}
                   checked={filters.brand === brand.name}
                   onChange={() =>
                     onChange({
@@ -230,7 +220,6 @@ export function CatalogSidebar({
                 <i className="side-dot" aria-hidden="true" /> Solo disponibles
               </>
             }
-            count={inStock}
             checked={filters.onlyAvailable}
             onChange={() =>
               onChange({ [catalogParams.onlyAvailable]: filters.onlyAvailable ? '' : '1' })

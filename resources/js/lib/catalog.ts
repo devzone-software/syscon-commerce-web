@@ -191,3 +191,78 @@ export function relatedProducts(product: Product, products: Product[], limit = 4
     .sort((a, b) => Number(b.stock > 0) - Number(a.stock > 0))
     .slice(0, limit);
 }
+
+/** "Cable UTP Cat 6 de 5 metros" → 5 m and the name without the length. */
+const LENGTH = /\s*(?:de\s+)?(\d+(?:[.,]\d+)?)\s*(?:m|mts?|metros?)\b\.?/i;
+
+export function productLength(name: string): { meters: number; base: string } | null {
+  const match = name.match(LENGTH);
+  if (!match) return null;
+  const meters = Number(match[1].replace(',', '.'));
+  const base = normalize(name.replace(LENGTH, ' ')).replace(/\s+/g, ' ').trim();
+  return meters > 0 ? { meters, base } : null;
+}
+
+export type LengthVariant = { product: Product; meters: number };
+
+/**
+ * Lengths the customer can choose for a product sold per length (cables): the same
+ * product name and category published with other lengths. Empty when there is only one.
+ */
+export function lengthVariants(product: Product, products: Product[]): LengthVariant[] {
+  const own = productLength(product.name);
+  if (!own) return [];
+  const seen = new Set<number>();
+  const variants = [product, ...products.filter((other) => other.id !== product.id)]
+    .filter((other) => other.active !== false && other.category === product.category)
+    .map((other) => ({ product: other, length: productLength(other.name) }))
+    .filter(
+      (item): item is { product: Product; length: { meters: number; base: string } } =>
+        item.length !== null && item.length.base === own.base,
+    )
+    .filter(({ length }) => !seen.has(length.meters) && seen.add(length.meters))
+    .map(({ product: item, length }) => ({ product: item, meters: length.meters }))
+    .sort((a, b) => a.meters - b.meters);
+  return variants.length > 1 ? variants : [];
+}
+
+/** Searches suggested next to the results, built from the catalog the customer is browsing. */
+export function relatedSearches(products: Product[], query: string, limit = 8): string[] {
+  const asked = normalize(query).trim();
+  const matches = asked ? products.filter((product) => matchesQuery(product, query)) : [];
+  const categories = new Set(matches.map((product) => product.category).filter(Boolean));
+  const pool = matches.length
+    ? products.filter((product) => matches.includes(product) || categories.has(product.category))
+    : products;
+  const terms = new Map<string, string>();
+  const add = (text?: string | null) => {
+    const value = (text ?? '')
+      .replace(/\(.*?\)/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+    const key = normalize(value);
+    if (value && key !== asked && !terms.has(key)) terms.set(key, value);
+  };
+  // Products sharing a word with the matches, e.g. "Cat 6" links cables with RJ45 connectors.
+  const words = new Set(
+    matches.flatMap((product) =>
+      normalize(product.name.replace(LENGTH, ' '))
+        .split(/[^a-z0-9]+/)
+        .filter((word) => word.length > 2 && !asked.includes(word)),
+    ),
+  );
+  const nearby = products.filter(
+    (product) =>
+      !pool.includes(product) &&
+      normalize(product.name)
+        .split(/[^a-z0-9]+/)
+        .some((word) => words.has(word)),
+  );
+  for (const product of pool) add(product.name.replace(LENGTH, ' ').replace(/\s+/g, ' '));
+  for (const product of pool) add(product.category);
+  for (const product of nearby) add(product.name);
+  for (const product of nearby) add(product.category);
+  for (const product of pool) add(product.brand);
+  return [...terms.values()].slice(0, limit);
+}

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   B2BBanner,
-  CategoryShowcase,
+  CategoryCarousel,
   FeaturedProducts,
   HomeHero,
   PromoBanner,
@@ -18,7 +18,7 @@ export function Home() {
   const summary = useMemo(
     () =>
       data && {
-        categories: groupProducts(data, 'category').slice(0, 8),
+        categories: groupProducts(data, 'category'),
         featured: pickFeatured(data, 4),
         lowestProduct: data
           .filter((product) => product.stock > 0)
@@ -34,7 +34,12 @@ export function Home() {
 
   return (
     <div className="container home">
-      <HomeHero products={summary?.featured} lowestProduct={summary?.lowestProduct} />
+      <div className="home-top">
+        <HomeHero products={summary?.featured} lowestProduct={summary?.lowestProduct} />
+        {summary && summary.categories.length > 0 && (
+          <CategoryCarousel categories={summary.categories} />
+        )}
+      </div>
       {loading ? (
         <Loading />
       ) : error ? (
@@ -47,7 +52,6 @@ export function Home() {
               Ver todo el catálogo <ArrowRightIcon size={16} />
             </Link>
           </div>
-          <CategoryShowcase categories={summary.categories} />
           <PromoBanner />
         </>
       ) : (

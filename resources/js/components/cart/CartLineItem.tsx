@@ -47,7 +47,7 @@ export function CartLineItem({
                   className="link-button"
                   onClick={() => onQuantity(product.stock)}
                 >
-                  Ajustar a {product.stock}
+                  Ajustar a lo disponible
                 </button>
               </>
             )}
