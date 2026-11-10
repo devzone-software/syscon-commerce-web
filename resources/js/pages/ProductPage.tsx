@@ -16,6 +16,7 @@ import {
   productSpecifications,
   productInquiryUrl,
 } from '../lib/catalog';
+import { isServicePlan, planInquiryUrl } from '../lib/servicePlans';
 import { useData, Loading, Empty, ProductCard } from '../ui';
 import '../../css/storefront.css';
 
@@ -24,6 +25,13 @@ const perks = [
   { icon: <ShieldIcon size={18} />, text: 'Consulta las condiciones de garantía por producto' },
   { icon: <TruckIcon size={18} />, text: 'Recojo en tienda o envío coordinado' },
   { icon: <HeadsetIcon size={18} />, text: 'Asesoría técnica antes y después de comprar' },
+];
+
+/** What a Ficon internet plan includes, instead of the delivery details of a product. */
+const planPerks = [
+  { icon: <ShieldIcon size={18} />, text: 'Servicio de Ficon, nuestra empresa aliada' },
+  { icon: <TruckIcon size={18} />, text: 'Instalación coordinada en tu domicilio u oficina' },
+  { icon: <HeadsetIcon size={18} />, text: 'Te ayudamos a revisar la cobertura en tu zona' },
 ];
 
 export function ProductPage() {
@@ -93,7 +101,8 @@ export function ProductPage() {
   const units = Math.min(quantity, Math.max(1, remaining));
   const description = data.description?.trim();
   const specifications = productSpecifications(data.specifications);
-  const inquiryUrl = productInquiryUrl(data);
+  const plan = isServicePlan(data);
+  const inquiryUrl = plan ? planInquiryUrl(data) : productInquiryUrl(data);
   const addToCart = () => {
     confirmAdd(data, units);
     setQuantity(1);
@@ -133,13 +142,20 @@ export function ProductPage() {
             </div>
             <div className="product-detail-info">
               <div className="product-price-row">
-                <p className="product-detail-price">{money(Number(data.price))}</p>
-                <p className={`product-detail-stock${data.stock < 1 ? ' out' : ''}`}>
-                  <i aria-hidden="true" /> {data.stock < 1 ? 'Agotado' : 'Disponible'}
+                <p className="product-detail-price">
+                  {money(Number(data.price))}
+                  {plan && <small> /mes</small>}
                 </p>
+                {!plan && (
+                  <p className={`product-detail-stock${data.stock < 1 ? ' out' : ''}`}>
+                    <i aria-hidden="true" /> {data.stock < 1 ? 'Agotado' : 'Disponible'}
+                  </p>
+                )}
               </div>
               <p className="product-price-note">
-                Precio por unidad. La entrega se elige en el checkout.
+                {plan
+                  ? 'Precio mensual referencial. El servicio lo brinda Ficon, empresa aliada.'
+                  : 'Precio por unidad. La entrega se elige en el checkout.'}
               </p>
               {lengths.length > 0 && (
                 <fieldset className="product-lengths">
@@ -186,7 +202,11 @@ export function ProductPage() {
                 </ul>
               )}
               <div className="product-buy" ref={buyRef}>
-                {remaining > 0 ? (
+                {plan ? (
+                  <Link className="flow-button" to={inquiryUrl}>
+                    Consultar cobertura
+                  </Link>
+                ) : remaining > 0 ? (
                   <>
                     <QuantityStepper
                       label="Cantidad"
@@ -211,18 +231,31 @@ export function ProductPage() {
                   Tienes {inCart} {inCart === 1 ? 'unidad' : 'unidades'} en tu carrito.
                 </p>
               )}
-              <Link className="product-info-link product-consult" to={inquiryUrl}>
-                <HeadsetIcon size={16} /> Consultar este producto
-              </Link>
-              <DeliveryPreview />
-              <ul className="product-perks">
-                {perks.map(({ icon, text }) => (
-                  <li key={text}>
-                    {icon}
-                    {text}
-                  </li>
-                ))}
-              </ul>
+              {plan ? (
+                <ul className="product-perks">
+                  {planPerks.map(({ icon, text }) => (
+                    <li key={text}>
+                      {icon}
+                      {text}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <>
+                  <Link className="product-info-link product-consult" to={inquiryUrl}>
+                    <HeadsetIcon size={16} /> Consultar este producto
+                  </Link>
+                  <DeliveryPreview />
+                  <ul className="product-perks">
+                    {perks.map(({ icon, text }) => (
+                      <li key={text}>
+                        {icon}
+                        {text}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -276,7 +309,7 @@ export function ProductPage() {
           </div>
         </PageSection>
       )}
-      {showQuickBuy && remaining > 0 && (
+      {showQuickBuy && !plan && remaining > 0 && (
         <aside className="product-quick-buy" aria-label="Compra rápida">
           <span>
             <small>Precio por unidad</small>

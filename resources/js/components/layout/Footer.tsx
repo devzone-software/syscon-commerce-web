@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom';
 import { accountHome, can, canUseBackoffice } from '../../lib/auth';
 import { useShop } from '../../state';
-import chipIcon from '../../../images/footer/chip.svg';
 import mailIcon from '../../../images/footer/mail.svg';
 import phoneIcon from '../../../images/footer/phone.svg';
 import whatsappIcon from '../../../images/footer/whatsapp.svg';
-import { company } from './Header';
+import { Brand, company } from './Header';
 
 export function Footer() {
   const { user } = useShop();
@@ -15,12 +14,9 @@ export function Footer() {
     <footer className="store-footer">
       <div className="container store-footer-grid">
         <div className="store-footer-about">
-          <Link to="/" className="store-footer-brand" aria-label="SYSCON Tecnología, ir al inicio">
-            <img src={chipIcon} alt="" />
-            <span>
-              SYSCON<small>TECNOLOGÍA</small>
-            </span>
-          </Link>
+          <div className="store-footer-logo">
+            <Brand clear />
+          </div>
           <p>
             Equipos de seguridad electrónica, redes, cómputo y licencias de software. Instalación y
             mantenimiento en Juliaca y la región Puno.

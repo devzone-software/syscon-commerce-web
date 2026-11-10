@@ -4,6 +4,7 @@ import { money } from '../../state';
 import { useConfirmAdd } from '../cart/AddToCartDialog';
 import type { Product } from '../../types';
 import { ProductImage } from '../ProductImage';
+import { isServicePlan, planInquiryUrl, planPriceSuffix } from '../../lib/servicePlans';
 import '../../../css/products.css';
 
 /** Product card of Figma "Client / Productos" (3-column catalog grid). */
@@ -26,22 +27,32 @@ export function CatalogCard({ product }: { product: Product }) {
       </Link>
       <div className="catalog-card-foot">
         <p className={`catalog-card-stock${out ? ' is-out' : ''}`}>
-          <i aria-hidden="true" /> {out ? 'Agotado' : 'Disponible'}
+          <i aria-hidden="true" />{' '}
+          {isServicePlan(product) ? 'Según cobertura' : out ? 'Agotado' : 'Disponible'}
         </p>
-        <strong className="catalog-card-price">{money(Number(product.price))}</strong>
+        <strong className="catalog-card-price">
+          {money(Number(product.price))}
+          {planPriceSuffix(product) && <small>{planPriceSuffix(product)}</small>}
+        </strong>
         <div className="catalog-card-actions">
           <Link className="catalog-card-view" to={url}>
             Ver detalle
           </Link>
-          <button
-            type="button"
-            className="catalog-card-add"
-            onClick={() => add(product)}
-            disabled={out}
-            aria-label={`Agregar ${product.name} al carrito`}
-          >
-            <img src={cartIcon} alt="" /> Agregar
-          </button>
+          {isServicePlan(product) ? (
+            <Link className="catalog-card-add" to={planInquiryUrl(product)}>
+              Consultar
+            </Link>
+          ) : (
+            <button
+              type="button"
+              className="catalog-card-add"
+              onClick={() => add(product)}
+              disabled={out}
+              aria-label={`Agregar ${product.name} al carrito`}
+            >
+              <img src={cartIcon} alt="" /> Agregar
+            </button>
+          )}
         </div>
       </div>
     </article>

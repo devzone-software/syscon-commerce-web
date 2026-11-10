@@ -19,6 +19,7 @@ import { useConfirmAdd } from '../components/cart/AddToCartDialog';
 import type { Product } from '../types';
 import { useData, ErrorBox, Loading, Empty } from '../ui';
 import '../../css/categories.css';
+import { isServicePlan, planInquiryUrl } from '../lib/servicePlans';
 
 const byCategory = (name: string) =>
   `/catalogo?${catalogParams.category}=${encodeURIComponent(name)}`;
@@ -67,18 +68,23 @@ function ShowcaseCard({ product }: { product: Product }) {
         {product.name}
       </Link>
       <p className="showcase-card-price">
-        <strong>{money(Number(product.price))}</strong> inc. IGV
+        <strong>{money(Number(product.price))}</strong>{' '}
+        {isServicePlan(product) ? 'al mes' : 'inc. IGV'}
       </p>
       <div className="showcase-card-actions">
         <Link to={url}>Ver detalle</Link>
-        <button
-          type="button"
-          onClick={() => add(product)}
-          disabled={!available}
-          aria-label={`Agregar ${product.name} al carrito`}
-        >
-          <CartIcon size={14} /> Agregar
-        </button>
+        {isServicePlan(product) ? (
+          <Link to={planInquiryUrl(product)}>Consultar</Link>
+        ) : (
+          <button
+            type="button"
+            onClick={() => add(product)}
+            disabled={!available}
+            aria-label={`Agregar ${product.name} al carrito`}
+          >
+            <CartIcon size={14} /> Agregar
+          </button>
+        )}
       </div>
     </article>
   );

@@ -1,15 +1,15 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  B2BBanner,
+  BusinessSecurity,
+  CameraCarousel,
   CategoryCarousel,
-  FeaturedProducts,
   HomeHero,
-  PromoBanner,
-  TrustStrip,
+  StoreBenefits,
 } from '../components/home/HomeSections';
 import { ArrowRightIcon } from '../components/icons';
-import { groupProducts, lowestAvailablePrice, pickFeatured } from '../lib/catalog';
+import { FiconBanner } from '../components/home/FiconBanner';
+import { groupProducts, normalize, pickFeatured } from '../lib/catalog';
 import { api } from '../services/api';
 import { useData, ErrorBox, Loading, Empty } from '../ui';
 
@@ -27,7 +27,13 @@ export function Home() {
               lowest === null || Number(product.price) < Number(lowest.price) ? product : lowest,
             null,
           ),
-        availableFrom: lowestAvailablePrice(data),
+        // Security cameras, in stock first and then from the lowest price.
+        cameras: data
+          .filter((product) => /camara/.test(normalize(product.category ?? '')))
+          .sort(
+            (a, b) =>
+              Number(b.stock > 0) - Number(a.stock > 0) || Number(a.price) - Number(b.price),
+          ),
       },
     [data],
   );
@@ -46,13 +52,19 @@ export function Home() {
         <ErrorBox message={error} retry={reload} />
       ) : summary && data?.length ? (
         <>
-          <FeaturedProducts products={summary.featured} availableFrom={summary.availableFrom} />
+          {summary.cameras.length > 0 && (
+            <CameraCarousel
+              products={summary.cameras}
+              category={summary.cameras[0].category ?? 'Cámaras IP'}
+            />
+          )}
           <div className="home-catalog-cta">
             <Link to="/catalogo">
               Ver todo el catálogo <ArrowRightIcon size={16} />
             </Link>
           </div>
-          <PromoBanner />
+          <BusinessSecurity cameraCategory={summary.cameras[0]?.category ?? 'Cámaras IP'} />
+          <FiconBanner />
         </>
       ) : (
         <Empty
@@ -60,8 +72,7 @@ export function Home() {
           text="El catálogo estará disponible cuando se publiquen productos desde administración."
         />
       )}
-      <TrustStrip />
-      <B2BBanner />
+      <StoreBenefits />
     </div>
   );
 }

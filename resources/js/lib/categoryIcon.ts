@@ -14,7 +14,7 @@ const categoryIcons: [RegExp, string][] = [
   [/software|licenc|windows|sistema/, softwareIcon],
   [/segur|antivirus|camara|vigilan/, securityIcon],
   [/laptop|computa|\bpc\b|notebook|equipo/, laptopIcon],
-  [/servidor|red|router|switch|rack|cable|conect|access/, serverIcon],
+  [/servidor|red|router|switch|rack|cable|conect|access|fibra|internet/, serverIcon],
   [/almacen|ssd|disco|nas/, storageIcon],
   [/componente|memoria|ram|tarjeta|grafica|procesador/, componentsIcon],
 ];

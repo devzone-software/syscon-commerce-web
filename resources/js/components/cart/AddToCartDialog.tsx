@@ -7,6 +7,7 @@ import type { Product } from '../../types';
 import { ProductImage } from '../ProductImage';
 import { QuantityStepper } from '../shared/QuantityStepper';
 import { CartIcon, CheckIcon, CloseIcon, ShieldIcon, TruckIcon } from '../icons';
+import { isServicePlan } from '../../lib/servicePlans';
 
 type Request = { product: Product; quantity: number };
 type ConfirmAdd = (product: Product, quantity?: number) => void;
@@ -26,8 +27,10 @@ export function useConfirmAdd() {
  */
 export function AddToCartProvider({ children }: { children: ReactNode }) {
   const [request, setRequest] = useState<Request | null>(null);
-  const confirmAdd: ConfirmAdd = (product, quantity = 1) =>
+  const confirmAdd: ConfirmAdd = (product, quantity = 1) => {
+    if (isServicePlan(product)) return;
     setRequest({ product, quantity: Math.max(1, Math.floor(quantity)) });
+  };
   return (
     <Context.Provider value={confirmAdd}>
       {children}

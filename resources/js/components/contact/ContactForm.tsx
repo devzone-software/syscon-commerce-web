@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ArrowRightIcon, MailIcon } from '../icons';
 import { company } from '../layout/Header';
@@ -12,6 +12,16 @@ const subjects = [
   'Otro',
 ];
 
+/** Corporate quote message with the details the sales team needs for that kind of project. */
+function projectMessage(project: string) {
+  const fields = /fibra|internet/i.test(project)
+    ? ['Dirección o distrito:', 'Es para hogar o empresa:', 'Velocidad de interés:']
+    : /videovigilancia|camara|cámara/i.test(project)
+      ? ['Rubro de la empresa:', 'Cantidad aproximada de cámaras:', 'Locales o vehículos a cubrir:']
+      : ['Empresa y RUC:', 'Productos y cantidades:', 'Fecha en que lo necesitas:'];
+  return [`Quisiera una cotización de ${project.slice(0, 200)}.`, ...fields].join('\n');
+}
+
 /** Prepares a message in the visitor's email app; it does not send a request to the API. */
 export function ContactForm() {
   const [params] = useSearchParams();
@@ -20,14 +30,27 @@ export function ContactForm() {
     email: '',
     phone: '',
     order: params.get('pedido')?.slice(0, 100) ?? '',
-    subject: params.has('producto') ? subjects[0] : params.has('pedido') ? subjects[2] : '',
+    subject:
+      params.has('producto') || params.has('proyecto')
+        ? subjects[0]
+        : params.has('pedido')
+          ? subjects[2]
+          : '',
     message: params.has('producto')
       ? `Quisiera consultar sobre ${params.get('producto')?.slice(0, 200)} (SKU: ${params.get('sku')?.slice(0, 100) ?? 'por consultar'}).`
-      : params.has('pedido')
-        ? 'Quisiera consultar sobre el estado de mi pedido.'
-        : '',
+      : params.has('proyecto')
+        ? projectMessage(params.get('proyecto') ?? '')
+        : params.has('pedido')
+          ? 'Quisiera consultar sobre el estado de mi pedido.'
+          : '',
   });
   const [error, setError] = useState('');
+
+  // Links such as "Cotizar para mi empresa" open the page on the prefilled form.
+  useEffect(() => {
+    if (window.location.hash === '#formulario')
+      document.getElementById('formulario')?.scrollIntoView({ block: 'start' });
+  }, []);
   const set = (key: keyof typeof form) => (value: string) =>
     setForm((current) => ({ ...current, [key]: value }));
 

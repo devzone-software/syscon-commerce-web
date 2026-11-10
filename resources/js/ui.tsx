@@ -8,6 +8,7 @@ import { ProductImage } from './components/ProductImage';
 import { Footer } from './components/layout/Footer';
 import { Header } from './components/layout/Header';
 import { PageMain } from './components/layout/PageMain';
+import { isServicePlan, planInquiryUrl, planPriceSuffix } from './lib/servicePlans';
 
 export function useData<T>(
   load: () => Promise<T>,
@@ -106,21 +107,30 @@ export function ProductCard({ product, compact = false }: { product: Product; co
         {product.name}
       </Link>
       <span className="card-product-meta">{details}</span>
-      <strong className="card-product-price">{money(Number(product.price))}</strong>
+      <strong className="card-product-price">
+        {money(Number(product.price))}
+        {planPriceSuffix(product) && <small>{planPriceSuffix(product)}</small>}
+      </strong>
       <div className="card-product-actions">
         <Link className="card-product-view" to={url}>
           {compact ? 'Ver' : 'Ver producto'}
         </Link>
-        <button
-          type="button"
-          className="card-product-add"
-          onClick={() => add(product)}
-          disabled={!available}
-          aria-label={`Agregar ${product.name} al carrito`}
-        >
-          <img src={cartAddIcon} alt="" />
-          Agregar
-        </button>
+        {isServicePlan(product) ? (
+          <Link className="card-product-add" to={planInquiryUrl(product)}>
+            Consultar
+          </Link>
+        ) : (
+          <button
+            type="button"
+            className="card-product-add"
+            onClick={() => add(product)}
+            disabled={!available}
+            aria-label={`Agregar ${product.name} al carrito`}
+          >
+            <img src={cartAddIcon} alt="" />
+            Agregar
+          </button>
+        )}
       </div>
     </article>
   );

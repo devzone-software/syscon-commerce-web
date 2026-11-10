@@ -229,6 +229,10 @@ export function lengthVariants(product: Product, products: Product[]): LengthVar
 /** Searches suggested next to the results, built from the catalog the customer is browsing. */
 export function relatedSearches(products: Product[], query: string, limit = 8): string[] {
   const asked = normalize(query).trim();
+  if (!asked)
+    return groupProducts(products, 'category')
+      .slice(0, limit)
+      .map((group) => group.name.toLowerCase());
   const matches = asked ? products.filter((product) => matchesQuery(product, query)) : [];
   const categories = new Set(matches.map((product) => product.category).filter(Boolean));
   const pool = matches.length
