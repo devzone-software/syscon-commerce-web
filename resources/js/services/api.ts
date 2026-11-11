@@ -29,6 +29,8 @@ import type {
   SalesSummary,
   Profile,
   Supplier,
+  Complaint,
+  ComplaintInput,
   SupplierHistory,
   SignUp,
   SupplierJob,
@@ -186,6 +188,15 @@ export const api = {
     request<Payment>(`/admin/payments/${encodeURIComponent(id)}/confirm`, {
       method: 'POST',
       body: json({ reference }),
+    }),
+  submitComplaint: (sheet: ComplaintInput) =>
+    request<Complaint>('/complaints', { method: 'POST', body: json(sheet) }),
+  complaints: (status?: Complaint['status']) =>
+    request<Complaint[]>(`/admin/complaints${query({ status })}`),
+  respondComplaint: (id: string, response: string) =>
+    request<Complaint>(`/admin/complaints/${encodeURIComponent(id)}/respond`, {
+      method: 'POST',
+      body: json({ response }),
     }),
   suppliers: () => request<Supplier[]>('/admin/suppliers'),
   createSupplier: (supplier: { name: string; feedUrl: string; minIntervalMinutes: number }) =>

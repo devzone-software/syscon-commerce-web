@@ -357,6 +357,36 @@ export type SignUp = {
 export type CartLine = { product: Product; quantity: number };
 
 /** Entities returned as-is by supplier-service. */
+/** A sheet of the virtual Libro de Reclamaciones, as the consumer fills it in. */
+export type ComplaintInput = {
+  type: 'RECLAMO' | 'QUEJA';
+  consumerName: string;
+  documentType: 'DNI' | 'CE' | 'PASAPORTE' | 'RUC';
+  documentNumber: string;
+  address: string;
+  phone: string;
+  email: string;
+  guardianName?: string;
+  itemType: 'PRODUCTO' | 'SERVICIO';
+  itemDescription: string;
+  amount?: string;
+  orderReference?: string;
+  detail: string;
+  consumerRequest: string;
+  accepted: boolean;
+};
+
+export type Complaint = Omit<ComplaintInput, 'accepted' | 'amount'> & {
+  id: string;
+  code: string;
+  amount: string | null;
+  status: 'PENDING' | 'ANSWERED';
+  response: string | null;
+  respondedAt: string | null;
+  dueOn: string;
+  createdAt: string;
+};
+
 export type Supplier = {
   id: string;
   name: string;

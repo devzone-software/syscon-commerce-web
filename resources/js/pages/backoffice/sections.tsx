@@ -3,6 +3,7 @@ import { permissions, type Permission } from '../../lib/auth';
 import { ActivityAdmin } from './ActivityAdmin';
 import { BillingAdmin } from './BillingAdmin';
 import { CashRegister } from './CashRegister';
+import { ComplaintsAdmin } from './ComplaintsAdmin';
 import { Dashboard } from './Dashboard';
 import { DirectSale } from './DirectSale';
 import { InternalUseAdmin } from './InternalUseAdmin';
@@ -128,6 +129,14 @@ export const sections: Section[] = [
     group: 'Ventas',
     permission: permissions.paymentsConfirm,
     element: <PaymentsAdmin />,
+  },
+  {
+    path: 'reclamaciones',
+    description: 'Atender las hojas del Libro de Reclamaciones dentro del plazo legal.',
+    label: 'Libro de Reclamaciones',
+    group: 'Ventas',
+    permission: permissions.ordersManage,
+    element: <ComplaintsAdmin />,
   },
   {
     path: 'facturacion',

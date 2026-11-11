@@ -3,6 +3,7 @@
 use App\Http\Controllers\Gateway\AuthGatewayController;
 use App\Http\Controllers\Gateway\CashGatewayController;
 use App\Http\Controllers\Gateway\CatalogGatewayController;
+use App\Http\Controllers\Gateway\ComplaintGatewayController;
 use App\Http\Controllers\Gateway\InventoryGatewayController;
 use App\Http\Controllers\Gateway\InvoiceGatewayController;
 use App\Http\Controllers\Gateway\OrderGatewayController;
@@ -23,6 +24,9 @@ Route::prefix('web-api')->group(function () {
     Route::get('/me', [AuthGatewayController::class, 'me']);
     Route::get('/profile', [AuthGatewayController::class, 'profile']);
     Route::post('/password', [AuthGatewayController::class, 'password'])->middleware('throttle:10,1');
+    Route::post('/complaints', [ComplaintGatewayController::class, 'store'])->middleware('throttle:5,1');
+    Route::get('/admin/complaints', [ComplaintGatewayController::class, 'index']);
+    Route::post('/admin/complaints/{id}/respond', [ComplaintGatewayController::class, 'respond'])->whereUuid('id');
     Route::get('/delivery-options', [OrderGatewayController::class, 'deliveryOptions']);
     Route::get('/lookup/ruc/{ruc}', [OrderGatewayController::class, 'ruc'])->where('ruc', '[0-9]{11}');
     Route::match(['get', 'post'], '/orders', [OrderGatewayController::class, 'orders']);

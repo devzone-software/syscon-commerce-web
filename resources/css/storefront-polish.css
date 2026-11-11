@@ -1414,3 +1414,81 @@ html {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Libro de Reclamaciones: form, proof and staff inbox. */
+.complaint-form fieldset { margin: 0 0 24px; padding: 20px; border: 1px solid #dce8f0; border-radius: 12px; }
+.complaint-form legend { padding: 0 6px; font-weight: 700; }
+.complaint-provider { margin: 0 0 16px; color: #434751; }
+.complaint-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; }
+.complaint-field { display: grid; gap: 6px; font-size: 14px; }
+.complaint-field.is-wide { grid-column: 1 / -1; }
+.complaint-field em { color: #b42318; font-style: normal; }
+.complaint-field small { color: #60758a; }
+.complaint-field input, .complaint-field select, .complaint-field textarea { width: 100%; padding: 10px 12px; font: inherit; border: 1px solid #c9d6e0; border-radius: 8px; background: #fff; }
+.complaint-choice { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+.complaint-choice label { display: flex; gap: 8px; align-items: flex-start; padding: 10px 14px; border: 1px solid #c9d6e0; border-radius: 8px; cursor: pointer; }
+.complaint-choice.is-types label { flex: 1 1 240px; }
+.complaint-choice span { display: grid; gap: 2px; }
+.complaint-choice small { color: #60758a; }
+.complaint-accept { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; }
+.complaint-legal { font-size: 13px; color: #60758a; }
+.complaint-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.complaint-proof dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; }
+.complaint-proof dl .is-wide { grid-column: 1 / -1; }
+.complaint-proof dt { font-size: 13px; color: #60758a; }
+.complaint-proof dd { margin: 2px 0 0; }
+.complaint-proof-ok { padding: 12px 16px; background: #e8f6ee; border-radius: 8px; color: #1f7340; }
+.complaints-admin { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.complaints-admin-head { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; width: 100%; padding: 0; font: inherit; text-align: left; background: none; border: 0; cursor: pointer; }
+.complaints-admin-head .is-late { color: #b42318; font-weight: 700; }
+.complaints-admin-status { margin-left: auto; padding: 2px 10px; font-size: 12px; font-weight: 700; border-radius: 999px; background: #fff4e5; color: #9a6700; }
+.complaints-admin-status.is-answered { background: #e8f6ee; color: #1f7340; }
+.complaints-admin-body dl { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 6px 16px; margin: 16px 0; }
+.complaints-admin-body dt { color: #60758a; }
+.complaints-admin-body dd { margin: 0; white-space: pre-wrap; }
+@media (max-width: 700px) {
+  .complaint-grid, .complaint-proof dl, .complaints-admin-body dl { grid-template-columns: minmax(0, 1fr); }
+}
+@media print {
+  .store-header, .store-footer, .page-hero, .complaint-actions, .complaints-page > img { display: none !important; }
+}
+
+/* Footer bottom bar: copyright and the legal / help links in one row. */
+.store-footer-bottom-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.store-footer-bottom-row p {
+  margin: 0;
+}
+.store-footer nav.store-footer-legal {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+.store-footer-legal a {
+  font-size: 12px;
+  color: #ecf1ffcc;
+  text-decoration: none;
+}
+.store-footer-legal a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+.info-page {
+  display: grid;
+  gap: 20px;
+  max-width: 760px;
+}
+.info-page h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+.info-page p {
+  margin: 0;
+  line-height: 1.7;
+  color: #434751;
+}

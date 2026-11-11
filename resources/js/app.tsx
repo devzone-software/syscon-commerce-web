@@ -34,6 +34,9 @@ const Backoffice = lazy(() =>
 );
 const About = lazy(() => import('./pages/About').then((module) => ({ default: module.About })));
 const Ficon = lazy(() => import('./pages/Ficon').then((module) => ({ default: module.Ficon })));
+const InfoPage = lazy(() =>
+  import('./pages/InfoPage').then((module) => ({ default: module.InfoPage })),
+);
 const Complaints = lazy(() =>
   import('./pages/Complaints').then((module) => ({ default: module.Complaints })),
 );
@@ -85,6 +88,13 @@ function StoreRoutes() {
           <Route path="/contacto" element={<Contact />} />
           <Route path="/libro-de-reclamaciones" element={<Complaints />} />
           <Route path="/ficon" element={<Ficon />} />
+          <Route path="/trabaja-con-nosotros" element={<InfoPage slug="trabaja-con-nosotros" />} />
+          <Route
+            path="/terminos-y-condiciones"
+            element={<InfoPage slug="terminos-y-condiciones" />}
+          />
+          <Route path="/privacidad" element={<InfoPage slug="privacidad" />} />
+          <Route path="/accesibilidad" element={<InfoPage slug="accesibilidad" />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

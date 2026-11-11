@@ -6,6 +6,16 @@ import phoneIcon from '../../../images/footer/phone.svg';
 import whatsappIcon from '../../../images/footer/whatsapp.svg';
 import { Brand, company } from './Header';
 
+/** Legal and help links of the footer's bottom bar. */
+const legalLinks = [
+  { to: '/trabaja-con-nosotros', label: 'Trabaja con nosotros' },
+  { to: '/terminos-y-condiciones', label: 'Términos y condiciones' },
+  { to: '/privacidad', label: 'Cómo cuidamos tu privacidad' },
+  { to: '/libro-de-reclamaciones', label: 'Libro de Reclamaciones' },
+  { to: '/accesibilidad', label: 'Accesibilidad' },
+  { to: '/contacto', label: 'Ayuda' },
+];
+
 export function Footer() {
   const { user } = useShop();
   const staff = canUseBackoffice(user);
@@ -61,9 +71,18 @@ export function Footer() {
         </div>
       </div>
       <div className="store-footer-bottom">
-        <div className="container">
-          © {new Date().getFullYear()} Grupo SYSCON Tecnología Informática. Todos los derechos
-          reservados.
+        <div className="container store-footer-bottom-row">
+          <nav className="store-footer-legal" aria-label="Información legal">
+            {legalLinks.map((link) => (
+              <Link key={link.to} to={link.to}>
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          <p>
+            © {new Date().getFullYear()} Grupo SYSCON Tecnología Informática · {company.city}. Todos
+            los derechos reservados.
+          </p>
         </div>
       </div>
     </footer>
