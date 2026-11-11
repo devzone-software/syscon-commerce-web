@@ -347,12 +347,11 @@ export type Profile = {
 export type SignUp = {
   firstName: string;
   lastName: string;
-  documentType: DocumentType;
-  documentNumber: string;
   phone: string;
   email: string;
   password: string;
-  password_confirmation: string;
+  contactConsent: boolean;
+  termsAccepted: boolean;
 };
 export type CartLine = { product: Product; quantity: number };
 

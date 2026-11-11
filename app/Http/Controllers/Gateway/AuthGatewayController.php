@@ -12,14 +12,17 @@ class AuthGatewayController extends GatewayController
     {
         $data = $request->validate([
             'email' => 'required|email|max:255',
-            'password' => 'required|string|min:12|max:128|confirmed',
+            'password' => 'required|string|min:12|max:128',
             'firstName' => 'required|string|max:80',
             'lastName' => 'required|string|max:80',
-            'documentType' => 'required|in:DNI,CE,RUC,PASAPORTE',
-            'documentNumber' => 'required|string|max:15',
             'phone' => ['required', 'regex:/^9\d{8}$/'],
+            'contactConsent' => 'boolean',
+            // The form says "Al continuar, acepto los Términos…", so the request must carry that acceptance.
+            'termsAccepted' => 'accepted',
         ]);
-        unset($data['password_confirmation']);
+        // The document is asked at checkout, where it is needed for the receipt.
+        $data['contactConsent'] = (bool) ($data['contactConsent'] ?? false);
+        $data['termsAccepted'] = true;
         return $this->reply($this->api->request('POST', '/api/auth/register', $data));
     }
 

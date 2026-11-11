@@ -1,9 +1,9 @@
 import { InputBox, PasswordInput } from '../components/auth/AuthFields';
-import { useState, type FormEvent, type ReactNode } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthLayout, type AuthFeature } from '../components/auth/AuthLayout';
 import { GoogleButton, googleClientId } from '../components/auth/GoogleButton';
-import { PasswordRequirements } from '../components/auth/PasswordRequirements';
+import { SignUpFlow } from '../components/auth/SignUpFlow';
 import {
   ArrowRightIcon,
   BuildingIcon,
@@ -13,30 +13,14 @@ import {
   MailIcon,
   ReceiptIcon,
   TruckIcon,
-  UserIcon,
 } from '../components/icons';
-import { loginDestination, MIN_PASSWORD, safeRedirect } from '../lib/auth';
+import { loginDestination, safeRedirect } from '../lib/auth';
 import { api } from '../services/api';
 import { useShop } from '../state';
-import type { DocumentType, SignUp } from '../types';
+import type { SignUp } from '../types';
 import { ErrorBox } from '../ui';
 
-const personalDocuments: { value: DocumentType; label: string; hint: string }[] = [
-  { value: 'DNI', label: 'DNI', hint: '8 dígitos' },
-  { value: 'CE', label: 'Carné de extranjería', hint: '9 a 12 caracteres' },
-  { value: 'PASAPORTE', label: 'Pasaporte', hint: '6 a 12 caracteres' },
-];
-
-const emptySignUp: SignUp = {
-  firstName: '',
-  lastName: '',
-  documentType: 'DNI',
-  documentNumber: '',
-  phone: '',
-  email: '',
-  password: '',
-  password_confirmation: '',
-};
+type Credentials = { email: string; password: string };
 
 const loginFeatures: AuthFeature[] = [
   {
@@ -90,35 +74,6 @@ const signUpFeatures: AuthFeature[] = [
   },
 ];
 
-function Segmented<T extends string>({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: T;
-  options: { value: T; label: ReactNode }[];
-  onChange: (value: T) => void;
-}) {
-  return (
-    <div className="auth-segmented" role="radiogroup" aria-label={label}>
-      {options.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          role="radio"
-          aria-checked={value === option.value}
-          className={value === option.value ? 'is-active' : undefined}
-          onClick={() => onChange(option.value)}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 export function Auth({ register = false }: { register?: boolean }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -126,16 +81,13 @@ export function Auth({ register = false }: { register?: boolean }) {
   // Page requested before RequireAuth sent the visitor here, e.g. the checkout.
   const requestedFrom = (location.state as { from?: unknown } | null)?.from;
   const from = safeRedirect(requestedFrom);
-  const [form, setForm] = useState<SignUp>(emptySignUp);
-  const [audience, setAudience] = useState<'empresa' | 'personal'>(
-    register ? 'personal' : 'empresa',
-  );
+  const [form, setForm] = useState<Credentials>({ email: '', password: '' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [created, setCreated] = useState(false);
-  const set = (name: keyof SignUp, value: string) =>
+  const set = (name: keyof Credentials, value: string) =>
     setForm((current) => ({ ...current, [name]: value }));
-  const field = (name: keyof SignUp) => ({
+  const field = (name: keyof Credentials) => ({
     value: form[name],
     onChange: (event: { target: { value: string } }) => set(name, event.target.value),
   });
@@ -162,14 +114,9 @@ export function Auth({ register = false }: { register?: boolean }) {
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    if (register && form.password !== form.password_confirmation) {
-      setError('Las contraseñas no coinciden.');
-      return;
-    }
     void run(async () => {
-      if (register) await api.register(form);
       await api.login(form.email, form.password);
-      await finish(register);
+      await finish(false);
     });
   };
   const withGoogle = (credential: string) =>
@@ -177,17 +124,31 @@ export function Auth({ register = false }: { register?: boolean }) {
       const { created: isNew } = await api.googleLogin(credential);
       await finish(Boolean(isNew));
     });
-  const chooseAudience = (value: 'empresa' | 'personal') => {
-    setAudience(value);
-    if (register) set('documentType', value === 'empresa' ? 'RUC' : 'DNI');
-  };
+  const signUp = (profile: SignUp) =>
+    void run(async () => {
+      await api.register(profile);
+      await api.login(profile.email, profile.password);
+      await finish(true);
+    });
+
+  if (register)
+    return (
+      <SignUpFlow
+        busy={busy}
+        error={error}
+        created={created}
+        onSubmit={signUp}
+        onGoogle={(credential) => void withGoogle(credential)}
+        onContinue={() => navigate(from, { replace: true })}
+      />
+    );
 
   const google = googleClientId() && (
     <>
       <div className="auth-divider">
         <span>O CONTINÚA CON</span>
       </div>
-      <GoogleButton mode={register ? 'signup' : 'signin'} onCredential={withGoogle} />
+      <GoogleButton mode="signin" onCredential={withGoogle} />
     </>
   );
 
@@ -198,7 +159,6 @@ export function Auth({ register = false }: { register?: boolean }) {
         title="¡Bienvenido a Grupo SYSCON!"
         text="Tu cuenta está lista. Ya puedes comprar y seguir tus pedidos."
         features={signUpFeatures}
-        footnote="Datos tratados conforme a la Ley N° 29733"
       >
         <div className="auth-done" role="status">
           <span className="auth-done-icon">
@@ -217,211 +177,45 @@ export function Auth({ register = false }: { register?: boolean }) {
       </AuthLayout>
     );
 
-  if (!register)
-    return (
-      <AuthLayout
-        eyebrow="Acceso para empresas y clientes"
-        title="Bienvenido nuevamente a Grupo SYSCON"
-        text="Consulta tus compras de tecnología y el estado de tus pedidos desde tu cuenta."
-        features={loginFeatures}
-        footnote="Conexión protegida · Cumplimiento Ley N° 29733"
-      >
-        <h2>Iniciar sesión</h2>
-        <p className="auth-lead">Ingresa tus credenciales para acceder a tu panel.</p>
-        {error && <ErrorBox message={error} />}
-        {/* One sign-in for everyone: the account itself says if it is a company, a person or staff. */}
-        <form onSubmit={submit} className="auth-fields">
-          <InputBox icon={<MailIcon size={16} />} label="Correo electrónico" required>
-            <input
-              {...field('email')}
-              type="email"
-              required
-              autoComplete="email"
-              placeholder="ejemplo@correo.com"
-            />
-          </InputBox>
-          <PasswordInput
-            label="Contraseña"
-            value={form.password}
-            onChange={(value) => set('password', value)}
-            autoComplete="current-password"
-          />
-          <div className="auth-row-end">
-            <Link to="/recuperar">¿Olvidaste tu contraseña?</Link>
-          </div>
-          <button className="auth-submit" disabled={busy}>
-            {busy ? 'Procesando…' : 'INICIAR SESIÓN'} <ArrowRightIcon size={16} />
-          </button>
-        </form>
-        {google}
-        <p className="auth-switch">
-          ¿Aún no tienes una cuenta de cliente?{' '}
-          <Link to="/registro" state={location.state}>
-            Crear cuenta corporativa o personal
-          </Link>
-        </p>
-      </AuthLayout>
-    );
-
-  const docType = personalDocuments.find((type) => type.value === form.documentType);
-  const matches =
-    form.password_confirmation.length > 0 && form.password === form.password_confirmation;
   return (
     <AuthLayout
-      eyebrow="Comunidad y clientes SYSCON"
-      title="Únete a Grupo SYSCON"
-      text="Crea tu cuenta para comprar, consultar tus pedidos y contactar con nuestro equipo."
-      features={signUpFeatures}
-      footnote="Datos tratados conforme a la Ley N° 29733"
+      eyebrow="Acceso para empresas y clientes"
+      title="Bienvenido nuevamente a Grupo SYSCON"
+      text="Consulta tus compras de tecnología y el estado de tus pedidos desde tu cuenta."
+      features={loginFeatures}
     >
-      <div className="auth-title-row">
-        <div>
-          <h2>Crear una cuenta</h2>
-          <p className="auth-lead">Completa tus datos para comenzar tu experiencia tecnológica.</p>
-        </div>
-        <Segmented
-          label="Tipo de cuenta"
-          value={audience}
-          onChange={chooseAudience}
-          options={[
-            {
-              value: 'personal',
-              label: (
-                <>
-                  <UserIcon size={14} /> Personal
-                </>
-              ),
-            },
-            {
-              value: 'empresa',
-              label: (
-                <>
-                  <BuildingIcon size={14} /> Empresa (RUC)
-                </>
-              ),
-            },
-          ]}
-        />
-      </div>
+      <h2>Iniciar sesión</h2>
+      <p className="auth-lead">Ingresa tus credenciales para acceder a tu panel.</p>
       {error && <ErrorBox message={error} />}
+      {/* One sign-in for everyone: the account itself says if it is a company, a person or staff. */}
       <form onSubmit={submit} className="auth-fields">
-        <div className="auth-grid">
-          <InputBox icon={<UserIcon size={16} />} label="Nombres" required>
-            <input
-              {...field('firstName')}
-              required
-              maxLength={80}
-              autoComplete="given-name"
-              placeholder="Ej. Jefferson"
-            />
-          </InputBox>
-          <InputBox icon={<UserIcon size={16} />} label="Apellidos" required>
-            <input
-              {...field('lastName')}
-              required
-              maxLength={80}
-              autoComplete="family-name"
-              placeholder="Ej. Reyes"
-            />
-          </InputBox>
-        </div>
-        <div className="auth-grid">
-          {audience === 'empresa' ? (
-            <InputBox icon={<BuildingIcon size={16} />} label="RUC de la empresa" required>
-              <input
-                {...field('documentNumber')}
-                required
-                maxLength={11}
-                inputMode="numeric"
-                placeholder="20XXXXXXXXX"
-              />
-            </InputBox>
-          ) : (
-            <>
-              <label className="auth-field">
-                <span className="auth-label">
-                  Tipo de documento <em aria-hidden="true">*</em>
-                </span>
-                <span className="auth-input">
-                  <select {...field('documentType')} required>
-                    {personalDocuments.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.label}
-                      </option>
-                    ))}
-                  </select>
-                </span>
-              </label>
-              <InputBox label="Número de documento" required>
-                <input
-                  {...field('documentNumber')}
-                  required
-                  maxLength={15}
-                  inputMode={form.documentType === 'DNI' ? 'numeric' : 'text'}
-                  placeholder={docType?.hint}
-                />
-              </InputBox>
-            </>
-          )}
-        </div>
-        <InputBox
-          icon={<MailIcon size={16} />}
-          label="Correo electrónico corporativo o personal"
-          required
-        >
+        <InputBox icon={<MailIcon size={16} />} label="Correo electrónico" required>
           <input
             {...field('email')}
             type="email"
             required
             autoComplete="email"
-            placeholder="nombre@empresa.com o ejemplo@correo.com"
+            placeholder="ejemplo@correo.com"
           />
         </InputBox>
-        <p className="auth-hint">
-          Enviaremos tu comprobante y las confirmaciones de pedido a este correo.
-        </p>
-        <InputBox
-          icon={<span className="auth-prefix">PE +51</span>}
-          label="Teléfono celular o WhatsApp"
-          required
-        >
-          <input
-            {...field('phone')}
-            type="tel"
-            required
-            inputMode="numeric"
-            pattern="9[0-9]{8}"
-            title="9 dígitos, empezando con 9"
-            placeholder="999 999 999"
-            autoComplete="tel-national"
-          />
-        </InputBox>
-        <div className="auth-grid">
-          <PasswordInput
-            label="Contraseña"
-            value={form.password}
-            onChange={(value) => set('password', value)}
-            autoComplete="new-password"
-            minLength={MIN_PASSWORD}
-          />
-          <PasswordInput
-            label="Confirmar contraseña"
-            value={form.password_confirmation}
-            onChange={(value) => set('password_confirmation', value)}
-            autoComplete="new-password"
-            minLength={MIN_PASSWORD}
-          />
+        <PasswordInput
+          label="Contraseña"
+          value={form.password}
+          onChange={(value) => set('password', value)}
+          autoComplete="current-password"
+        />
+        <div className="auth-row-end">
+          <Link to="/recuperar">¿Olvidaste tu contraseña?</Link>
         </div>
-        <PasswordRequirements value={form.password} matches={matches} />
         <button className="auth-submit" disabled={busy}>
-          {busy ? 'Procesando…' : 'CREAR CUENTA'} <ArrowRightIcon size={16} />
+          {busy ? 'Procesando…' : 'INICIAR SESIÓN'} <ArrowRightIcon size={16} />
         </button>
       </form>
       {google}
       <p className="auth-switch">
-        ¿Ya tienes una cuenta registrada?{' '}
-        <Link to="/ingresar" state={location.state}>
-          Iniciar sesión
+        ¿Aún no tienes una cuenta de cliente?{' '}
+        <Link to="/registro" state={location.state}>
+          Crear cuenta corporativa o personal
         </Link>
       </p>
     </AuthLayout>

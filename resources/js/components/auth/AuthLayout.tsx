@@ -23,7 +23,7 @@ export function AuthLayout({
   title: string;
   text: string;
   features: AuthFeature[];
-  footnote: string;
+  footnote?: string;
   children: ReactNode;
   below?: ReactNode;
 }) {
@@ -47,29 +47,36 @@ export function AuthLayout({
                   </li>
                 ))}
               </ul>
-              <p className="auth-panel-foot">
-                <ShieldIcon size={14} /> {footnote}
-              </p>
+              {footnote && (
+                <p className="auth-panel-foot">
+                  <ShieldIcon size={14} /> {footnote}
+                </p>
+              )}
             </aside>
             <section className="auth-form">{children}</section>
           </div>
           {below}
         </div>
       </PageMain>
-      <footer className="auth-footer">
-        <div className="container auth-footer-row">
-          <span>
-            © {new Date().getFullYear()} Grupo SYSCON S.A.C. Todos los derechos reservados.
-          </span>
-          <nav aria-label="Enlaces">
-            <Link to="/contacto">Ayuda y contacto</Link>
-            <Link to="/nosotros">Nosotros</Link>
-            <Link to="/" className="auth-footer-back">
-              <ArrowLeftIcon size={14} /> Volver a la tienda
-            </Link>
-          </nav>
-        </div>
-      </footer>
+      <AuthFooter />
     </div>
+  );
+}
+
+/** Slim footer shared by the sign-in and sign-up pages. */
+export function AuthFooter() {
+  return (
+    <footer className="auth-footer">
+      <div className="container auth-footer-row">
+        <span>© {new Date().getFullYear()} Grupo SYSCON S.A.C. Todos los derechos reservados.</span>
+        <nav aria-label="Enlaces">
+          <Link to="/contacto">Ayuda y contacto</Link>
+          <Link to="/nosotros">Nosotros</Link>
+          <Link to="/" className="auth-footer-back">
+            <ArrowLeftIcon size={14} /> Volver a la tienda
+          </Link>
+        </nav>
+      </div>
+    </footer>
   );
 }

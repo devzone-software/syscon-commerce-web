@@ -75,12 +75,12 @@ class GatewayTest extends TestCase
     public function test_register_requires_the_full_profile(): void
     {
         Http::fake(['java.test/api/auth/register' => Http::response(['success' => true, 'data' => 'id'], 201)]);
-        $profile = ['email' => 'ana@mail.com', 'password' => 'very-long-password', 'password_confirmation' => 'very-long-password', 'firstName' => 'Ana', 'lastName' => 'Pérez', 'documentType' => 'DNI', 'documentNumber' => '12345678', 'phone' => '987654321'];
+        $profile = ['email' => 'ana@mail.com', 'password' => 'very-long-password', 'firstName' => 'Ana', 'lastName' => 'Pérez', 'phone' => '987654321', 'contactConsent' => true, 'termsAccepted' => true];
         $this->postJson('/web-api/register', ['email' => 'ana@mail.com', 'password' => 'very-long-password'])->assertUnprocessable();
         $this->postJson('/web-api/register', ['phone' => '12345'] + $profile)->assertUnprocessable();
-        $this->postJson('/web-api/register', ['password_confirmation' => 'otra-cosa-distinta'] + $profile)->assertUnprocessable();
+        $this->postJson('/web-api/register', ['termsAccepted' => false] + $profile)->assertUnprocessable();
         $this->postJson('/web-api/register', $profile)->assertStatus(201);
-        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/auth/register' && $request['documentNumber'] === '12345678' && ! isset($request['password_confirmation']));
+        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/auth/register' && $request['contactConsent'] === true && $request['termsAccepted'] === true);
     }
 
     public function test_me_separates_roles_from_permissions(): void
