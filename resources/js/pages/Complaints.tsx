@@ -94,11 +94,96 @@ function ComplaintProof({ complaint, onNew }: { complaint: Complaint; onNew: () 
 }
 
 /** Virtual Libro de Reclamaciones: the consumer fills in the sheet and gets its number. */
+/** What the book is for and which help channels come first (shown before the form). */
+function ComplaintIntro({ onStart }: { onStart: () => void }) {
+  return (
+    <section className="complaint-intro" aria-labelledby="complaint-intro-title">
+      <h2 id="complaint-intro-title" className="visually-hidden">
+        Antes de registrar una queja o un reclamo
+      </h2>
+      <p>
+        En nuestra página de <Link to="/contacto">Ayuda y contacto</Link>,{' '}
+        <strong>
+          te orientamos y puedes comunicarte con nosotros por teléfono, WhatsApp o correo
+        </strong>{' '}
+        para resolver cualquier dificultad con tus compras, pedidos, comprobantes o con la
+        instalación de tus equipos.
+      </p>
+      <ul className="complaint-channels">
+        <li>
+          <span>Teléfono</span>
+          <a href={company.phoneHref}>{company.phone}</a>
+        </li>
+        <li>
+          <span>WhatsApp</span>
+          <a href={company.whatsappHref} target="_blank" rel="noopener noreferrer">
+            {company.whatsappLabel}
+          </a>
+        </li>
+        <li>
+          <span>Correo</span>
+          <a href={`mailto:${company.email}`}>{company.email}</a>
+        </li>
+      </ul>
+      <p>
+        Sin embargo, si no estás satisfecho con la experiencia que te brindamos,{' '}
+        <strong>también cuentas con un Libro de Reclamaciones</strong> para registrar una queja o un
+        reclamo.
+      </p>
+
+      <div className="complaint-kinds">
+        <div>
+          <h3>¿Qué es un reclamo?</h3>
+          <p>
+            Es tu disconformidad con un <strong>producto o servicio que compraste</strong> en
+            SYSCON: por ejemplo, un equipo que llegó con fallas, una licencia que no se activó, una
+            instalación, la entrega, un cobro o tu comprobante, en tienda o en nuestra web.
+          </p>
+        </div>
+        <div>
+          <h3>¿Qué es una queja?</h3>
+          <p>
+            Es tu disconformidad con la <strong>atención que recibiste</strong> y que no tiene que
+            ver con lo que compraste: el trato en tienda, por teléfono, WhatsApp o correo, o los
+            tiempos de respuesta.
+          </p>
+        </div>
+      </div>
+
+      <h3>¿Qué sucede después de que registro una queja o un reclamo?</h3>
+      <p>
+        Al terminar verás el código de tu hoja y te enviaremos una copia a tu correo para que te
+        quede como constancia. Además, en un plazo máximo de <strong>15 días hábiles</strong>{' '}
+        recibirás nuestra respuesta en ese mismo correo.
+      </p>
+
+      <div className="complaints-actions">
+        <button type="button" className="button button-primary" onClick={onStart}>
+          Ingresar una queja o un reclamo
+        </button>
+        <Link className="button button-secondary" to="/contacto">
+          Prefiero pedir ayuda primero
+        </Link>
+      </div>
+      <p className="complaint-legal">
+        La formulación del reclamo no impide acudir a otras vías de solución de controversias ni es
+        requisito previo para interponer una denuncia ante el INDECOPI.
+      </p>
+    </section>
+  );
+}
+
 export function Complaints() {
   const [sheet, setSheet] = useState<ComplaintInput>(emptyComplaint);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<Complaint | null>(null);
+  // First an explanation of the book and of our help channels; the form opens on request.
+  const [started, setStarted] = useState(false);
+  const open = (value: boolean) => {
+    setStarted(value);
+    window.scrollTo({ top: 0 });
+  };
   const set =
     <K extends keyof ComplaintInput>(key: K) =>
     (value: ComplaintInput[K]) =>
@@ -134,8 +219,17 @@ export function Complaints() {
           <div>
             {done ? (
               <ComplaintProof complaint={done} onNew={() => setDone(null)} />
+            ) : !started ? (
+              <ComplaintIntro onStart={() => open(true)} />
             ) : (
               <form className="complaint-form" onSubmit={submit} noValidate>
+                <button
+                  type="button"
+                  className="link-button complaint-back"
+                  onClick={() => open(false)}
+                >
+                  ← Volver a la información del Libro de Reclamaciones
+                </button>
                 <p className="complaint-provider">
                   <strong>Grupo SYSCON Tecnología Informática</strong> · {company.city}
                 </p>

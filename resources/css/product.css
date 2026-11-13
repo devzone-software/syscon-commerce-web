@@ -383,3 +383,41 @@
     color: #526477;
   }
 }
+
+/* Buy box: "Comprar ahora" first and strongest, "Agregar al carrito" soft below it. */
+.product-buy-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1 1 260px;
+  min-width: 240px;
+}
+.product-buy-actions .flow-button {
+  width: 100%;
+  min-width: 0;
+  min-height: 50px;
+  margin: 0;
+  font-size: 15px;
+}
+.flow-button.is-soft {
+  background: #e3edfb;
+  color: #0d3b82;
+}
+.flow-button.is-soft:hover:not(:disabled) {
+  background: #d3e3f8;
+  color: #00265d;
+}
+.product-buy > a.flow-button {
+  flex: 1 1 200px;
+  margin: 0;
+}
+@media (max-width: 700px) {
+  .product-quick-buy .flow-button {
+    min-width: 0;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .product-quick-buy .flow-button.is-soft svg + * {
+    display: none;
+  }
+}

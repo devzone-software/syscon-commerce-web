@@ -30,4 +30,13 @@ describe('ProductImage', () => {
     expect(html).toContain('<small>TP-Link</small>');
     expect(html).not.toContain('Equipo');
   });
+  it('labels the stock photos of the referencial folder, unless the badge is turned off', () => {
+    const photo = { ...product, imageUrl: 'http://api.test/images/products/referencial/a.webp' };
+    expect(renderToStaticMarkup(<ProductImage product={photo} />)).toContain('Imagen referencial');
+    expect(renderToStaticMarkup(<ProductImage product={photo} badge={false} />)).not.toContain(
+      'Imagen referencial',
+    );
+    // A manufacturer's photo or an illustration is not labeled.
+    expect(renderToStaticMarkup(<ProductImage product={product} />)).not.toContain('referencial');
+  });
 });

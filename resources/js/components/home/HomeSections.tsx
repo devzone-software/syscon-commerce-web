@@ -8,6 +8,11 @@ import heroBagIcon from '../../../images/home/hero-bag.svg';
 import heroFireIcon from '../../../images/home/hero-fire.svg';
 import promoArrowIcon from '../../../images/home/arrow-right-dark.svg';
 import promoImage from '../../../images/home/promo-security.jpg';
+import heroCompanies from '../../../images/photos/hero-empresas.webp';
+import heroPayments from '../../../images/photos/hero-pagos.webp';
+import heroPrices from '../../../images/photos/hero-precios.webp';
+import heroTechnology from '../../../images/photos/hero-tecnologia.webp';
+import securityPhoto from '../../../images/photos/videovigilancia.webp';
 import trustBoltIcon from '../../../images/home/trust-bolt.svg';
 import trustLockIcon from '../../../images/home/trust-lock.svg';
 import trustShieldIcon from '../../../images/home/trust-shield.svg';
@@ -17,6 +22,8 @@ import { categoryIcon } from '../../lib/categoryIcon';
 import type { Product } from '../../types';
 import { money } from '../../state';
 import { ProductCard } from '../../ui';
+import { PromoCard } from './PromoCard';
+import { categoryPhoto } from '../../lib/categoryPhoto';
 import { ProductImage } from '../ProductImage';
 import {
   BoxIcon,
@@ -63,6 +70,8 @@ type HeroAction = { to: string; label: string; icon?: string };
 
 const heroSlides: {
   tone: string;
+  /** Real photo behind the text (Unsplash; see images/photos/CREDITOS.md). */
+  photo: string;
   label: string;
   title: string;
   text: string;
@@ -71,6 +80,7 @@ const heroSlides: {
 }[] = [
   {
     tone: '',
+    photo: heroTechnology,
     label: 'Tecnología y licenciamiento para empresas',
     title: 'Tecnología para tu trabajo y tu negocio',
     text: 'Licencias digitales, hardware para estaciones de trabajo, componentes de alto rendimiento y seguridad informática empresarial.',
@@ -79,6 +89,7 @@ const heroSlides: {
   },
   {
     tone: 'is-offers',
+    photo: heroPrices,
     label: 'Selección por precio',
     title: 'Los precios más bajos del catálogo en hardware y software',
     text: 'Laptops, almacenamiento, redes y licencias: consulta las condiciones de cada producto antes de comprar.',
@@ -87,6 +98,7 @@ const heroSlides: {
   },
   {
     tone: 'is-business',
+    photo: heroCompanies,
     label: 'Empresas y profesionales',
     title: 'Cotizaciones por volumen con factura electrónica',
     text: 'Atención personalizada para compras corporativas, licitaciones e instituciones públicas y privadas.',
@@ -98,6 +110,7 @@ const heroSlides: {
   },
   {
     tone: 'is-payment',
+    photo: heroPayments,
     label: 'Compra en línea',
     title: 'Consulta los medios de pago disponibles',
     text: 'Elige una modalidad de entrega habilitada y sigue tu pedido desde Mis pedidos.',
@@ -167,6 +180,13 @@ export function HomeHero({
               aria-hidden={i !== index}
               inert={i !== index}
             >
+              <img
+                className="home-hero-photo"
+                src={slide.photo}
+                alt=""
+                loading={i === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+              />
               <div className="home-hero-copy">
                 <span className="home-hero-label">
                   <i aria-hidden="true" /> {slide.label}
@@ -394,7 +414,11 @@ function useRail(items: number) {
   return { rail, edges, update, move };
 }
 
-export function CategoryCarousel({ categories }: { categories: CatalogGroup[] }) {
+/** Fiber internet plans have their own Ficon banner on the home page, so no card here. */
+const hiddenInRail = /fibra|internet/;
+
+export function CategoryCarousel({ categories: all }: { categories: CatalogGroup[] }) {
+  const categories = all.filter((category) => !hiddenInRail.test(normalize(category.name)));
   const { rail, edges, update, move } = useRail(categories.length);
 
   return (
@@ -407,9 +431,15 @@ export function CategoryCarousel({ categories }: { categories: CatalogGroup[] })
           <li key={category.name}>
             <Link to={`/catalogo?${catalogParams.category}=${encodeURIComponent(category.name)}`}>
               <strong>{category.name}</strong>
-              <span className="home-category-rail-icon">
-                <img src={categoryIcon(category.name)} alt="" />
-              </span>
+              {categoryPhoto(category.name) ? (
+                <span className="home-category-rail-photo">
+                  <img src={categoryPhoto(category.name)!} alt="" loading="lazy" decoding="async" />
+                </span>
+              ) : (
+                <span className="home-category-rail-icon">
+                  <img src={categoryIcon(category.name)} alt="" />
+                </span>
+              )}
               <p>{categoryBlurb(category.name)}</p>
               <span className="home-category-rail-cta">Ver productos</span>
             </Link>
@@ -440,28 +470,42 @@ export function CategoryCarousel({ categories }: { categories: CatalogGroup[] })
   );
 }
 
-/** Every security camera of the catalog in a sideways carousel of product cards. */
-export function CameraCarousel({ products, category }: { products: Product[]; category: string }) {
+/** A sideways carousel of promotional product cards with a heading and a "see all" link. */
+export function ProductRail({
+  id,
+  eyebrow,
+  title,
+  products,
+  link,
+  linkLabel,
+  noun,
+}: {
+  id: string;
+  eyebrow: string;
+  title: string;
+  products: Product[];
+  link: string;
+  linkLabel: string;
+  /** Plural used by the arrow buttons: "Ver más {noun}". */
+  noun: string;
+}) {
   const { rail, edges, update, move } = useRail(products.length);
   return (
-    <section className="home-block home-product-rail" aria-labelledby="home-cameras">
+    <section className="home-block home-product-rail" aria-labelledby={id}>
       <div className="section-head">
         <div className="section-title">
-          <p className="section-eyebrow">Videovigilancia</p>
-          <h2 id="home-cameras">Cámaras de seguridad para tu hogar y negocio</h2>
+          <p className="section-eyebrow">{eyebrow}</p>
+          <h2 id={id}>{title}</h2>
         </div>
-        <Link
-          className="section-link"
-          to={`/catalogo?${catalogParams.category}=${encodeURIComponent(category)}`}
-        >
-          Ver todas las cámaras <img src={arrowIcon} alt="" />
+        <Link className="section-link" to={link}>
+          {linkLabel} <img src={arrowIcon} alt="" />
         </Link>
       </div>
       <div className="home-product-rail-frame">
         <ul ref={rail} onScroll={update}>
           {products.map((product) => (
             <li key={product.id}>
-              <ProductCard product={product} />
+              <PromoCard product={product} />
             </li>
           ))}
         </ul>
@@ -469,7 +513,7 @@ export function CameraCarousel({ products, category }: { products: Product[]; ca
           <button
             type="button"
             className="home-category-rail-arrow is-prev"
-            aria-label="Ver cámaras anteriores"
+            aria-label={`Ver ${noun} anteriores`}
             onClick={() => move(-1)}
           >
             <ChevronLeftIcon size={22} />
@@ -479,7 +523,7 @@ export function CameraCarousel({ products, category }: { products: Product[]; ca
           <button
             type="button"
             className="home-category-rail-arrow is-next"
-            aria-label="Ver más cámaras"
+            aria-label={`Ver más ${noun}`}
             onClick={() => move(1)}
           >
             <ChevronRightIcon size={22} />
@@ -487,6 +531,21 @@ export function CameraCarousel({ products, category }: { products: Product[]; ca
         )}
       </div>
     </section>
+  );
+}
+
+/** Every security camera of the catalog in a sideways carousel of product cards. */
+export function CameraCarousel({ products, category }: { products: Product[]; category: string }) {
+  return (
+    <ProductRail
+      id="home-cameras"
+      eyebrow="Videovigilancia"
+      title="Cámaras de seguridad para tu hogar y negocio"
+      products={products}
+      link={`/catalogo?${catalogParams.category}=${encodeURIComponent(category)}`}
+      linkLabel="Ver todas las cámaras"
+      noun="cámaras"
+    />
   );
 }
 
@@ -518,84 +577,6 @@ const securitySteps = [
   'Cámaras, grabadores, discos y cableado en una sola cotización.',
   'Precio por volumen, factura electrónica y soporte después de la instalación.',
 ];
-
-/** A wall of camera feeds: the picture of a business watched from one monitor. */
-function MonitoringWall() {
-  const feeds = [0, 1, 2, 3, 4, 5];
-  return (
-    <svg
-      className="business-security-wall"
-      viewBox="0 0 360 250"
-      role="img"
-      aria-label="Monitor con seis cámaras en vivo"
-    >
-      <rect
-        x="4"
-        y="4"
-        width="352"
-        height="214"
-        rx="14"
-        fill="#0b1830"
-        stroke="#29c4f0"
-        strokeOpacity=".35"
-        strokeWidth="2"
-      />
-      {feeds.map((feed) => {
-        const x = 18 + (feed % 3) * 112;
-        const y = 18 + Math.floor(feed / 3) * 96;
-        return (
-          <g key={feed}>
-            <rect x={x} y={y} width="100" height="84" rx="8" fill="#13284d" />
-            <circle cx={x + 12} cy={y + 12} r="4" fill="#e5484d" />
-            <text
-              x={x + 22}
-              y={y + 16}
-              fontSize="9"
-              fontWeight="700"
-              fill="#a1eaff"
-              fontFamily="Inter, Arial, sans-serif"
-            >
-              {['BUS 01', 'BUS 02', 'TERMINAL', 'COCHERA', 'ALMACÉN', 'OFICINA'][feed]}
-            </text>
-            {feed < 2 ? (
-              <g fill="#29c4f0" opacity=".85">
-                <rect x={x + 18} y={y + 34} width="64" height="30" rx="6" />
-                <rect x={x + 24} y={y + 39} width="12" height="10" rx="2" fill="#13284d" />
-                <rect x={x + 40} y={y + 39} width="12" height="10" rx="2" fill="#13284d" />
-                <rect x={x + 56} y={y + 39} width="12" height="10" rx="2" fill="#13284d" />
-                <circle
-                  cx={x + 32}
-                  cy={y + 66}
-                  r="6"
-                  fill="#0b1830"
-                  stroke="#29c4f0"
-                  strokeWidth="3"
-                />
-                <circle
-                  cx={x + 68}
-                  cy={y + 66}
-                  r="6"
-                  fill="#0b1830"
-                  stroke="#29c4f0"
-                  strokeWidth="3"
-                />
-              </g>
-            ) : (
-              <g fill="none" stroke="#29c4f0" strokeOpacity=".7" strokeWidth="3">
-                <path
-                  d={`M${x + 14} ${y + 70} L${x + 40} ${y + 42} L${x + 58} ${y + 58} L${x + 86} ${y + 32}`}
-                />
-                <rect x={x + 14} y={y + 30} width="72" height="44" rx="4" strokeOpacity=".25" />
-              </g>
-            )}
-          </g>
-        );
-      })}
-      <rect x="150" y="218" width="60" height="18" fill="#13284d" />
-      <rect x="110" y="234" width="140" height="10" rx="5" fill="#13284d" />
-    </svg>
-  );
-}
 
 /** Corporate video surveillance: many cameras for companies such as transport fleets. */
 export function BusinessSecurity({ cameraCategory }: { cameraCategory: string }) {
@@ -630,7 +611,14 @@ export function BusinessSecurity({ cameraCategory }: { cameraCategory: string })
             </Link>
           </div>
         </div>
-        <MonitoringWall />
+        <figure className="business-security-photo">
+          <img
+            src={securityPhoto}
+            alt="Cámaras de seguridad tipo bullet instaladas en la pared de un local"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
       </div>
       <ul className="business-security-sectors">
         {securitySectors.map((sector) => (

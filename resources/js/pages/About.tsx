@@ -1,7 +1,7 @@
 import { ContentDisclosure } from '../components/shared/ContentDisclosure';
 import { Link } from 'react-router-dom';
 import { useAccountPath } from '../hooks/useAccountPath';
-import team from '../../images/about/team.jpg';
+import team from '../../images/photos/nosotros.webp';
 import homeIcon from '../../images/catalog/home.svg';
 import {
   ArrowRightIcon,
@@ -208,7 +208,7 @@ export function About() {
           </ul>
         </div>
         <figure>
-          <img src={team} alt="Imagen referencial de un equipo de trabajo tecnológico" />
+          <img src={team} alt="Imagen referencial: técnico trabajando en un servidor" />
           <figcaption>
             <i>
               <ShieldIcon size={20} />

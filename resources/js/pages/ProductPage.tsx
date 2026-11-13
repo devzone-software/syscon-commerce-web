@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { money, useShop } from '../state';
 import { useConfirmAdd } from '../components/cart/AddToCartDialog';
@@ -38,7 +38,8 @@ export function ProductPage() {
   const { id = '' } = useParams();
   const { data, loading, error, reload } = useData(() => api.product(id), [id]);
   const catalog = useData(api.products);
-  const { cart } = useShop();
+  const { cart, add } = useShop();
+  const navigate = useNavigate();
   const confirmAdd = useConfirmAdd();
   const [quantity, setQuantity] = useState(1);
   const buyRef = useRef<HTMLDivElement>(null);
@@ -106,6 +107,12 @@ export function ProductPage() {
   const addToCart = () => {
     confirmAdd(data, units);
     setQuantity(1);
+  };
+  // Straight to payment with the chosen quantity; checkout asks to sign in first if needed.
+  const buyNow = () => {
+    add(data, units);
+    setQuantity(1);
+    navigate('/checkout');
   };
 
   return (
@@ -214,16 +221,28 @@ export function ProductPage() {
                       max={remaining}
                       onChange={setQuantity}
                     />
-                    <button type="button" className="flow-button" onClick={addToCart}>
-                      <CartIcon /> Agregar al carrito
-                    </button>
+                    <div className="product-buy-actions">
+                      <button type="button" className="flow-button" onClick={buyNow}>
+                        Comprar ahora
+                      </button>
+                      <button type="button" className="flow-button is-soft" onClick={addToCart}>
+                        <CartIcon /> Agregar al carrito
+                      </button>
+                    </div>
                   </>
                 ) : (
-                  <p className="notice">
-                    {data.stock < 1
-                      ? 'Este producto está agotado por ahora.'
-                      : 'Alcanzaste la cantidad máxima disponible para este producto.'}
-                  </p>
+                  <>
+                    <p className="notice">
+                      {data.stock < 1
+                        ? 'Este producto está agotado por ahora.'
+                        : 'Alcanzaste la cantidad máxima disponible para este producto.'}
+                    </p>
+                    {inCart > 0 && (
+                      <Link className="flow-button" to="/checkout">
+                        Ir a pagar
+                      </Link>
+                    )}
+                  </>
                 )}
               </div>
               {inCart > 0 && (
@@ -315,8 +334,11 @@ export function ProductPage() {
             <small>Precio por unidad</small>
             <strong>{money(Number(data.price))}</strong>
           </span>
-          <button type="button" className="flow-button" onClick={addToCart}>
+          <button type="button" className="flow-button is-soft" onClick={addToCart}>
             <CartIcon /> Agregar
+          </button>
+          <button type="button" className="flow-button" onClick={buyNow}>
+            Comprar ahora
           </button>
         </aside>
       )}

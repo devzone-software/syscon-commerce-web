@@ -197,10 +197,10 @@ body {
   color: #fff;
 }
 .home-hero.is-offers {
-  background: linear-gradient(90deg, #00265d 0%, #00507a 55%, #00838f 100%);
+  background: linear-gradient(90deg, #2f5d94 0%, #3a78a6 55%, #4a9db0 100%);
 }
 .home-hero.is-business {
-  background: linear-gradient(90deg, #111c2d 0%, #1d3461 55%, #0d3b82 100%);
+  background: linear-gradient(90deg, #26395a 0%, #2b4673 55%, #2a5a96 100%);
 }
 .home-hero.is-payment {
   background: linear-gradient(90deg, #0d3b82 0%, #1557b0 55%, #0079b8 100%);

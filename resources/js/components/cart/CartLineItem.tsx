@@ -26,7 +26,7 @@ export function CartLineItem({
         tabIndex={-1}
         aria-hidden="true"
       >
-        <ProductImage product={product} />
+        <ProductImage product={product} badge={false} />
       </Link>
       <div className="cart-line-info">
         {product.brand && <span className="card-product-brand">{product.brand}</span>}

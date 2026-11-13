@@ -1,3 +1,4 @@
+import { categoryPhoto } from '../lib/categoryPhoto';
 import { ContentDisclosure } from '../components/shared/ContentDisclosure';
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -211,8 +212,19 @@ export function Categories() {
                   return (
                     <li key={category.name}>
                       <Link to={byCategory(category.name)}>
-                        <span className="category-tile-media">
-                          {sample && <ProductImage product={sample} />}
+                        <span
+                          className={`category-tile-media${categoryPhoto(category.name) ? ' is-photo' : ''}`}
+                        >
+                          {categoryPhoto(category.name) ? (
+                            <img
+                              src={categoryPhoto(category.name)!}
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ) : (
+                            sample && <ProductImage product={sample} />
+                          )}
                         </span>
                         <span className="category-tile-tag">
                           <img src={categoryIcon(category.name)} alt="" />

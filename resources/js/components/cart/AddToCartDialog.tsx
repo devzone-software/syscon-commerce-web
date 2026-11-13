@@ -99,7 +99,7 @@ function AddToCartDialog({ request, onClose }: { request: Request; onClose: () =
 
         <div className="add-dialog-product">
           <span className="add-dialog-media">
-            <ProductImage product={product} />
+            <ProductImage product={product} badge={false} />
           </span>
           <div>
             {details && <p className="add-dialog-cat">{details}</p>}

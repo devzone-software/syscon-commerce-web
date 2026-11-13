@@ -41,7 +41,10 @@
   --store-header: var(--syscon-surface-default);
   --store-radius: var(--syscon-radius-md);
   /* Catalog banner: navy band under the white header. */
-  --store-banner: linear-gradient(90deg, #0c131f 0%, #00265d 60%, #0b3a82 100%);
+  /* Large brand surfaces (header, banners, auth bands): a softer navy than the brand primary. */
+  --syscon-surface-brand: #1b4279;
+  --syscon-surface-brand-gradient: linear-gradient(160deg, #1a3d6f 0%, #22508c 55%, #1b4279 100%);
+  --store-banner: linear-gradient(90deg, #1a3d6f 0%, #1b4279 60%, #2a5a96 100%);
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
