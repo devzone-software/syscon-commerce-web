@@ -29,6 +29,10 @@ import type {
   SalesSummary,
   Profile,
   Supplier,
+  CategoryMargin,
+  PriceReference,
+  PriceSource,
+  PriceSuggestion,
   Complaint,
   ComplaintInput,
   SupplierHistory,
@@ -207,6 +211,46 @@ export const api = {
     request<Complaint>(`/admin/complaints/${encodeURIComponent(id)}/respond`, {
       method: 'POST',
       body: json({ response }),
+    }),
+  priceSuggestions: () => request<PriceSuggestion[]>('/admin/pricing/suggestions'),
+  approvePrice: (productId: string, price: string) =>
+    request<{ productId: string; price: string }>(`/admin/pricing/products/${productId}/approve`, {
+      method: 'POST',
+      body: json({ price }),
+    }),
+  dismissPrice: (productId: string) =>
+    request<null>(`/admin/pricing/products/${productId}/dismiss`, { method: 'POST' }),
+  priceSources: () => request<PriceSource[]>('/admin/pricing/sources'),
+  savePriceSource: (source: { name: string; website: string; active?: boolean }, id?: string) =>
+    request<PriceSource>(id ? `/admin/pricing/sources/${id}` : '/admin/pricing/sources', {
+      method: id ? 'PATCH' : 'POST',
+      body: json(source),
+    }),
+  priceReferences: () => request<PriceReference[]>('/admin/pricing/references'),
+  savePriceReference: (reference: {
+    productId: string;
+    sourceId: string;
+    url: string;
+    price?: string;
+  }) =>
+    request<PriceReference>('/admin/pricing/references', {
+      method: 'POST',
+      body: json(reference),
+    }),
+  manualReferencePrice: (id: string, price: string) =>
+    request<PriceReference>(`/admin/pricing/references/${id}/price`, {
+      method: 'POST',
+      body: json({ price }),
+    }),
+  refreshReference: (id: string) =>
+    request<PriceReference>(`/admin/pricing/references/${id}/refresh`, { method: 'POST' }),
+  deleteReference: (id: string) =>
+    request<null>(`/admin/pricing/references/${id}`, { method: 'DELETE' }),
+  categoryMargins: () => request<CategoryMargin[]>('/admin/pricing/margins'),
+  saveCategoryMargin: (categoryId: string, margin: string | null) =>
+    request<CategoryMargin>(`/admin/pricing/margins/${categoryId}`, {
+      method: 'PUT',
+      body: json({ margin }),
     }),
   suppliers: () => request<Supplier[]>('/admin/suppliers'),
   createSupplier: (supplier: { name: string; feedUrl: string; minIntervalMinutes: number }) =>

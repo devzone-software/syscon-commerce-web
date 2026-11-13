@@ -121,6 +121,65 @@ class GatewayTest extends TestCase
         Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/auth/register' && $request['contactConsent'] === true && $request['termsAccepted'] === true);
     }
 
+    public function test_pricing_gateway_needs_catalog_write_and_only_known_paths(): void
+    {
+        $id = '11111111-2222-3333-4444-555555555555';
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            'java.test/api/admin/pricing/*' => Http::response(['success' => true, 'data' => []], 200),
+        ]);
+        // A customer token is turned away before reaching the platform.
+        $this->withSession(['syscon.access' => $this->token(['ROLE_CUSTOMER']), 'syscon.refresh' => 'r'])
+            ->getJson('/web-api/admin/pricing/suggestions')->assertForbidden();
+        Http::assertNotSent(fn ($request) => str_contains($request->url(), '/api/admin/pricing/'));
+
+        $staff = ['syscon.access' => $this->token(['ROLE_ADMIN', 'catalog:write']), 'syscon.refresh' => 'r'];
+        $this->withSession($staff)->getJson('/web-api/admin/pricing/suggestions')->assertOk();
+        $this->withSession($staff)->putJson("/web-api/admin/pricing/margins/$id", ['margin' => 25])->assertOk();
+        Http::assertSent(fn ($request) => $request->method() === 'PUT' && $request->url() === "http://java.test/api/admin/pricing/margins/$id" && $request['margin'] === 25);
+        // Paths outside the list do not exist on the gateway.
+        $this->withSession($staff)->getJson('/web-api/admin/pricing/../users')->assertNotFound();
+        $this->withSession($staff)->postJson('/web-api/admin/pricing/margins')->assertStatus(405);
+
+        // Approving a price drops the cached catalog so the store shows it at once.
+        Cache::put('catalog.products', ['status' => 200, 'body' => []], 60);
+        $this->withSession($staff)->postJson("/web-api/admin/pricing/products/$id/approve", ['price' => '99.90'])->assertOk();
+        $this->assertNull(Cache::get('catalog.products'));
+    }
+
+    public function test_idle_session_is_closed_and_revoked_but_public_pages_keep_working(): void
+    {
+        config(['session.idle_minutes' => 15]);
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            'java.test/api/auth/logout' => Http::response(['success' => true, 'data' => null], 200),
+            'java.test/api/catalog/products' => Http::response(['success' => true, 'data' => [['id' => '1']]], 200),
+        ]);
+        $signedIn = ['syscon.access' => $this->token(['ROLE_CUSTOMER'], ['email' => 'ana@mail.com']), 'syscon.refresh' => 'refresh-secret'];
+
+        // Active 5 minutes ago: still signed in, and the activity time moves forward.
+        $this->withSession($signedIn + ['syscon.seen' => now()->subMinutes(5)->timestamp])
+            ->getJson('/web-api/me')->assertOk()->assertHeaderMissing('X-Session-Expired');
+        $this->assertGreaterThanOrEqual(now()->subSeconds(5)->timestamp, session('syscon.seen'));
+        Http::assertNotSent(fn ($request) => str_ends_with($request->url(), '/api/auth/logout'));
+
+        // 16 minutes idle: the refresh token is revoked and the page is told why.
+        $this->withSession($signedIn + ['syscon.seen' => now()->subMinutes(16)->timestamp])
+            ->getJson('/web-api/me')->assertUnauthorized()->assertHeader('X-Session-Expired', '1');
+        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/api/auth/logout') && $request['refreshToken'] === 'refresh-secret');
+        $this->assertNull(session('syscon.refresh'));
+
+        // A public page opened after the idle time still loads, as a guest.
+        $this->withSession($signedIn + ['syscon.seen' => now()->subMinutes(30)->timestamp])
+            ->getJson('/web-api/catalog/products')->assertOk()->assertHeader('X-Session-Expired', '1');
+
+        // The page's ping keeps an active visitor signed in; guests get 401.
+        $this->withSession($signedIn + ['syscon.seen' => now()->subMinutes(14)->timestamp])
+            ->postJson('/web-api/session/ping')->assertOk();
+        $this->flushSession();
+        $this->postJson('/web-api/session/ping')->assertUnauthorized();
+    }
+
     public function test_me_separates_roles_from_permissions(): void
     {
         Http::fake(['java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200)]);

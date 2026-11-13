@@ -10,6 +10,7 @@ use App\Http\Controllers\Gateway\OrderGatewayController;
 use App\Http\Controllers\Gateway\PaymentGatewayController;
 use App\Http\Controllers\Gateway\ReportGatewayController;
 use App\Http\Controllers\Gateway\SaleGatewayController;
+use App\Http\Controllers\Gateway\PricingGatewayController;
 use App\Http\Controllers\Gateway\SupplierGatewayController;
 use App\Http\Controllers\Gateway\UserGatewayController;
 use App\Http\Middleware\SessionIdleTimeout;
@@ -66,6 +67,13 @@ Route::prefix('web-api')->middleware(SessionIdleTimeout::class)->group(function 
     Route::get('/admin/customers', [SaleGatewayController::class, 'customers']);
     Route::get('/admin/reports/summary', [ReportGatewayController::class, 'summary']);
     Route::get('/admin/reports/sales', [ReportGatewayController::class, 'sales']);
+    // Reference prices: only these platform paths are reachable through the gateway.
+    Route::get('/admin/pricing/{path}', [PricingGatewayController::class, 'forward'])->whereIn('path', ['suggestions', 'sources', 'references', 'margins']);
+    Route::post('/admin/pricing/{path}', [PricingGatewayController::class, 'forward'])
+        ->where('path', 'sources|references|products/[0-9a-f-]{36}/(approve|dismiss)|references/[0-9a-f-]{36}/(price|refresh)');
+    Route::patch('/admin/pricing/{path}', [PricingGatewayController::class, 'forward'])->where('path', 'sources/[0-9a-f-]{36}');
+    Route::put('/admin/pricing/{path}', [PricingGatewayController::class, 'forward'])->where('path', 'margins/[0-9a-f-]{36}');
+    Route::delete('/admin/pricing/{path}', [PricingGatewayController::class, 'forward'])->where('path', 'references/[0-9a-f-]{36}');
     Route::match(['get', 'post'], '/admin/suppliers', [SupplierGatewayController::class, 'suppliers']);
     Route::post('/admin/suppliers/{id}/run', [SupplierGatewayController::class, 'run'])->whereUuid('id');
     Route::get('/admin/supplier-jobs', [SupplierGatewayController::class, 'jobs']);

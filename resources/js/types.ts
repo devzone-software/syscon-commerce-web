@@ -393,6 +393,47 @@ export type Supplier = {
   active: boolean;
   minIntervalMinutes: number;
 };
+/** Reference prices (soles, IGV included) and the selling price they suggest. */
+export type PriceSuggestion = {
+  productId: string;
+  sku: string;
+  name: string;
+  category: string | null;
+  active: boolean;
+  currentPrice: string;
+  referencePrice: string;
+  referenceSource: string;
+  checkedAt: string | null;
+  references: { source: string; price: string; status: PriceReferenceStatus }[];
+  categoryMargin: string | null;
+  currentMargin: string;
+  suggestedPrice: string | null;
+  /** UP / DOWN: a change to review · OK: already at the suggestion · REVIEWED: approved or ignored for this cost. */
+  status: 'UP' | 'DOWN' | 'OK' | 'REVIEWED' | 'NO_MARGIN';
+};
+export type PriceReferenceStatus = 'PENDING' | 'OK' | 'MANUAL' | 'ERROR';
+export type PriceSource = {
+  id: string;
+  name: string;
+  host: string;
+  active: boolean;
+  links: number;
+};
+export type PriceReference = {
+  id: string;
+  productId: string;
+  product: string;
+  sku: string;
+  sourceId: string;
+  source: string;
+  sourceActive: boolean;
+  url: string;
+  price: string | null;
+  status: PriceReferenceStatus;
+  error: string | null;
+  checkedAt: string | null;
+};
+export type CategoryMargin = { categoryId: string; category: string; margin: string | null };
 export type SupplierJob = {
   id: string;
   supplier: Supplier;

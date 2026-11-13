@@ -10,6 +10,7 @@ import { InternalUseAdmin } from './InternalUseAdmin';
 import { InventoryAdmin } from './InventoryAdmin';
 import { OrdersAdmin } from './OrdersAdmin';
 import { PaymentsAdmin } from './PaymentsAdmin';
+import { PricingAdmin } from './PricingAdmin';
 import { ProductBulkAdmin } from './ProductBulkAdmin';
 import { ProductsAdmin } from './ProductsAdmin';
 import { PurchasesAdmin } from './PurchasesAdmin';
@@ -64,6 +65,14 @@ export const sections: Section[] = [
     group: 'Catálogo',
     permission: permissions.catalogWrite,
     element: <TaxonomyAdmin />,
+  },
+  {
+    path: 'precios',
+    description: 'Comparar precios con las webs de otras empresas y aprobar los ajustes sugeridos.',
+    label: 'Precios de referencia',
+    group: 'Catálogo',
+    permission: permissions.catalogWrite,
+    element: <PricingAdmin />,
   },
   {
     path: 'proveedores',

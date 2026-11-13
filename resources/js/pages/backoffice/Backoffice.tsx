@@ -6,12 +6,40 @@ import {
   type CSSProperties,
   type KeyboardEvent,
   type PointerEvent,
+  type ReactElement,
 } from 'react';
 import { Link, NavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Brand } from '../../components/layout/Header';
 import { PageMain } from '../../components/layout/PageMain';
-import { CloseIcon, ExpandIcon, MenuIcon, ShrinkIcon, SidebarIcon } from '../../components/icons';
-import { can, canUseBackoffice, roleLabel } from '../../lib/auth';
+import {
+  ActivityIcon,
+  BookIcon,
+  BoxIcon,
+  BuildingIcon,
+  CardIcon,
+  CartIcon,
+  CashIcon,
+  ChartIcon,
+  ClipboardIcon,
+  CloseIcon,
+  ExpandIcon,
+  HomeIcon,
+  KeyIcon,
+  PercentIcon,
+  LayersIcon,
+  LogoutIcon,
+  MenuIcon,
+  ReceiptIcon,
+  ShrinkIcon,
+  SidebarIcon,
+  StoreIcon,
+  TagIcon,
+  TrendIcon,
+  TruckIcon,
+  UsersIcon,
+  BoltIcon,
+} from '../../components/icons';
+import { can, canUseBackoffice, displayName, initials, roleLabel } from '../../lib/auth';
 import {
   clampWidth,
   loadLayout,
@@ -23,6 +51,28 @@ import { useShop } from '../../state';
 import { Empty } from '../../ui';
 import { sections } from './sections';
 import '../../../css/backoffice.css';
+
+/** One icon per menu entry, keyed by the section path. */
+const sectionIcons: Record<string, ReactElement> = {
+  '': <HomeIcon size={18} />,
+  productos: <BoxIcon size={18} />,
+  categorias: <TagIcon size={18} />,
+  precios: <PercentIcon size={18} />,
+  proveedores: <BuildingIcon size={18} />,
+  existencias: <LayersIcon size={18} />,
+  compras: <TruckIcon size={18} />,
+  'uso-interno': <ClipboardIcon size={18} />,
+  pedidos: <CartIcon size={18} />,
+  'venta-directa': <BoltIcon size={18} />,
+  caja: <CashIcon size={18} />,
+  pagos: <CardIcon size={18} />,
+  reclamaciones: <BookIcon size={18} />,
+  facturacion: <ReceiptIcon size={18} />,
+  'reportes/ventas': <TrendIcon size={18} />,
+  reportes: <ChartIcon size={18} />,
+  usuarios: <UsersIcon size={18} />,
+  actividad: <ActivityIcon size={18} />,
+};
 
 export function Backoffice() {
   const { user, logout } = useShop();
@@ -104,9 +154,11 @@ export function Backoffice() {
   const navigation = allowed.filter((section) => !section.parent);
   const currentSection = allowed.find((section) => `/admin/${section.path}` === location.pathname);
   const groups = [...new Set(navigation.map((section) => section.group))];
+  // Home first: /admin needs a session, so closing it first would jump to the sign-in page.
   const signOut = async () => {
+    navigate('/', { replace: true });
+    window.scrollTo({ top: 0 });
     await logout();
-    navigate('/');
   };
 
   return (
@@ -134,12 +186,8 @@ export function Backoffice() {
           <SidebarIcon />
         </button>
         <Brand />
-        <span className="bo-topbar-tag">Administración</span>
+        <span className="bo-topbar-tag">Panel de administración</span>
         <div className="bo-topbar-user">
-          <span>
-            {user?.email}
-            {user?.roles[0] && <small> · {roleLabel(user.roles[0])}</small>}
-          </span>
           {document.fullscreenEnabled && (
             <button
               type="button"
@@ -152,14 +200,25 @@ export function Backoffice() {
               {fullscreen ? <ShrinkIcon /> : <ExpandIcon />}
             </button>
           )}
-          <Link to="/" className="link-button">
-            Ver tienda
+          <Link to="/" className="bo-top-link" title="Ver tienda">
+            <StoreIcon size={18} /> <span>Ver tienda</span>
           </Link>
-          <Link to="/cuenta" className="link-button">
-            Mis compras personales
+          <Link to="/cuenta" className="bo-top-link" title="Mis compras personales">
+            <CartIcon size={18} /> <span>Mis compras</span>
           </Link>
-          <button type="button" className="link-button" onClick={signOut}>
-            Salir
+          {user && (
+            <span className="bo-user-chip" title={user.email}>
+              <span className="bo-avatar" aria-hidden="true">
+                {initials(user)}
+              </span>
+              <span className="bo-user-text">
+                <strong>{displayName(user)}</strong>
+                <small>{user.roles[0] ? roleLabel(user.roles[0]) : user.email}</small>
+              </span>
+            </span>
+          )}
+          <button type="button" className="bo-top-link is-exit" onClick={signOut} title="Salir">
+            <LogoutIcon size={18} /> <span>Salir</span>
           </button>
         </div>
       </header>
@@ -190,7 +249,10 @@ export function Backoffice() {
                       isActive || currentSection?.parent === section.path ? 'active' : undefined
                     }
                   >
-                    {section.label}
+                    <span className="bo-nav-icon">
+                      {sectionIcons[section.path] ?? <HomeIcon size={18} />}
+                    </span>
+                    <span className="bo-nav-label">{section.label}</span>
                   </NavLink>
                 ))}
             </div>
@@ -198,7 +260,10 @@ export function Backoffice() {
           <div className="bo-nav-group">
             <span>Tu cuenta</span>
             <NavLink to="/admin/mi-acceso" end>
-              Mi acceso
+              <span className="bo-nav-icon">
+                <KeyIcon size={18} />
+              </span>
+              <span className="bo-nav-label">Mi acceso</span>
             </NavLink>
           </div>
         </nav>

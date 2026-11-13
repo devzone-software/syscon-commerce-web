@@ -211,3 +211,83 @@ export const ChatIcon = ({ size }: { size?: number }) => (
     <path d="M8 9h8M8 12h5" />
   </Icon>
 );
+
+/* Backoffice navigation and dashboard. */
+export const HomeIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M4 11 12 4l8 7M6 9.5V20h12V9.5M10 20v-5h4v5" />
+  </Icon>
+);
+export const ChartIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M4 20h16M7 16v-5M12 16V8M17 16v-3" />
+  </Icon>
+);
+export const TrendIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="m4 16 5-5 4 4 7-7M15 8h5v5" />
+  </Icon>
+);
+export const UsersIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <circle cx="9" cy="8" r="3.5" />
+    <path d="M3 20c.6-3.4 3-5 6-5s5.4 1.6 6 5M16 4.5a3.5 3.5 0 0 1 0 7M18 15c1.6.6 2.7 2.2 3 5" />
+  </Icon>
+);
+export const CashIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <rect x="3" y="6" width="18" height="12" rx="2" />
+    <circle cx="12" cy="12" r="2.5" />
+    <path d="M6.5 9.5v.01M17.5 14.5v.01" />
+  </Icon>
+);
+export const CardIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="M3 10h18M7 15h3" />
+  </Icon>
+);
+export const BookIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11M9 8h6" />
+  </Icon>
+);
+export const ActivityIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M3 12h4l3-7 4 14 3-7h4" />
+  </Icon>
+);
+export const LayersIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="m12 3 9 5-9 5-9-5zM3 13l9 5 9-5" />
+  </Icon>
+);
+export const ClipboardIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M9 4h6v3H9zM9 5.5H6v15h12v-15h-3M9 12h6M9 16h4" />
+  </Icon>
+);
+export const CalendarIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <rect x="3.5" y="5" width="17" height="15" rx="2" />
+    <path d="M3.5 10h17M8 3v4M16 3v4" />
+  </Icon>
+);
+export const ClockIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M12 7.5V12l3 2" />
+  </Icon>
+);
+export const AlertIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M12 4 2.5 20h19zM12 10v4.5M12 17.5v.01" />
+  </Icon>
+);
+export const PercentIcon = ({ size }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M19 5 5 19" />
+    <circle cx="7" cy="7" r="2.5" />
+    <circle cx="17" cy="17" r="2.5" />
+  </Icon>
+);

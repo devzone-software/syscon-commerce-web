@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { StatCard } from './StatCard';
+import { CardIcon, ClockIcon, ReceiptIcon, TrendIcon } from '../icons';
 import { defaultPeriod, periodDays } from '../../lib/reports';
 import { api } from '../../services/api';
 import { money } from '../../state';
@@ -39,24 +40,38 @@ function WeekSalesView({ data, days }: { data: SalesSummary; days: string[] }) {
       <div className="bo-stats">
         <StatCard
           label="Ventas · 7 días"
+          icon={<TrendIcon />}
+          tone="green"
           value={money(Number(data.sales.total))}
           hint={plural(data.sales.orders, 'pedido pagado', 'pedidos pagados')}
         />
-        <StatCard label="Ticket promedio" value={money(Number(data.sales.averageTicket))} />
+        <StatCard
+          label="Ticket promedio"
+          icon={<ReceiptIcon />}
+          tone="blue"
+          value={money(Number(data.sales.averageTicket))}
+        />
         <StatCard
           label="Pedidos con pago pendiente"
+          icon={<CardIcon />}
+          tone="amber"
           value={pending.orders}
           hint={pending.orders ? money(Number(pending.total)) : 'Nada pendiente'}
         />
         <StatCard
           label="Reservas que vencen en 24 h"
+          icon={<ClockIcon />}
+          tone="red"
           value={pending.expiringIn24h}
           hint={`${data.reservations.units} u. reservadas ahora`}
         />
       </div>
-      <section className="bo-card" aria-labelledby="week-sales-title">
+      <section className="bo-card bo-week-card" aria-labelledby="week-sales-title">
         <div className="checkout-card-head">
-          <h2 id="week-sales-title">Ventas por día</h2>
+          <div>
+            <h2 id="week-sales-title">Ventas por día</h2>
+            <p className="bo-card-sub">Pedidos pagados en los últimos 7 días</p>
+          </div>
           <Link className="link-button" to="/admin/reportes/ventas">
             Ver reporte
           </Link>
