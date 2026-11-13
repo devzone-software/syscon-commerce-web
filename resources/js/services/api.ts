@@ -47,6 +47,9 @@ export class ApiError extends Error {
   }
 }
 
+/** Window event fired when the server reports that the session closed for inactivity. */
+export const SESSION_EXPIRED = 'syscon:session-expired';
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const csrf = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? '';
   let response: Response;
@@ -65,6 +68,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     throw new ApiError('No se pudo conectar. Comprueba tu conexión e inténtalo de nuevo.', 0);
   }
   const result = (await response.json().catch(() => null)) as Envelope<T> | null;
+  // The server closed the session for inactivity; IdleSession sends the visitor to sign in.
+  if (response.headers.get('X-Session-Expired')) window.dispatchEvent(new Event(SESSION_EXPIRED));
   const nextCsrf = response.headers.get('X-CSRF-TOKEN');
   const csrfMeta = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]');
   if (nextCsrf && csrfMeta) csrfMeta.content = nextCsrf;
@@ -113,9 +118,14 @@ export const api = {
     request<string>('/register', { method: 'POST', body: json(profile) }),
   googleLogin: (credential: string) =>
     request<{ created: boolean }>('/login/google', { method: 'POST', body: json({ credential }) }),
-  login: (email: string, password: string) =>
-    request<unknown>('/login', { method: 'POST', body: json({ email, password }) }),
+  /** Sends the "No soy un robot" token; the session then allows a few sign-in tries. */
+  captcha: (token: string) => request<null>('/captcha', { method: 'POST', body: json({ token }) }),
+  /** `login` is the account e-mail or its mobile number. */
+  login: (login: string, password: string) =>
+    request<unknown>('/login', { method: 'POST', body: json({ login, password }) }),
   logout: () => request<null>('/logout', { method: 'POST' }),
+  /** Tells the server the visitor is still active on an open page. */
+  pingSession: () => request<null>('/session/ping', { method: 'POST' }),
   me: () => request<User>('/me'),
   changePassword: (passwords: {
     currentPassword: string;

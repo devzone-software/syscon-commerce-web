@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Gateway;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class AuthGatewayController extends GatewayController
@@ -28,9 +30,56 @@ class AuthGatewayController extends GatewayController
 
     public function login(Request $request): JsonResponse
     {
-        $data = $request->validate(['email' => 'required|email', 'password' => 'required|string']);
+        // "login" is the e-mail or the mobile number; "email" stays accepted for older clients.
+        $data = $request->validate([
+            'login' => 'required_without:email|nullable|string|max:255',
+            'email' => 'required_without:login|nullable|string|max:255',
+            'password' => 'required|string',
+        ]);
         if ($error = $this->requireIdentityConfig()) return $error;
-        return $this->startSession($request, $this->api->request('POST', '/api/auth/login', $data), $data['email']);
+        if ($error = $this->requireCaptcha()) return $error;
+        $login = trim($data['login'] ?? $data['email']);
+        $result = $this->api->request('POST', '/api/auth/login', ['login' => $login, 'password' => $data['password']]);
+        if ($result['status'] === 200) session()->forget(self::CAPTCHA);
+        // The session e-mail comes from the token; the typed value only helps when it is an e-mail.
+        return $this->startSession($request, $result, str_contains($login, '@') ? $login : null);
+    }
+
+    private const CAPTCHA = 'syscon.captcha';
+    private const CAPTCHA_MINUTES = 10;
+    private const CAPTCHA_TRIES = 5;
+
+    /** reCAPTCHA v2 token from the sign-in form: once Google accepts it, a few password tries are allowed. */
+    public function captcha(Request $request): JsonResponse
+    {
+        $data = $request->validate(['token' => 'required|string|max:4096']);
+        $secret = (string) config('services.recaptcha.secret');
+        if ($secret === '') return response()->json(['success' => true, 'message' => 'Verificación no requerida.', 'data' => null]);
+        try {
+            $answer = Http::asForm()->timeout(10)->post('https://www.google.com/recaptcha/api/siteverify', [
+                'secret' => $secret, 'response' => $data['token'], 'remoteip' => $request->ip(),
+            ])->json();
+        } catch (ConnectionException) {
+            return response()->json(['success' => false, 'message' => 'No se pudo verificar que no eres un robot. Inténtalo de nuevo.', 'data' => null], 503);
+        }
+        if (! ($answer['success'] ?? false)) {
+            return response()->json(['success' => false, 'message' => 'No se pudo confirmar que no eres un robot. Vuelve a marcar la casilla.', 'data' => null], 422);
+        }
+        session([self::CAPTCHA => ['until' => now()->addMinutes(self::CAPTCHA_MINUTES)->timestamp, 'tries' => 0]]);
+        return response()->json(['success' => true, 'message' => 'Verificado.', 'data' => null]);
+    }
+
+    /** With reCAPTCHA configured, each password try spends one of the tries the last check granted. */
+    private function requireCaptcha(): ?JsonResponse
+    {
+        if ((string) config('services.recaptcha.secret') === '') return null;
+        $pass = session(self::CAPTCHA);
+        if (! is_array($pass) || ($pass['until'] ?? 0) < now()->timestamp || ($pass['tries'] ?? 0) >= self::CAPTCHA_TRIES) {
+            session()->forget(self::CAPTCHA);
+            return response()->json(['success' => false, 'message' => 'Confirma que no eres un robot para continuar.', 'data' => null], 428);
+        }
+        session([self::CAPTCHA => ['until' => $pass['until'], 'tries' => $pass['tries'] + 1]]);
+        return null;
     }
 
     /** Google Identity Services credential (ID token); auth-service verifies it and creates the customer if needed. */
@@ -56,6 +105,13 @@ class AuthGatewayController extends GatewayController
             return response()->json(['success' => true, 'message' => 'Autenticado.', 'data' => $reply])->header('X-CSRF-TOKEN', csrf_token());
         }
         return $this->reply($result);
+    }
+
+    /** Activity from an open page that sends nothing else; the idle middleware records it. */
+    public function ping(): JsonResponse
+    {
+        if ($error = $this->requireLogin()) return $error;
+        return response()->json(['success' => true, 'message' => 'Sesión activa.', 'data' => null]);
     }
 
     public function logout(Request $request): JsonResponse

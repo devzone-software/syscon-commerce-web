@@ -1,11 +1,12 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Header } from '../layout/Header';
 import { PageMain } from '../layout/PageMain';
-import { ArrowRightIcon, CheckIcon, EyeIcon, EyeOffIcon } from '../icons';
+import { EyeIcon, EyeOffIcon } from '../icons';
 import { ErrorBox } from '../../ui';
-import { MIN_PASSWORD } from '../../lib/auth';
+import { MIN_PASSWORD, suggestPassword } from '../../lib/auth';
 import type { SignUp } from '../../types';
+import { AccountCreated } from './AccountCreated';
 import { AuthFooter } from './AuthLayout';
 import { GoogleButton, googleClientId } from './GoogleButton';
 import '../../../css/auth.css';
@@ -58,6 +59,23 @@ const GoogleLogo = () => (
   </svg>
 );
 
+const KeyIcon = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="7.5" cy="15.5" r="4.5" />
+    <path d="M10.7 12.3 21 2M16 7l3 3M19 4l2 2" />
+  </svg>
+);
+
 const PeruFlag = () => (
   <svg width="20" height="14" viewBox="0 0 3 2" aria-hidden="true">
     <rect width="3" height="2" fill="#d91023" />
@@ -72,6 +90,7 @@ const PeruFlag = () => (
 export function SignUpFlow({
   busy,
   error,
+  takenEmail,
   created,
   onSubmit,
   onGoogle,
@@ -79,6 +98,8 @@ export function SignUpFlow({
 }: {
   busy: boolean;
   error: string;
+  /** E-mail the platform rejected because an account already uses it. */
+  takenEmail: string | null;
   created: boolean;
   onSubmit: (profile: SignUp) => void;
   onGoogle: (credential: string) => void;
@@ -88,6 +109,19 @@ export function SignUpFlow({
   const [expanded, setExpanded] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [googleOff, setGoogleOff] = useState(false);
+  // Strong password offered under the field once the visitor reaches it.
+  const [suggestion, setSuggestion] = useState('');
+  const [copied, setCopied] = useState(false);
+  const applySuggestion = () => {
+    setForm((current) => ({ ...current, password: suggestion }));
+    setShowPassword(true); // so the visitor sees what they are about to save
+    setCopied(false);
+  };
+  const copySuggestion = () =>
+    navigator.clipboard
+      ?.writeText(suggestion)
+      .then(() => setCopied(true))
+      .catch(() => setCopied(false));
   const [form, setForm] = useState<SignUp>({
     firstName: '',
     lastName: '',
@@ -102,6 +136,13 @@ export function SignUpFlow({
     onChange: (event: { target: { value: string } }) =>
       setForm((current) => ({ ...current, [name]: event.target.value })),
   });
+  // The notice only applies to the e-mail that was rejected; editing it hides the notice.
+  const emailTaken =
+    takenEmail !== null && takenEmail.toLowerCase() === form.email.trim().toLowerCase();
+  const emailInput = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (takenEmail) emailInput.current?.focus();
+  }, [takenEmail]);
   const submit = (event: FormEvent) => {
     event.preventDefault();
     if (!expanded) return setExpanded(true);
@@ -117,16 +158,7 @@ export function SignUpFlow({
   if (created)
     return (
       <SignUpShell title="¡Bienvenido a Grupo SYSCON!">
-        <div className="auth-done" role="status">
-          <span className="auth-done-icon">
-            <CheckIcon size={28} />
-          </span>
-          <h2>¡Creaste tu cuenta!</h2>
-          <p>Ya puedes comprar y seguir tus pedidos en SYSCON.</p>
-          <button type="button" className="auth-submit" onClick={onContinue}>
-            Continuar <ArrowRightIcon size={16} />
-          </button>
-        </div>
+        <AccountCreated onContinue={onContinue} />
       </SignUpShell>
     );
 
@@ -154,6 +186,9 @@ export function SignUpFlow({
       <form onSubmit={submit} className="signup-form">
         <Field label="E-mail">
           <input
+            ref={emailInput}
+            aria-invalid={emailTaken || undefined}
+            aria-describedby={emailTaken ? 'signup-email-taken' : undefined}
             value={form.email}
             onChange={(event) => {
               const email = event.target.value;
@@ -170,6 +205,15 @@ export function SignUpFlow({
             placeholder="ejemplo@correo.com"
           />
         </Field>
+        {emailTaken && (
+          <p id="signup-email-taken" className="signup-taken" role="alert">
+            <strong>Ya existe una cuenta con este correo.</strong> Si es tuya,{' '}
+            <Link to="/ingresar" state={location.state}>
+              inicia sesión
+            </Link>
+            . Si quieres crear otra cuenta, utiliza otro correo.
+          </p>
+        )}
         {expanded && (
           <>
             <Field label="Teléfono">
@@ -209,6 +253,7 @@ export function SignUpFlow({
                   maxLength={128}
                   title={`Usa al menos ${MIN_PASSWORD} caracteres.`}
                   autoComplete="new-password"
+                  onFocus={() => setSuggestion((current) => current || suggestPassword())}
                 />
                 <button
                   type="button"
@@ -221,6 +266,41 @@ export function SignUpFlow({
               </span>
               <small>Mínimo {MIN_PASSWORD} caracteres. Puedes usar una frase.</small>
             </Field>
+            {suggestion && (form.password === '' || form.password === suggestion) && (
+              <div className="signup-suggest" aria-live="polite">
+                <KeyIcon />
+                {form.password === suggestion ? (
+                  <>
+                    <p>
+                      <strong>Usando la contraseña segura sugerida.</strong> Guárdala o deja que tu
+                      navegador la recuerde.
+                    </p>
+                    <button type="button" onClick={copySuggestion}>
+                      {copied ? '¡Copiada!' : 'Copiar'}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p>
+                      <strong>Contraseña segura sugerida</strong>
+                      <code>{suggestion}</code>
+                    </p>
+                    <button type="button" onClick={applySuggestion}>
+                      Usar
+                    </button>
+                    <button
+                      type="button"
+                      className="signup-suggest-other"
+                      onClick={() => setSuggestion(suggestPassword())}
+                      aria-label="Sugerir otra contraseña"
+                      title="Sugerir otra"
+                    >
+                      ↻
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
             <label className="signup-check">
               <input
                 type="checkbox"

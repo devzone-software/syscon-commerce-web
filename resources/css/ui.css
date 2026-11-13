@@ -157,3 +157,59 @@
 .bo-card.form-stack > h2 {
   margin-bottom: 0;
 }
+
+/* Inactivity warning (IdleSession): shown over every page, store and backoffice. */
+.idle-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: #0f172a8c;
+  backdrop-filter: blur(2px);
+}
+.idle-dialog {
+  width: min(100%, 420px);
+  padding: 28px 28px 24px;
+  border-radius: 16px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 24px 60px -20px #0f172a80;
+}
+.idle-clock {
+  display: inline-grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: #fdf1dc;
+  color: #92400e;
+  font-size: 20px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.idle-dialog h2 {
+  margin: 0 0 8px;
+  font-size: 21px;
+  color: #0f172a;
+}
+.idle-dialog p {
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #475569;
+}
+.idle-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.idle-actions .button {
+  flex: 1 1 150px;
+}
+.login-expired {
+  margin: 0;
+}

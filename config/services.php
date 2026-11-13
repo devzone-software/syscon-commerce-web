@@ -14,6 +14,12 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
     ],
 
+    // reCAPTCHA v2 ("No soy un robot") on sign-in; both keys empty turns it off.
+    'recaptcha' => [
+        'site_key' => env('RECAPTCHA_SITE_KEY'),
+        'secret' => env('RECAPTCHA_SECRET_KEY'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

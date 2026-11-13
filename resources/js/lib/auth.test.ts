@@ -10,6 +10,7 @@ import {
   passwordRequirementStatus,
   roleLabel,
   safeRedirect,
+  suggestPassword,
 } from './auth';
 
 const user = (permissions?: string[]) => ({ id: '1', email: 'a@b.pe', roles: [], permissions });
@@ -88,5 +89,24 @@ describe('password requirements', () => {
     expect(passwordRequirementStatus('').complete).toBe(false);
     expect(passwordRequirementStatus('short').remaining).toBe(7);
     expect(passwordRequirementStatus('abcdefghijkl')).toEqual({ remaining: 0, complete: true });
+  });
+});
+
+describe('suggested password', () => {
+  it('is long and mixes lowercase, uppercase, digits and symbols', () => {
+    for (let i = 0; i < 50; i++) {
+      const password = suggestPassword();
+      expect(password).toHaveLength(16);
+      expect(password.length).toBeGreaterThanOrEqual(MIN_PASSWORD);
+      expect(password).toMatch(/[a-z]/);
+      expect(password).toMatch(/[A-Z]/);
+      expect(password).toMatch(/[2-9]/);
+      expect(password).toMatch(/[!@#$%&*?\-_+=]/);
+      expect(password).not.toMatch(/[lIO01]/);
+    }
+  });
+
+  it('changes every time', () => {
+    expect(new Set(Array.from({ length: 20 }, () => suggestPassword())).size).toBe(20);
   });
 });

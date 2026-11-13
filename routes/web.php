@@ -12,12 +12,15 @@ use App\Http\Controllers\Gateway\ReportGatewayController;
 use App\Http\Controllers\Gateway\SaleGatewayController;
 use App\Http\Controllers\Gateway\SupplierGatewayController;
 use App\Http\Controllers\Gateway\UserGatewayController;
+use App\Http\Middleware\SessionIdleTimeout;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('web-api')->group(function () {
+Route::prefix('web-api')->middleware(SessionIdleTimeout::class)->group(function () {
     Route::get('/catalog/{kind}', [CatalogGatewayController::class, 'catalog'])->whereIn('kind', ['products', 'categories', 'brands']);
     Route::get('/product/{id}', [CatalogGatewayController::class, 'product'])->whereUuid('id');
     Route::post('/register', [AuthGatewayController::class, 'register']);
+    Route::post('/session/ping', [AuthGatewayController::class, 'ping'])->middleware('throttle:30,1');
+    Route::post('/captcha', [AuthGatewayController::class, 'captcha'])->middleware('throttle:20,1');
     Route::post('/login', [AuthGatewayController::class, 'login']);
     Route::post('/login/google', [AuthGatewayController::class, 'google']);
     Route::post('/logout', [AuthGatewayController::class, 'logout']);

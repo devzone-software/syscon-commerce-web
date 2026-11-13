@@ -1,3 +1,4 @@
+import { IdleSession } from './components/IdleSession';
 import { StrictMode, lazy, Suspense, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
@@ -65,7 +66,14 @@ function StoreRoutes() {
           <Route path="/" element={<Home />} />
           <Route path="/catalogo" element={<Catalog />} />
           <Route path="/producto/:id" element={<ProductPage />} />
-          <Route path="/carrito" element={<Cart />} />
+          <Route
+            path="/carrito"
+            element={
+              <RequireAuth>
+                <Cart />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/checkout"
             element={
@@ -112,6 +120,7 @@ function App() {
   return (
     <StateProvider>
       <BrowserRouter>
+        <IdleSession />
         <AddToCartProvider>
           <Suspense fallback={<Loading />}>
             <PasswordGate>

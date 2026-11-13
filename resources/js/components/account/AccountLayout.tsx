@@ -1,3 +1,4 @@
+import { AccountMenu } from '../layout/AccountMenu';
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { catalogSearchQuery } from '../../lib/catalog';
@@ -80,9 +81,12 @@ export function AccountLayout({ title, children }: { title: string; children: Re
     if (location.pathname === '/cuenta/productos')
       setQuery(new URLSearchParams(location.search).get('q') ?? '');
   }, [location.pathname, location.search]);
+  // Go home first: these pages need a session, so closing it first would jump to sign-in.
   const signOut = async () => {
+    setOpen(false);
+    navigate('/', { replace: true });
+    window.scrollTo({ top: 0 });
     await logout();
-    navigate('/');
   };
   const search = (event: FormEvent) => {
     event.preventDefault();
@@ -214,6 +218,11 @@ export function AccountLayout({ title, children }: { title: string; children: Re
           <Link className="portal-icon" to="/cuenta/soporte" aria-label="Ayuda">
             <HelpIcon size={20} />
           </Link>
+          {user && (
+            <div className="portal-account">
+              <AccountMenu user={user} onSignOut={() => void signOut()} />
+            </div>
+          )}
           <Link to="/" className="portal-logo" aria-label="Grupo SYSCON, ir a la tienda">
             <img className="brand-image" src={logo} alt="Grupo SYSCON" width={112} height={32} />
           </Link>

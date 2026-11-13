@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const faqs = [
   {
@@ -29,8 +29,13 @@ const faqs = [
 
 export function ContactFaq() {
   const [open, setOpen] = useState<number | null>(null);
+  // "Preguntas" in the account menu opens the contact page right on this section.
+  useEffect(() => {
+    if (window.location.hash === '#preguntas')
+      document.getElementById('preguntas')?.scrollIntoView({ block: 'start' });
+  }, []);
   return (
-    <section className="contact-faq" aria-labelledby="contact-faq-title">
+    <section id="preguntas" className="contact-faq" aria-labelledby="contact-faq-title">
       <div className="contact-center">
         <p className="contact-eyebrow">CENTRO DE AYUDA</p>
         <h2 id="contact-faq-title">Preguntas Frecuentes</h2>

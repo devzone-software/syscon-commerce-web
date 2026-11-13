@@ -6,7 +6,8 @@ import wordmark from '../../../images/header/logo-syscon-palabra.png';
 import searchIcon from '../../../images/header/search.svg';
 import { cartTotal } from '../../lib/cart';
 import { catalogSearchQuery } from '../../lib/catalog';
-import { canUseBackoffice } from '../../lib/auth';
+import { canUseBackoffice, initials } from '../../lib/auth';
+import { AccountMenu, fullName } from './AccountMenu';
 import { money, useShop } from '../../state';
 import { CloseIcon, MenuIcon } from '../icons';
 import { CategoryMenu } from './CategoryMenu';
@@ -86,9 +87,13 @@ export function Header() {
       search: catalogSearchQuery(location.pathname === '/catalogo' ? location.search : '', query),
     });
   };
+  // Leave at once for the home page (a protected page would otherwise jump to the sign-in
+  // form), then close the session.
   const signOut = async () => {
+    setOpen(false);
+    navigate('/', { replace: true });
+    window.scrollTo({ top: 0 });
     await logout();
-    navigate('/');
   };
 
   return (
@@ -114,17 +119,8 @@ export function Header() {
             <nav className="store-account" aria-label="Cuenta">
               {user ? (
                 <>
-                  {staff ? (
-                    <Link to="/admin">Administración</Link>
-                  ) : (
-                    <>
-                      <Link to="/cuenta">Mi cuenta</Link>
-                      <Link to="/cuenta/pedidos">Mis pedidos</Link>
-                    </>
-                  )}
-                  <button type="button" onClick={signOut}>
-                    Salir
-                  </button>
+                  <AccountMenu user={user} onSignOut={() => void signOut()} />
+                  <Link to="/cuenta/pedidos">Mis compras</Link>
                 </>
               ) : (
                 <>
@@ -192,18 +188,20 @@ export function Header() {
           <div className="store-menu-account">
             {user ? (
               <>
-                <span className="store-menu-user">{user.email}</span>
-                {staff ? (
-                  <NavLink to="/admin">Administración</NavLink>
-                ) : (
-                  <>
-                    <NavLink to="/cuenta" end>
-                      Mi cuenta
-                    </NavLink>
-                    <NavLink to="/cuenta/pedidos">Mis pedidos</NavLink>
-                  </>
-                )}
-                <button type="button" onClick={signOut}>
+                <span className="store-menu-user">
+                  <span className="account-avatar" aria-hidden="true">
+                    {initials(user)}
+                  </span>
+                  <span>
+                    <strong>{fullName(user)}</strong>
+                    <small>{user.email}</small>
+                  </span>
+                </span>
+                <NavLink to="/cuenta/pedidos">Compras</NavLink>
+                <Link to="/contacto#preguntas">Preguntas</Link>
+                <NavLink to="/contacto">Ayuda</NavLink>
+                {staff && <NavLink to="/admin">Panel de administración</NavLink>}
+                <button type="button" onClick={() => void signOut()}>
                   Salir
                 </button>
               </>

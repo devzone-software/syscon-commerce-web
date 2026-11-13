@@ -12,7 +12,7 @@ class GatewayTest extends TestCase
     {
         parent::setUp();
         $this->withoutVite();
-        config(['services.java.url' => 'http://java.test', 'services.java.jwt_secret' => str_repeat('a', 40)]);
+        config(['services.java.url' => 'http://java.test', 'services.java.jwt_secret' => str_repeat('a', 40), 'services.recaptcha.secret' => null]);
         Cache::flush();
     }
 
@@ -57,6 +57,44 @@ class GatewayTest extends TestCase
         $response = $this->postJson('/web-api/login', ['email' => 'cliente@example.com', 'password' => 'very-long-password']);
         $response->assertOk()->assertHeader('X-CSRF-TOKEN')->assertDontSee('refresh-secret')->assertDontSee($token);
         $this->getJson('/web-api/me')->assertOk()->assertJsonPath('data.email', 'cliente@example.com')->assertJsonPath('data.roles.0', 'ROLE_CUSTOMER');
+    }
+
+    public function test_login_requires_a_recaptcha_check_when_configured(): void
+    {
+        config(['services.recaptcha.secret' => 'recaptcha-secret']);
+        Http::fake([
+            'www.google.com/recaptcha/api/siteverify' => Http::sequence()->push(['success' => false])->push(['success' => true]),
+            'java.test/api/auth/login' => Http::response(['success' => false, 'message' => 'Credenciales inválidas', 'data' => null], 401),
+        ]);
+        $credentials = ['login' => 'ana@mail.com', 'password' => 'very-long-password'];
+        $this->postJson('/web-api/login', $credentials)->assertStatus(428);
+        $this->postJson('/web-api/captcha', ['token' => 'rejected'])->assertUnprocessable();
+        $this->postJson('/web-api/login', $credentials)->assertStatus(428);
+        $this->postJson('/web-api/captcha', ['token' => 'accepted'])->assertOk();
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'siteverify') && $request['secret'] === 'recaptcha-secret' && $request['response'] === 'accepted');
+        // One check allows five password tries, then the box must be checked again.
+        for ($i = 0; $i < 5; $i++) $this->postJson('/web-api/login', $credentials)->assertUnauthorized();
+        $this->postJson('/web-api/login', $credentials)->assertStatus(428);
+        Http::assertSentCount(7);
+    }
+
+    public function test_captcha_is_a_no_op_without_keys(): void
+    {
+        Http::fake();
+        $this->postJson('/web-api/captcha', ['token' => 'anything'])->assertOk();
+        Http::assertNothingSent();
+    }
+
+    public function test_login_with_the_mobile_number_forwards_it_and_reads_the_email_from_the_token(): void
+    {
+        Http::fake([
+            'java.test/api/auth/login' => Http::response(['success' => true, 'data' => ['accessToken' => $this->token(['ROLE_CUSTOMER'], ['email' => 'cliente@example.com']), 'refreshToken' => 'refresh-secret']], 200),
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => '00000000-0000-0000-0000-000000000001'], 200),
+        ]);
+        $this->postJson('/web-api/login', ['password' => 'very-long-password'])->assertUnprocessable();
+        $this->postJson('/web-api/login', ['login' => '987654321', 'password' => 'very-long-password'])->assertOk();
+        Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/auth/login' && $request['login'] === '987654321');
+        $this->getJson('/web-api/me')->assertOk()->assertJsonPath('data.email', 'cliente@example.com');
     }
 
     public function test_google_sign_in_opens_a_session_with_the_token_identity(): void
@@ -385,7 +423,8 @@ class GatewayTest extends TestCase
         $this->withSession($session)->postJson('/web-api/password', ['currentPassword' => 'Temporal-123456', 'newPassword' => 'Nueva-clave-2026', 'newPassword_confirmation' => 'Nueva-clave-2026'])
             ->assertOk()->assertDontSee('new-refresh');
         Http::assertSent(fn ($request) => $request->url() === 'http://java.test/api/auth/password' && ! isset($request['newPassword_confirmation']));
-        $this->assertSame(['access' => $fresh, 'refresh' => 'new-refresh'], session('syscon'));
+        // The session also keeps the last activity time (SessionIdleTimeout).
+        $this->assertSame(['access' => $fresh, 'refresh' => 'new-refresh'], array_intersect_key(session('syscon'), ['access' => 1, 'refresh' => 1]));
     }
 
     public function test_user_management_and_audit_are_superadmin_permissions(): void
