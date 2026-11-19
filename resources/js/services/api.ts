@@ -270,6 +270,17 @@ export const api = {
     request<StaffAccount>(`/admin/users/${encodeURIComponent(id)}/suspend`, { method: 'POST' }),
   reactivateUser: (id: string) =>
     request<StaffAccount>(`/admin/users/${encodeURIComponent(id)}/reactivate`, { method: 'POST' }),
+  changeUserRole: (id: string, role: 'ADMIN' | 'CUSTOMER') =>
+    request<StaffAccount>(`/admin/users/${encodeURIComponent(id)}/role`, {
+      method: 'POST',
+      body: json({ role }),
+    }),
+  /** `null` goes back to the standard admin permissions. */
+  setUserPermissions: (id: string, permissions: string[] | null) =>
+    request<StaffAccount>(`/admin/users/${encodeURIComponent(id)}/permissions`, {
+      method: 'PUT',
+      body: json(permissions === null ? { default: true } : { permissions }),
+    }),
   resetUserPassword: (id: string) =>
     request<IssuedPassword>(`/admin/users/${encodeURIComponent(id)}/reset-password`, {
       method: 'POST',

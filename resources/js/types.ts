@@ -281,6 +281,10 @@ export type StaffAccount = {
   validatedAt: string | null;
   lastLoginAt: string | null;
   createdAt: string | null;
+  /** Effective staff permissions (empty for customers). */
+  permissions?: string[];
+  /** True when the superadmin chose this admin's permissions instead of the standard set. */
+  customPermissions?: boolean;
 };
 export type NewAdmin = {
   email: string;

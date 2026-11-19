@@ -38,6 +38,26 @@ class UserGatewayController extends GatewayController
         return $this->reply($this->api->authenticated('POST', "/api/admin/users/$id/$action"));
     }
 
+    /** Customer to admin or back; superadmins are not changed from here. */
+    public function role(Request $request, string $id): JsonResponse
+    {
+        if ($error = $this->requirePermission('users:manage')) return $error;
+        $data = $request->validate(['role' => 'required|in:ADMIN,CUSTOMER']);
+        return $this->reply($this->api->authenticated('POST', "/api/admin/users/$id/role", $data));
+    }
+
+    /** Permissions of one admin, or back to the standard set with default=true. */
+    public function permissions(Request $request, string $id): JsonResponse
+    {
+        if ($error = $this->requirePermission('users:manage')) return $error;
+        $data = $request->validate([
+            'default' => 'sometimes|boolean',
+            'permissions' => 'required_unless:default,true|array|max:20',
+            'permissions.*' => 'string|max:40',
+        ]);
+        return $this->reply($this->api->authenticated('PUT', "/api/admin/users/$id/permissions", $data));
+    }
+
     public function audit(Request $request): JsonResponse
     {
         if ($error = $this->requirePermission('audit:view')) return $error;

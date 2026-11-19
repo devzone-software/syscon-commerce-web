@@ -180,6 +180,26 @@ class GatewayTest extends TestCase
         $this->postJson('/web-api/session/ping')->assertUnauthorized();
     }
 
+    public function test_superadmin_changes_roles_and_admin_permissions_through_the_gateway(): void
+    {
+        $id = '00000000-0000-0000-0000-0000000000cc';
+        Http::fake([
+            'java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200),
+            "java.test/api/admin/users/$id/*" => Http::response(['success' => true, 'data' => ['id' => $id]], 200),
+        ]);
+        $super = ['syscon.access' => $this->token(['ROLE_SUPERADMIN', 'users:manage']), 'syscon.refresh' => 'r'];
+        $admin = ['syscon.access' => $this->token(['ROLE_ADMIN', 'orders:manage']), 'syscon.refresh' => 'r'];
+
+        $this->withSession($admin)->postJson("/web-api/admin/users/$id/role", ['role' => 'ADMIN'])->assertForbidden();
+        $this->withSession($super)->postJson("/web-api/admin/users/$id/role", ['role' => 'SUPERADMIN'])->assertUnprocessable();
+        $this->withSession($super)->postJson("/web-api/admin/users/$id/role", ['role' => 'ADMIN'])->assertOk();
+        $this->withSession($super)->putJson("/web-api/admin/users/$id/permissions", ['permissions' => ['reports:view', 'sales:create']])->assertOk();
+        $this->withSession($super)->putJson("/web-api/admin/users/$id/permissions", ['default' => true])->assertOk();
+        Http::assertSent(fn ($request) => $request->method() === 'POST' && $request->url() === "http://java.test/api/admin/users/$id/role" && $request['role'] === 'ADMIN');
+        Http::assertSent(fn ($request) => $request->method() === 'PUT' && $request->url() === "http://java.test/api/admin/users/$id/permissions" && ($request->data()['permissions'] ?? null) === ['reports:view', 'sales:create']);
+        Http::assertSent(fn ($request) => $request->method() === 'PUT' && ($request->data()['default'] ?? false) === true);
+    }
+
     public function test_me_separates_roles_from_permissions(): void
     {
         Http::fake(['java.test/api/auth/me' => Http::response(['success' => true, 'data' => 'id'], 200)]);

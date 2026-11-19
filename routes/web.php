@@ -82,6 +82,8 @@ Route::prefix('web-api')->middleware(SessionIdleTimeout::class)->group(function 
     Route::match(['get', 'post'], '/admin/internal-uses', [InventoryGatewayController::class, 'internalUses']);
     Route::match(['get', 'post'], '/admin/users', [UserGatewayController::class, 'users']);
     Route::post('/admin/users/{id}/{action}', [UserGatewayController::class, 'action'])->whereUuid('id')->whereIn('action', ['validate', 'suspend', 'reactivate', 'reset-password']);
+    Route::post('/admin/users/{id}/role', [UserGatewayController::class, 'role'])->whereUuid('id');
+    Route::put('/admin/users/{id}/permissions', [UserGatewayController::class, 'permissions'])->whereUuid('id');
     Route::get('/admin/audit', [UserGatewayController::class, 'audit']);
 });
 

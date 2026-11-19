@@ -162,25 +162,189 @@ function AdminForm({ onCreated }: { onCreated: (issued: IssuedPassword) => void 
   );
 }
 
-type Action = 'validate' | 'suspend' | 'reactivate' | 'reset';
+type Action =
+  'validate' | 'suspend' | 'reactivate' | 'reset' | 'promote' | 'demote' | 'permissions';
+type ConfirmAction = Exclude<Action, 'permissions'>;
 const actionLabels: Record<Action, string> = {
   validate: 'Validar',
   suspend: 'Suspender',
   reactivate: 'Reactivar',
   reset: 'Nueva contraseña',
+  promote: 'Hacer administrador',
+  demote: 'Quitar rol de administrador',
+  permissions: 'Permisos',
 };
-const actionHints: Record<Action, string> = {
+const actionHints: Record<ConfirmAction, string> = {
   validate: '¿Verificaste su identidad? La cuenta podrá ingresar.',
   suspend: 'Se cerrarán sus sesiones de inmediato.',
   reactivate: 'Volverá a su estado anterior a la suspensión.',
   reset: 'Se cerrarán sus sesiones y deberá ingresar con la nueva contraseña.',
+  promote:
+    'Podrá entrar al panel con los permisos estándar de administrador. Luego puedes ajustarlos.',
+  demote: 'Volverá a ser cliente: pierde el acceso al panel y se cierran sus sesiones.',
 };
 
+/**
+ * Permissions the superadmin can give an admin. "Usuarios" stays with the superadmin so nobody
+ * below can raise their own access.
+ */
+const permissionGroups: {
+  title: string;
+  items: { value: string; label: string; hint: string }[];
+}[] = [
+  {
+    title: 'Operación diaria',
+    items: [
+      {
+        value: 'catalog:write',
+        label: 'Catálogo y precios',
+        hint: 'Productos, categorías y precios de referencia.',
+      },
+      {
+        value: 'orders:manage',
+        label: 'Pedidos y reclamaciones',
+        hint: 'Preparar, enviar y entregar pedidos; Libro de Reclamaciones.',
+      },
+      { value: 'payments:confirm', label: 'Pagos', hint: 'Verificar y confirmar pagos manuales.' },
+      { value: 'cash:manage', label: 'Caja', hint: 'Abrir, registrar movimientos y cerrar caja.' },
+      {
+        value: 'invoices:submit',
+        label: 'Comprobantes SUNAT',
+        hint: 'Emitir boletas, facturas y notas.',
+      },
+    ],
+  },
+  {
+    title: 'Permisos adicionales',
+    items: [
+      {
+        value: 'sales:create',
+        label: 'Venta directa',
+        hint: 'Registrar ventas en mostrador (requiere Caja).',
+      },
+      {
+        value: 'inventory:manage',
+        label: 'Compras y uso interno',
+        hint: 'Registrar compras a proveedores y retiros.',
+      },
+      {
+        value: 'suppliers:manage',
+        label: 'Proveedores',
+        hint: 'Feeds y sincronización de proveedores.',
+      },
+      {
+        value: 'reports:view',
+        label: 'Reportes',
+        hint: 'Ventas, conciliación y resumen del catálogo.',
+      },
+      {
+        value: 'audit:view',
+        label: 'Actividad del personal',
+        hint: 'Bitácora de cambios del personal.',
+      },
+    ],
+  },
+];
+const STANDARD_PERMISSIONS = permissionGroups[0].items.map((item) => item.value);
+
 function actionsFor(account: StaffAccount): Action[] {
+  if (account.role === 'CUSTOMER') return ['promote'];
   if (account.role !== 'ADMIN') return [];
-  if (account.status === 'PENDING') return ['validate', 'reset', 'suspend'];
-  if (account.status === 'SUSPENDED') return ['reactivate'];
-  return ['reset', 'suspend'];
+  if (account.status === 'PENDING')
+    return ['validate', 'permissions', 'reset', 'suspend', 'demote'];
+  if (account.status === 'SUSPENDED') return ['reactivate', 'demote'];
+  return ['permissions', 'reset', 'suspend', 'demote'];
+}
+
+/** Checkbox editor of one admin's permissions. */
+function PermissionsEditor({
+  account,
+  onSaved,
+  onClose,
+}: {
+  account: StaffAccount;
+  onSaved: (account: StaffAccount) => void;
+  onClose: () => void;
+}) {
+  const [chosen, setChosen] = useState<string[]>(account.permissions ?? STANDARD_PERMISSIONS);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const name = [account.firstName, account.lastName].filter(Boolean).join(' ') || account.email;
+  const toggle = (value: string) =>
+    setChosen((current) =>
+      current.includes(value) ? current.filter((item) => item !== value) : [...current, value],
+    );
+  const save = async (permissions: string[] | null) => {
+    setBusy(true);
+    setError('');
+    try {
+      onSaved(await api.setUserPermissions(account.id, permissions));
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <section className="bo-card users-permissions" aria-labelledby="users-permissions-title">
+      <div className="checkout-card-head">
+        <div>
+          <h2 id="users-permissions-title">Permisos de {name}</h2>
+          <p className="bo-card-sub">
+            {account.email} ·{' '}
+            {account.customPermissions ? 'permisos personalizados' : 'permisos estándar'}
+          </p>
+        </div>
+        <button type="button" className="link-button" onClick={onClose}>
+          Cerrar
+        </button>
+      </div>
+      {error && <ErrorBox message={error} />}
+      <div className="users-permissions-groups">
+        {permissionGroups.map((group) => (
+          <fieldset key={group.title}>
+            <legend>{group.title}</legend>
+            {group.items.map((item) => (
+              <label key={item.value} className="users-permission">
+                <input
+                  type="checkbox"
+                  checked={chosen.includes(item.value)}
+                  onChange={() => toggle(item.value)}
+                />
+                <span>
+                  <strong>{item.label}</strong>
+                  <small>{item.hint}</small>
+                </span>
+              </label>
+            ))}
+          </fieldset>
+        ))}
+      </div>
+      <p className="notice" role="note">
+        Gestionar usuarios queda solo para el superadministrador. Los cambios se aplican de
+        inmediato; el menú del administrador se actualiza en hasta 15 minutos o al volver a
+        ingresar.
+      </p>
+      <div className="bo-inline-confirm">
+        <button
+          type="button"
+          className="button button-primary"
+          disabled={busy || chosen.length === 0}
+          onClick={() => void save(chosen)}
+        >
+          {busy ? 'Guardando…' : 'Guardar permisos'}
+        </button>
+        <button
+          type="button"
+          className="button button-secondary"
+          disabled={busy}
+          onClick={() => void save(null)}
+        >
+          Usar permisos estándar
+        </button>
+      </div>
+    </section>
+  );
 }
 
 export function UsersAdmin() {
@@ -194,22 +358,29 @@ export function UsersAdmin() {
     [role, status, q, page],
   );
   const [issued, setIssued] = useState<IssuedPassword | null>(null);
-  const [confirm, setConfirm] = useState<{ id: string; action: Action } | null>(null);
+  const [confirm, setConfirm] = useState<{ id: string; action: ConfirmAction } | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [actionError, setActionError] = useState('');
+  const [editing, setEditing] = useState<StaffAccount | null>(null);
 
   const filter = (apply: () => void) => {
     apply();
     setPage(1);
   };
-  const run = async (account: StaffAccount, action: Action) => {
+  const run = async (account: StaffAccount, action: ConfirmAction) => {
     setBusy(true);
     setMessage('');
     setActionError('');
     try {
       if (action === 'reset') setIssued(await api.resetUserPassword(account.id));
-      else {
+      else if (action === 'promote' || action === 'demote') {
+        const done = await api.changeUserRole(
+          account.id,
+          action === 'promote' ? 'ADMIN' : 'CUSTOMER',
+        );
+        setMessage(`${done.email}: ahora es ${roleLabel(`ROLE_${done.role}`).toLowerCase()}.`);
+      } else {
         const done =
           action === 'validate'
             ? await api.validateUser(account.id)
@@ -232,7 +403,7 @@ export function UsersAdmin() {
     <>
       <PageHeader
         title="Usuarios"
-        description="Cuentas del personal y de los clientes. Solo el superadministrador crea, valida, suspende o resetea cuentas de administrador."
+        description="Cuentas del personal y de los clientes. Solo el superadministrador crea y valida administradores, cambia roles y elige los permisos de cada administrador."
       />
       {issued ? (
         <IssuedPasswordNotice issued={issued} onClose={() => setIssued(null)} />
@@ -300,6 +471,18 @@ export function UsersAdmin() {
           </p>
         )}
         {actionError && <ErrorBox message={actionError} />}
+        {editing && (
+          <PermissionsEditor
+            key={editing.id}
+            account={editing}
+            onClose={() => setEditing(null)}
+            onSaved={(saved) => {
+              setEditing(null);
+              setMessage(`${saved.email}: permisos actualizados.`);
+              reload();
+            }}
+          />
+        )}
         {loading ? (
           <Loading />
         ) : error ? (
@@ -307,7 +490,7 @@ export function UsersAdmin() {
         ) : data?.items.length ? (
           <>
             <div className="table-wrap responsive-table">
-              <table className="data-table">
+              <table className="data-table users-table">
                 <thead>
                   <tr>
                     <th scope="col">Cuenta</th>
@@ -336,7 +519,16 @@ export function UsersAdmin() {
                           </small>
                         )}
                       </td>
-                      <td data-label="Rol">{roleLabel(`ROLE_${account.role}`)}</td>
+                      <td data-label="Rol">
+                        {roleLabel(`ROLE_${account.role}`)}
+                        {account.role === 'ADMIN' && account.permissions && (
+                          <small>
+                            {account.permissions.length}{' '}
+                            {account.permissions.length === 1 ? 'permiso' : 'permisos'} ·{' '}
+                            {account.customPermissions ? 'personalizados' : 'estándar'}
+                          </small>
+                        )}
+                      </td>
                       <td data-label="Estado">
                         <StatusBadge status={account.status} labels={accountStatusLabels} />
                         {account.mustChangePassword && <small>Con contraseña temporal</small>}
@@ -355,7 +547,7 @@ export function UsersAdmin() {
                               <button
                                 type="button"
                                 className={
-                                  confirm.action === 'suspend'
+                                  confirm.action === 'suspend' || confirm.action === 'demote'
                                     ? 'button button-danger'
                                     : 'button button-primary'
                                 }
@@ -380,7 +572,12 @@ export function UsersAdmin() {
                                 key={action}
                                 type="button"
                                 className="link-button"
-                                onClick={() => setConfirm({ id: account.id, action })}
+                                onClick={() => {
+                                  if (action === 'permissions') {
+                                    setConfirm(null);
+                                    setEditing(account);
+                                  } else setConfirm({ id: account.id, action });
+                                }}
                               >
                                 {actionLabels[action]}
                                 <span className="visually-hidden"> {account.email}</span>
