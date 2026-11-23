@@ -46,7 +46,8 @@ function SupplierForm({ onCreated }: { onCreated: () => void }) {
     >
       <h2 id="supplier-form-title">Nuevo proveedor</h2>
       <p className="muted">
-        Conecta el catálogo del proveedor para actualizar sus productos, precios y existencias.
+        Conecta el catálogo del proveedor para actualizar sus productos y existencias, y recibir sus
+        precios como costo (soles, IGV incluido).
       </p>
       <details className="supplier-format">
         <summary>Formato y requisitos del catálogo</summary>
@@ -152,8 +153,10 @@ export function SuppliersAdmin() {
       />
       <p className="notice error" role="note">
         Cada sincronización actualiza por SKU los productos del catálogo:{' '}
-        <strong>reemplaza su precio y su stock</strong> por los del feed y los publica. Úsala solo
-        con proveedores cuyo stock represente el tuyo.
+        <strong>reemplaza su stock</strong> por el del feed. Úsala solo con proveedores cuyo stock
+        represente el tuyo. El precio del proveedor no cambia tu precio de venta: llega como costo a{' '}
+        <strong>Precios de referencia</strong>, donde apruebas el precio sugerido. Los productos
+        nuevos se crean ocultos hasta que les pongas precio y los publiques.
       </p>
       <SupplierForm onCreated={suppliers.reload} />
       <section className="bo-card" aria-labelledby="suppliers-title">

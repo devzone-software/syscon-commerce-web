@@ -15,6 +15,7 @@ const referenceStatus: Record<PriceReference['status'], { label: string; tone: s
   MANUAL: { label: 'Escrito a mano', tone: 'tone-info' },
   ERROR: { label: 'No se pudo leer', tone: 'tone-danger' },
   PENDING: { label: 'Sin leer', tone: 'tone-warning' },
+  SUPPLIER: { label: 'Del proveedor', tone: 'tone-info' },
 };
 
 /** Reference prices from other companies' websites, and the selling price they suggest. */
@@ -108,7 +109,9 @@ function Suggestions({
   // Reads every link one by one, so each request stays short and the progress is visible.
   const refreshAll = async () => {
     setMessage('');
-    const references = (await api.priceReferences()).filter((ref) => ref.sourceActive);
+    const references = (await api.priceReferences()).filter(
+      (ref) => ref.sourceActive && !ref.fromSupplier,
+    );
     setProgress({ done: 0, total: references.length });
     let failed = 0;
     for (const [index, ref] of references.entries()) {
@@ -553,40 +556,46 @@ function References({ onChange }: { onChange: () => void }) {
                       {ref.error && <small>{ref.error}</small>}
                     </td>
                     <td>
-                      <form
-                        className="pricing-manual"
-                        onSubmit={(event) => {
-                          event.preventDefault();
-                          const value = manual[ref.id];
-                          if (value && Number(value) > 0)
-                            void run(ref.id, () =>
-                              api.manualReferencePrice(ref.id, Number(value).toFixed(2)),
-                            );
-                        }}
-                      >
-                        <input
-                          inputMode="decimal"
-                          aria-label={`Precio a mano de ${ref.product} en ${ref.source}`}
-                          placeholder="S/"
-                          value={manual[ref.id] ?? ''}
-                          onChange={(event) =>
-                            setManual({ ...manual, [ref.id]: event.target.value })
-                          }
-                        />
-                        <button className="link-button" disabled={busy === ref.id}>
-                          Guardar
-                        </button>
-                      </form>
+                      {ref.fromSupplier ? (
+                        <small>Se actualiza al sincronizar el proveedor</small>
+                      ) : (
+                        <form
+                          className="pricing-manual"
+                          onSubmit={(event) => {
+                            event.preventDefault();
+                            const value = manual[ref.id];
+                            if (value && Number(value) > 0)
+                              void run(ref.id, () =>
+                                api.manualReferencePrice(ref.id, Number(value).toFixed(2)),
+                              );
+                          }}
+                        >
+                          <input
+                            inputMode="decimal"
+                            aria-label={`Precio a mano de ${ref.product} en ${ref.source}`}
+                            placeholder="S/"
+                            value={manual[ref.id] ?? ''}
+                            onChange={(event) =>
+                              setManual({ ...manual, [ref.id]: event.target.value })
+                            }
+                          />
+                          <button className="link-button" disabled={busy === ref.id}>
+                            Guardar
+                          </button>
+                        </form>
+                      )}
                     </td>
                     <td className="pricing-actions">
-                      <button
-                        type="button"
-                        className="link-button"
-                        disabled={busy === ref.id}
-                        onClick={() => void run(ref.id, () => api.refreshReference(ref.id))}
-                      >
-                        {busy === ref.id ? 'Leyendo…' : 'Leer ahora'}
-                      </button>
+                      {!ref.fromSupplier && (
+                        <button
+                          type="button"
+                          className="link-button"
+                          disabled={busy === ref.id}
+                          onClick={() => void run(ref.id, () => api.refreshReference(ref.id))}
+                        >
+                          {busy === ref.id ? 'Leyendo…' : 'Leer ahora'}
+                        </button>
+                      )}
                       <button
                         type="button"
                         className="link-button pricing-delete"

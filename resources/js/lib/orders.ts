@@ -77,6 +77,7 @@ export const orderEventLabels: Record<string, string> = {
   STATUS_CHANGED: 'Cambio de estado',
   EXPIRED: 'Reserva vencida',
   INVOICE_ACCEPTED: 'Comprobante aceptado por SUNAT',
+  INVOICE_AUTO_FAILED: 'No se pudo emitir el comprobante automáticamente: emitirlo desde Comprobantes',
   CREDIT_NOTE_ACCEPTED: 'Nota de crédito aceptada',
   DEBIT_NOTE_ACCEPTED: 'Nota de débito aceptada',
   NOTIFICATION_RESENT: 'Correo reenviado',

@@ -415,7 +415,7 @@ export type PriceSuggestion = {
   /** UP / DOWN: a change to review · OK: already at the suggestion · REVIEWED: approved or ignored for this cost. */
   status: 'UP' | 'DOWN' | 'OK' | 'REVIEWED' | 'NO_MARGIN';
 };
-export type PriceReferenceStatus = 'PENDING' | 'OK' | 'MANUAL' | 'ERROR';
+export type PriceReferenceStatus = 'PENDING' | 'OK' | 'MANUAL' | 'ERROR' | 'SUPPLIER';
 export type PriceSource = {
   id: string;
   name: string;
@@ -431,6 +431,8 @@ export type PriceReference = {
   sourceId: string;
   source: string;
   sourceActive: boolean;
+  /** Price that arrives with a supplier CSV sync: not read from a website nor typed by hand. */
+  fromSupplier: boolean;
   url: string;
   price: string | null;
   status: PriceReferenceStatus;
