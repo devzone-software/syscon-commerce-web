@@ -1,15 +1,8 @@
 /* Cart and order summary (the summary is reused by checkout). */
-.cart-heading {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
 .cart-clear-confirm {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--syscon-space-4);
   font-size: 13px;
   color: var(--store-ink-soft);
 }
@@ -24,8 +17,8 @@
 .cart-line {
   display: grid;
   grid-template-columns: 96px 1fr auto;
-  gap: 18px;
-  padding: 18px;
+  gap: var(--syscon-space-4);
+  padding: var(--syscon-space-4);
   border-bottom: 1px solid var(--store-line);
 }
 .cart-line:last-child {
@@ -40,7 +33,7 @@
   display: grid;
   place-items: center;
   border-radius: 10px;
-  background: #f2f7f9;
+  background: #f2f4f9;
   overflow: hidden;
 }
 .cart-line-media img {
@@ -48,6 +41,9 @@
   height: 100%;
   object-fit: contain;
   padding: 8px;
+}
+.cart-line-media .image-fallback small {
+  display: none;
 }
 .cart-line-media .image-fallback {
   font-size: 9px;
@@ -59,7 +55,7 @@
   min-width: 0;
 }
 .cart-line-name {
-  font: 700 15px/1.4 Manrope, sans-serif;
+  font: 700 15px/1.4 Inter, sans-serif;
   color: var(--store-ink);
   overflow-wrap: anywhere;
 }
@@ -95,14 +91,14 @@
   top: 96px;
 }
 .order-summary .notice {
-  margin: 0 0 14px;
+  margin: 0 0 var(--syscon-space-4);
 }
 
 @media (max-width: 700px) {
   .cart-line {
     grid-template-columns: 72px 1fr;
     gap: 12px;
-    padding: 14px;
+    padding: var(--syscon-space-4);
   }
   .cart-line-media {
     width: 72px;

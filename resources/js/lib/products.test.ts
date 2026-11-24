@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { cleanProduct, emptyProduct, toProductInput, validateProduct } from './products';
-import { isUuid } from './validation';
+import { isEmail, isUuid } from './validation';
 
 describe('product form rules', () => {
   it('requires sku, name, non negative price and integer stock', () => {
@@ -18,11 +18,31 @@ describe('product form rules', () => {
     expect(cleanProduct(input)).toMatchObject({ sku: 'A', brand: null, category: null });
   });
   it('drops the id when editing an existing product', () => {
-    const product = { ...emptyProduct, id: 'x', price: '10.50' as unknown as number };
+    const product = {
+      ...emptyProduct,
+      id: 'x',
+      physicalStock: 0,
+      reservedStock: 0,
+      price: '10.50' as unknown as number,
+    };
     expect(toProductInput(product)).toEqual({ ...emptyProduct, price: 10.5 });
+  });
+  it('edits physical stock without subtracting pending reservations again', () => {
+    const input = toProductInput({
+      ...emptyProduct,
+      id: 'x',
+      stock: 7,
+      physicalStock: 10,
+      reservedStock: 3,
+    });
+    expect(input.stock).toBe(10);
+    expect(input).not.toHaveProperty('physicalStock');
+    expect(input).not.toHaveProperty('reservedStock');
   });
   it('validates the UUIDs used by the lookups', () => {
     expect(isUuid('0b7f1c2e-8a4d-4f5e-9c1b-2d3e4f5a6b7c')).toBe(true);
     expect(isUuid('pedido-1')).toBe(false);
+    expect(isEmail('ventas@gruposyscon.pe')).toBe(true);
+    expect(isEmail('ventas@gruposyscon')).toBe(false);
   });
 });

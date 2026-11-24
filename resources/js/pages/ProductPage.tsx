@@ -1,25 +1,52 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { money, useShop } from '../state';
+import { useConfirmAdd } from '../components/cart/AddToCartDialog';
 import { ProductImage } from '../components/ProductImage';
-import { StockBadge } from '../components/product/StockBadge';
+import { InfoRows } from '../components/cart/OrderSummary';
+import { PageSection } from '../components/layout/PageHero';
 import { QuantityStepper } from '../components/shared/QuantityStepper';
-import { CartIcon } from '../components/icons';
-import { relatedProducts } from '../lib/catalog';
+import { DeliveryPreview } from '../components/product/DeliveryPreview';
+import { ProductComparison } from '../components/product/ProductComparison';
+import { CartIcon, HeadsetIcon, ReceiptIcon, ShieldIcon, TruckIcon } from '../components/icons';
+import {
+  lengthVariants,
+  relatedProducts,
+  productSpecifications,
+  productInquiryUrl,
+} from '../lib/catalog';
+import { isServicePlan, planInquiryUrl } from '../lib/servicePlans';
 import { useData, Loading, Empty, ProductCard } from '../ui';
+import '../../css/storefront.css';
+
+const perks = [
+  { icon: <ReceiptIcon size={18} />, text: 'Boleta o factura electrónica con tu compra' },
+  { icon: <ShieldIcon size={18} />, text: 'Consulta las condiciones de garantía por producto' },
+  { icon: <TruckIcon size={18} />, text: 'Recojo en tienda o envío coordinado' },
+  { icon: <HeadsetIcon size={18} />, text: 'Asesoría técnica antes y después de comprar' },
+];
+
+/** What a Ficon internet plan includes, instead of the delivery details of a product. */
+const planPerks = [
+  { icon: <ShieldIcon size={18} />, text: 'Servicio de Ficon, nuestra empresa aliada' },
+  { icon: <TruckIcon size={18} />, text: 'Instalación coordinada en tu domicilio u oficina' },
+  { icon: <HeadsetIcon size={18} />, text: 'Te ayudamos a revisar la cobertura en tu zona' },
+];
 
 export function ProductPage() {
   const { id = '' } = useParams();
   const { data, loading, error, reload } = useData(() => api.product(id), [id]);
   const catalog = useData(api.products);
-  const { add, cart } = useShop();
+  const { cart, add } = useShop();
+  const navigate = useNavigate();
+  const confirmAdd = useConfirmAdd();
   const [quantity, setQuantity] = useState(1);
-  const [added, setAdded] = useState(0);
+  const buyRef = useRef<HTMLDivElement>(null);
+  const [showQuickBuy, setShowQuickBuy] = useState(false);
 
   useEffect(() => {
     setQuantity(1);
-    setAdded(0);
   }, [id]);
 
   const related = useMemo(
@@ -27,13 +54,30 @@ export function ProductPage() {
     [data, catalog.data],
   );
 
+  const lengths = useMemo(
+    () => (data && catalog.data ? lengthVariants(data, catalog.data) : []),
+    [data, catalog.data],
+  );
+  const metersLabel = (meters: number) =>
+    `${meters.toLocaleString('es-PE')} ${meters === 1 ? 'metro' : 'metros'}`;
+
+  useEffect(() => {
+    const target = buyRef.current;
+    if (!target || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(([entry]) => setShowQuickBuy(!entry.isIntersecting), {
+      threshold: 0.15,
+    });
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [data?.id]);
+
   if (loading)
     return (
       <div className="container page">
         <Loading />
       </div>
     );
-  if (error || !data)
+  if (error || !data || !data.active)
     return (
       <div className="container page">
         <Empty
@@ -56,104 +100,247 @@ export function ProductPage() {
   const inCart = cart.find((line) => line.product.id === data.id)?.quantity ?? 0;
   const remaining = Math.max(0, data.stock - inCart);
   const units = Math.min(quantity, Math.max(1, remaining));
+  const description = data.description?.trim();
+  const specifications = productSpecifications(data.specifications);
+  const plan = isServicePlan(data);
+  const inquiryUrl = plan ? planInquiryUrl(data) : productInquiryUrl(data);
   const addToCart = () => {
-    add(data, units);
-    setAdded(units);
+    confirmAdd(data, units);
     setQuantity(1);
+  };
+  // Straight to payment with the chosen quantity; checkout asks to sign in first if needed.
+  const buyNow = () => {
+    add(data, units);
+    setQuantity(1);
+    navigate('/checkout');
   };
 
   return (
-    <div className="container page product-page">
-      <nav className="breadcrumb" aria-label="Ruta de navegación">
-        <Link to="/">Inicio</Link> <span aria-hidden="true">/</span>{' '}
-        <Link to="/catalogo">Catálogo</Link>
-        {data.category && (
-          <>
-            {' '}
-            <span aria-hidden="true">/</span>{' '}
-            <Link to={`/catalogo?categoria=${encodeURIComponent(data.category)}`}>
-              {data.category}
-            </Link>
-          </>
-        )}{' '}
-        <span aria-hidden="true">/</span> <span aria-current="page">{data.name}</span>
-      </nav>
-      <div className="product-detail">
-        <div className="product-detail-media">
-          <ProductImage product={data} />
-        </div>
-        <div className="product-detail-info">
-          {data.brand && (
-            <Link
-              className="product-detail-brand"
-              to={`/catalogo?marca=${encodeURIComponent(data.brand)}`}
-            >
-              {data.brand}
-            </Link>
-          )}
-          <h1>{data.name}</h1>
-          <dl className="product-detail-meta">
-            <div>
-              <dt>SKU</dt>
-              <dd>{data.sku}</dd>
-            </div>
+    <div className="product-view">
+      <section className="product-hero">
+        <div className="container">
+          <nav className="breadcrumb" aria-label="Ruta de navegación">
+            <Link to="/">Inicio</Link> <span aria-hidden="true">/</span>{' '}
+            <Link to="/catalogo">Productos</Link>
             {data.category && (
-              <div>
-                <dt>Categoría</dt>
-                <dd>{data.category}</dd>
-              </div>
-            )}
-          </dl>
-          <p className="product-detail-price">{money(Number(data.price))}</p>
-          <StockBadge stock={data.stock} showUnits />
-          <div className="product-buy">
-            {remaining > 0 ? (
               <>
-                <QuantityStepper
-                  label="Cantidad"
-                  value={units}
-                  max={remaining}
-                  onChange={setQuantity}
-                />
-                <button type="button" className="button button-primary" onClick={addToCart}>
-                  <CartIcon /> Agregar al carrito
-                </button>
+                {' '}
+                <span aria-hidden="true">/</span>{' '}
+                <Link to={`/catalogo?categoria=${encodeURIComponent(data.category)}`}>
+                  {data.category}
+                </Link>
               </>
-            ) : (
-              <p className="notice">
-                {data.stock < 1
-                  ? 'Este producto no tiene stock disponible por ahora.'
-                  : 'Ya tienes en tu carrito todas las unidades disponibles.'}
+            )}{' '}
+            <span aria-hidden="true">/</span> <span aria-current="page">{data.name}</span>
+          </nav>
+          <div className="product-detail">
+            <header className="product-detail-heading">
+              <p className="product-detail-eyebrow">{data.category}</p>
+              <h1>{data.name}</h1>
+              <p className="product-detail-sub">
+                {[data.brand, `SKU ${data.sku}`].filter(Boolean).join(' · ')}
               </p>
-            )}
-          </div>
-          {inCart > 0 && (
-            <p className="product-in-cart">
-              Tienes {inCart} {inCart === 1 ? 'unidad' : 'unidades'} en tu carrito.
-            </p>
-          )}
-          {added > 0 && (
-            <div className="notice success" role="status">
-              {added === 1 ? 'Se agregó 1 unidad' : `Se agregaron ${added} unidades`} al carrito.{' '}
-              <Link to="/carrito">Ver carrito</Link>
+              <a className="product-info-link" href="#product-information">
+                Ver descripción y características
+              </a>
+            </header>
+            <div className="product-detail-media">
+              <ProductImage product={data} loading="eager" />
             </div>
-          )}
-          <p className="product-detail-note">
-            El precio y el stock se validan nuevamente al confirmar el pedido.
-          </p>
+            <div className="product-detail-info">
+              <div className="product-price-row">
+                <p className="product-detail-price">
+                  {money(Number(data.price))}
+                  {plan && <small> /mes</small>}
+                </p>
+                {!plan && (
+                  <p className={`product-detail-stock${data.stock < 1 ? ' out' : ''}`}>
+                    <i aria-hidden="true" /> {data.stock < 1 ? 'Agotado' : 'Disponible'}
+                  </p>
+                )}
+              </div>
+              <p className="product-price-note">
+                {plan
+                  ? 'Precio mensual referencial. El servicio lo brinda Ficon, empresa aliada.'
+                  : 'Precio por unidad. La entrega se elige en el checkout.'}
+              </p>
+              {lengths.length > 0 && (
+                <fieldset className="product-lengths">
+                  <legend>
+                    ¿Cuántos metros necesitas?{' '}
+                    <strong>
+                      {metersLabel(
+                        lengths.find(({ product }) => product.id === data.id)?.meters ?? 0,
+                      )}
+                    </strong>
+                  </legend>
+                  <div className="product-lengths-options">
+                    {lengths.map(({ product, meters }) => (
+                      <Link
+                        key={product.id}
+                        to={`/producto/${product.id}`}
+                        replace
+                        className={`product-length${product.id === data.id ? ' is-current' : ''}${
+                          product.stock < 1 ? ' is-out' : ''
+                        }`}
+                        aria-current={product.id === data.id ? 'true' : undefined}
+                        aria-label={`${metersLabel(meters)}, ${money(Number(product.price))}${
+                          product.stock < 1 ? ', agotado' : ''
+                        }`}
+                      >
+                        <strong>{meters.toLocaleString('es-PE')} m</strong>
+                        <small>{money(Number(product.price))}</small>
+                      </Link>
+                    ))}
+                  </div>
+                  <Link className="product-lengths-other" to={inquiryUrl}>
+                    ¿Necesitas otra medida? Cotízala con un asesor
+                  </Link>
+                </fieldset>
+              )}
+              {specifications.length > 0 && (
+                <ul
+                  className="product-highlights"
+                  aria-label="Características publicadas destacadas"
+                >
+                  {specifications.slice(0, 3).map((line, index) => (
+                    <li key={index}>{line.text}</li>
+                  ))}
+                </ul>
+              )}
+              <div className="product-buy" ref={buyRef}>
+                {plan ? (
+                  <Link className="flow-button" to={inquiryUrl}>
+                    Consultar cobertura
+                  </Link>
+                ) : remaining > 0 ? (
+                  <>
+                    <QuantityStepper
+                      label="Cantidad"
+                      value={units}
+                      max={remaining}
+                      onChange={setQuantity}
+                    />
+                    <div className="product-buy-actions">
+                      <button type="button" className="flow-button" onClick={buyNow}>
+                        Comprar ahora
+                      </button>
+                      <button type="button" className="flow-button is-soft" onClick={addToCart}>
+                        <CartIcon /> Agregar al carrito
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="notice">
+                      {data.stock < 1
+                        ? 'Este producto está agotado por ahora.'
+                        : 'Alcanzaste la cantidad máxima disponible para este producto.'}
+                    </p>
+                    {inCart > 0 && (
+                      <Link className="flow-button" to="/checkout">
+                        Ir a pagar
+                      </Link>
+                    )}
+                  </>
+                )}
+              </div>
+              {inCart > 0 && (
+                <p className="product-in-cart">
+                  Tienes {inCart} {inCart === 1 ? 'unidad' : 'unidades'} en tu carrito.
+                </p>
+              )}
+              {plan ? (
+                <ul className="product-perks">
+                  {planPerks.map(({ icon, text }) => (
+                    <li key={text}>
+                      {icon}
+                      {text}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <>
+                  <Link className="product-info-link product-consult" to={inquiryUrl}>
+                    <HeadsetIcon size={16} /> Consultar este producto
+                  </Link>
+                  <DeliveryPreview />
+                  <ul className="product-perks">
+                    {perks.map(({ icon, text }) => (
+                      <li key={text}>
+                        {icon}
+                        {text}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
+      <PageSection id="product-information" title="Información del producto">
+        {description && <p className="product-description">{description}</p>}
+        {specifications.length > 0 && (
+          <section aria-label="Características técnicas">
+            <h3>Características técnicas</h3>
+            <table className="product-specifications">
+              <caption className="visually-hidden">Características técnicas de {data.name}</caption>
+              <tbody>
+                {specifications.map(({ label, value, text }, index) =>
+                  label ? (
+                    <tr key={index}>
+                      <th scope="row">{label}</th>
+                      <td>{value}</td>
+                    </tr>
+                  ) : (
+                    <tr key={index}>
+                      <td colSpan={2}>{text}</td>
+                    </tr>
+                  ),
+                )}
+              </tbody>
+            </table>
+          </section>
+        )}
+        {!description && !specifications.length && (
+          <p className="product-information-empty">
+            Las características técnicas todavía no están publicadas.{' '}
+            <Link to={inquiryUrl}>Consulta con nuestro equipo antes de comprar.</Link>
+          </p>
+        )}
+        <InfoRows
+          rows={[
+            { label: 'Marca', value: data.brand || '—' },
+            { label: 'Categoría', value: data.category || '—' },
+            { label: 'SKU', value: data.sku },
+          ]}
+        />
+        <p className="flow-note">El precio y la disponibilidad se confirman al crear el pedido.</p>
+      </PageSection>
       {related.length > 0 && (
-        <section className="product-related" aria-labelledby="related-title">
-          <h2 id="related-title">
-            {data.category ? `Más en ${data.category}` : `Más de ${data.brand}`}
-          </h2>
-          <div className="product-grid">
+        <PageSection title={data.category ? `Más en ${data.category}` : `Más de ${data.brand}`}>
+          <ProductComparison product={data} alternatives={related} />
+          <div className="featured-grid">
             {related.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
-        </section>
+        </PageSection>
+      )}
+      {showQuickBuy && !plan && remaining > 0 && (
+        <aside className="product-quick-buy" aria-label="Compra rápida">
+          <span>
+            <small>Precio por unidad</small>
+            <strong>{money(Number(data.price))}</strong>
+          </span>
+          <button type="button" className="flow-button is-soft" onClick={addToCart}>
+            <CartIcon /> Agregar
+          </button>
+          <button type="button" className="flow-button" onClick={buyNow}>
+            Comprar ahora
+          </button>
+        </aside>
       )}
     </div>
   );

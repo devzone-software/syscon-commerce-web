@@ -36,6 +36,9 @@ return [
 
     'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
 
+    // Minutes without activity before a signed-in session is closed (SessionIdleTimeout).
+    'idle_minutes' => (int) env('SESSION_IDLE_MINUTES', 15),
+
     /*
     |--------------------------------------------------------------------------
     | Session Encryption

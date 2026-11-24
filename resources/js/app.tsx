@@ -1,8 +1,11 @@
-import { StrictMode, lazy, Suspense } from 'react';
+import { IdleSession } from './components/IdleSession';
+import { StrictMode, lazy, Suspense, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { StateProvider } from './state';
+import { StateProvider, useShop } from './state';
+import { AddToCartProvider } from './components/cart/AddToCartDialog';
 import { Layout, Loading, RequireAuth } from './ui';
+import { AccountLayout } from './components/account/AccountLayout';
 import '../css/app.css';
 
 const Home = lazy(() => import('./pages/Home').then((module) => ({ default: module.Home })));
@@ -13,6 +16,9 @@ const ProductPage = lazy(() =>
   import('./pages/ProductPage').then((module) => ({ default: module.ProductPage })),
 );
 const Cart = lazy(() => import('./pages/Cart').then((module) => ({ default: module.Cart })));
+const AccountCart = lazy(() =>
+  import('./pages/Cart').then((module) => ({ default: module.AccountCart })),
+);
 const Auth = lazy(() => import('./pages/Auth').then((module) => ({ default: module.Auth })));
 const Checkout = lazy(() =>
   import('./pages/Checkout').then((module) => ({ default: module.Checkout })),
@@ -28,6 +34,26 @@ const Backoffice = lazy(() =>
   import('./pages/backoffice/Backoffice').then((module) => ({ default: module.Backoffice })),
 );
 const About = lazy(() => import('./pages/About').then((module) => ({ default: module.About })));
+const Ficon = lazy(() => import('./pages/Ficon').then((module) => ({ default: module.Ficon })));
+const InfoPage = lazy(() =>
+  import('./pages/InfoPage').then((module) => ({ default: module.InfoPage })),
+);
+const Complaints = lazy(() =>
+  import('./pages/Complaints').then((module) => ({ default: module.Complaints })),
+);
+const Recover = lazy(() =>
+  import('./pages/Recover').then((module) => ({ default: module.Recover })),
+);
+const Categories = lazy(() =>
+  import('./pages/Categories').then((module) => ({ default: module.Categories })),
+);
+const Offers = lazy(() => import('./pages/Offers').then((module) => ({ default: module.Offers })));
+const Contact = lazy(() =>
+  import('./pages/Contact').then((module) => ({ default: module.Contact })),
+);
+const ChangePassword = lazy(() =>
+  import('./pages/ChangePassword').then((module) => ({ default: module.ChangePassword })),
+);
 const NotFound = lazy(() =>
   import('./pages/NotFound').then((module) => ({ default: module.NotFound })),
 );
@@ -40,9 +66,14 @@ function StoreRoutes() {
           <Route path="/" element={<Home />} />
           <Route path="/catalogo" element={<Catalog />} />
           <Route path="/producto/:id" element={<ProductPage />} />
-          <Route path="/carrito" element={<Cart />} />
-          <Route path="/ingresar" element={<Auth />} />
-          <Route path="/registro" element={<Auth register />} />
+          <Route
+            path="/carrito"
+            element={
+              <RequireAuth>
+                <Cart />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/checkout"
             element={
@@ -59,23 +90,19 @@ function StoreRoutes() {
               </RequireAuth>
             }
           />
-          <Route
-            path="/cuenta"
-            element={
-              <RequireAuth>
-                <Account />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/cuenta/pedidos"
-            element={
-              <RequireAuth>
-                <Orders />
-              </RequireAuth>
-            }
-          />
           <Route path="/nosotros" element={<About />} />
+          <Route path="/categorias" element={<Categories />} />
+          <Route path="/ofertas" element={<Offers />} />
+          <Route path="/contacto" element={<Contact />} />
+          <Route path="/libro-de-reclamaciones" element={<Complaints />} />
+          <Route path="/ficon" element={<Ficon />} />
+          <Route path="/trabaja-con-nosotros" element={<InfoPage slug="trabaja-con-nosotros" />} />
+          <Route
+            path="/terminos-y-condiciones"
+            element={<InfoPage slug="terminos-y-condiciones" />}
+          />
+          <Route path="/privacidad" element={<InfoPage slug="privacidad" />} />
+          <Route path="/accesibilidad" element={<InfoPage slug="accesibilidad" />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
@@ -83,24 +110,95 @@ function StoreRoutes() {
   );
 }
 
+/** A temporary password from the superadmin must be replaced before using any page. */
+function PasswordGate({ children }: { children: ReactNode }) {
+  const { user } = useShop();
+  return user?.mustChangePassword ? <ChangePassword /> : children;
+}
+
 function App() {
   return (
     <StateProvider>
       <BrowserRouter>
-        <Suspense fallback={<Loading />}>
-          <Routes>
-            {/* The backoffice has its own layout, separate from the public store. */}
-            <Route
-              path="/admin/*"
-              element={
-                <RequireAuth>
-                  <Backoffice />
-                </RequireAuth>
-              }
-            />
-            <Route path="*" element={<StoreRoutes />} />
-          </Routes>
-        </Suspense>
+        <IdleSession />
+        <AddToCartProvider>
+          <Suspense fallback={<Loading />}>
+            <PasswordGate>
+              <Routes>
+                {/* The backoffice has its own layout, separate from the public store. */}
+                <Route
+                  path="/admin/*"
+                  element={
+                    <RequireAuth>
+                      <Backoffice />
+                    </RequireAuth>
+                  }
+                />
+                {/* Authentication forms reuse the storefront header. */}
+                <Route path="/ingresar" element={<Auth />} />
+                <Route path="/registro" element={<Auth register />} />
+                <Route path="/recuperar" element={<Recover />} />
+                {/* The customer portal has its own sidebar layout (Figma "Client / Mi cuenta"). */}
+                {[
+                  { path: '/cuenta/productos', title: 'Productos', page: <Catalog /> },
+                  { path: '/cuenta/soporte', title: 'Ayuda y contacto', page: <Contact /> },
+                  { path: '/cuenta/nosotros', title: 'Sobre SYSCON', page: <About /> },
+                ].map(({ path, title, page }) => (
+                  <Route
+                    key={path}
+                    path={path}
+                    element={
+                      <RequireAuth>
+                        <AccountLayout title={title}>
+                          <div
+                            className={
+                              path === '/cuenta/productos' ? 'portal-catalog' : 'portal-page'
+                            }
+                          >
+                            {page}
+                          </div>
+                        </AccountLayout>
+                      </RequireAuth>
+                    }
+                  />
+                ))}
+                <Route
+                  path="/cuenta/seleccion"
+                  element={
+                    <RequireAuth>
+                      <Offers />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/cuenta"
+                  element={
+                    <RequireAuth>
+                      <Account />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/cuenta/carrito"
+                  element={
+                    <RequireAuth>
+                      <AccountCart />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/cuenta/pedidos"
+                  element={
+                    <RequireAuth>
+                      <Orders />
+                    </RequireAuth>
+                  }
+                />
+                <Route path="*" element={<StoreRoutes />} />
+              </Routes>
+            </PasswordGate>
+          </Suspense>
+        </AddToCartProvider>
       </BrowserRouter>
     </StateProvider>
   );

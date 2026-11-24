@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Product } from '../types';
+import type { AdminProduct } from '../types';
 import { parseCsv } from './csv';
 import { MAX_IMPORT_ROWS, previewProductImport, productsToCsv } from './productCsv';
 
@@ -48,12 +48,16 @@ describe('product import preview', () => {
     expect(previewProductImport('', []).fileErrors).toEqual(['El archivo está vacío.']);
   });
   it('round-trips the exported catalog', () => {
-    const product: Product = {
+    const product: AdminProduct = {
       id: '1',
       sku: 'X;1',
       name: 'Cable "Cat 6"',
       price: 14.9,
       stock: 3,
+      physicalStock: 5,
+      reservedStock: 2,
+      description: 'Cable para redes',
+      specifications: 'Categoría: 6\nLargo: 1 m',
       imageUrl: null,
       category: 'Cables de red',
       brand: null,
@@ -61,6 +65,13 @@ describe('product import preview', () => {
     };
     const { rows } = previewProductImport(productsToCsv([product]), ['X;1']);
     expect(rows[0]).toMatchObject({ action: 'update', errors: [] });
-    expect(rows[0].input).toMatchObject({ sku: 'X;1', name: 'Cable "Cat 6"', price: 14.9 });
+    expect(rows[0].input).toMatchObject({
+      sku: 'X;1',
+      name: 'Cable "Cat 6"',
+      price: 14.9,
+      stock: 5,
+      description: 'Cable para redes',
+      specifications: 'Categoría: 6\nLargo: 1 m',
+    });
   });
 });

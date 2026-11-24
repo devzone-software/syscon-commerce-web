@@ -1,5 +1,5 @@
+import { CatalogToolsNav } from '../../components/backoffice/CatalogToolsNav';
 import { useRef, useState, type ChangeEvent } from 'react';
-import { Link } from 'react-router-dom';
 import { PageHeader } from '../../components/backoffice/PageHeader';
 import { StatCard } from '../../components/backoffice/StatCard';
 import { Pagination } from '../../components/shared/Pagination';
@@ -35,7 +35,7 @@ function RowStatus({ row, outcome }: { row: ImportRow; outcome?: Outcome }) {
 }
 
 export function ProductBulkAdmin() {
-  const catalog = useData(api.products);
+  const catalog = useData(api.adminProducts);
   const [fileName, setFileName] = useState('');
   const [fileError, setFileError] = useState('');
   const [preview, setPreview] = useState<ImportPreview | null>(null);
@@ -107,21 +107,17 @@ export function ProductBulkAdmin() {
 
   return (
     <>
+      <CatalogToolsNav />
       <PageHeader
-        title="Carga masiva de productos"
-        description="Exporta el catálogo publicado o importa productos desde un archivo CSV. Cada fila se guarda con el mismo upsert por SKU que el formulario de productos."
-        actions={
-          <Link className="button button-secondary" to="/admin/productos">
-            Volver a productos
-          </Link>
-        }
+        title="Importar / exportar productos"
+        description="Importa o descarga productos mediante archivos CSV. Si el SKU ya existe, se actualiza ese producto; el stock del archivo representa unidades físicas."
       />
       <div className="bo-two-columns">
         <section className="bo-card" aria-labelledby="export-title">
           <h2 id="export-title">Exportar</h2>
           <p className="muted">
-            Descarga los productos publicados en el mismo formato que acepta la importación. Los
-            productos inactivos no se incluyen porque el backend no los lista.
+            Descarga todos los productos en el formato de importación. La columna stock contiene
+            unidades físicas, antes de descontar reservas.
           </p>
           {catalog.loading ? (
             <Loading />

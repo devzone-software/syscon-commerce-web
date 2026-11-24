@@ -26,7 +26,7 @@ export function CartLineItem({
         tabIndex={-1}
         aria-hidden="true"
       >
-        <ProductImage product={product} />
+        <ProductImage product={product} badge={false} />
       </Link>
       <div className="cart-line-info">
         {product.brand && <span className="card-product-brand">{product.brand}</span>}
@@ -47,7 +47,7 @@ export function CartLineItem({
                   className="link-button"
                   onClick={() => onQuantity(product.stock)}
                 >
-                  Ajustar a {product.stock}
+                  Ajustar a lo disponible
                 </button>
               </>
             )}

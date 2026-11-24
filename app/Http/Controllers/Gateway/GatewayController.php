@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\Identity;
 use App\Services\JavaApi;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -19,6 +20,13 @@ abstract class GatewayController extends Controller
     protected function reply(array $result): JsonResponse
     {
         return response()->json($result['body'], $result['status']);
+    }
+
+    /** Streams a platform file with its type and name; errors keep the JSON envelope. */
+    protected function sendFile(array $result): Response
+    {
+        if ($result['status'] !== 200) return $this->reply($result);
+        return response($result['bytes'], 200, $result['headers'] + ['Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
     }
 
     protected function requireLogin(): ?JsonResponse

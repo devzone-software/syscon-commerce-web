@@ -9,3 +9,6 @@ export const isHttpUrl = (value: string) => {
     return false;
   }
 };
+
+/** Same shape the browser accepts for type="email": something@domain.tld. */
+export const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());

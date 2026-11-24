@@ -26,9 +26,16 @@ class CatalogGatewayController extends GatewayController
     {
         if ($error = $this->requirePermission('catalog:write')) return $error;
         $data = $request->validate(['sku' => 'required|string|max:100', 'name' => 'required|string|max:255', 'price' => 'required|numeric|min:0', 'stock' => 'required|integer|min:0', 'imageUrl' => 'nullable|url|max:2048', 'category' => 'nullable|string|max:100', 'brand' => 'nullable|string|max:100', 'active' => 'required|boolean']);
+        $data += $request->validate(['description' => 'nullable|string|max:5000', 'specifications' => 'nullable|string|max:5000']);
         $result = $this->api->authenticated('POST', '/api/catalog/products', $data);
         // Upserts can also create categories and brands.
         if ($result['status'] < 300) foreach (['products', 'categories', 'brands'] as $kind) Cache::forget("catalog.$kind");
         return $this->reply($result);
+    }
+
+    public function administrative(): JsonResponse
+    {
+        if ($error = $this->requirePermission('catalog:write')) return $error;
+        return $this->reply($this->api->authenticated('GET', '/api/catalog/admin/products'));
     }
 }

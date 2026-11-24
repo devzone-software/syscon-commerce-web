@@ -1,3 +1,4 @@
+import { CatalogToolsNav } from '../../components/backoffice/CatalogToolsNav';
 import { Link } from 'react-router-dom';
 import { PageHeader } from '../../components/backoffice/PageHeader';
 import { groupProducts, type CatalogGroup } from '../../lib/catalog';
@@ -21,7 +22,7 @@ function GroupTable({
     <section className="bo-card" aria-labelledby={`${param}-title`}>
       <h2 id={`${param}-title`}>{title}</h2>
       {names.length ? (
-        <div className="table-wrap">
+        <div className="table-wrap responsive-table">
           <table className="data-table">
             <thead>
               <tr>
@@ -37,11 +38,13 @@ function GroupTable({
             <tbody>
               {names.map((name) => (
                 <tr key={name}>
-                  <td>
+                  <td data-label="Nombre">
                     <strong>{name}</strong>
                   </td>
-                  <td className="num">{counts.get(name) ?? 0}</td>
-                  <td className="num">
+                  <td data-label="Productos publicados" className="num">
+                    {counts.get(name) ?? 0}
+                  </td>
+                  <td data-label="Acciones" className="num">
                     <Link
                       className="link-button"
                       to={`/catalogo?${param}=${encodeURIComponent(name)}`}
@@ -74,9 +77,10 @@ export function TaxonomyAdmin() {
   };
   return (
     <>
+      <CatalogToolsNav />
       <PageHeader
         title="Categorías y marcas"
-        description="Se crean automáticamente al guardar un producto con un nombre nuevo. El backend aún no permite editarlas ni eliminarlas."
+        description="Consulta cómo se organizan los productos publicados. Para asignar una categoría o marca nueva, escribe su nombre al guardar el producto."
       />
       {loading ? (
         <Loading />

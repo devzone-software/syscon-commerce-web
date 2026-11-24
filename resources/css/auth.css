@@ -1,0 +1,1075 @@
+/* Authentication forms use the shared storefront header, footer and background. */
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--store-soft);
+}
+.auth-main {
+  flex: 1;
+  padding: var(--syscon-space-12) 0 0;
+}
+
+.auth-card {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
+  max-width: 940px;
+  margin: 0 auto;
+  border-radius: var(--syscon-radius-md);
+  background: #fff;
+  box-shadow: 0 24px 50px -20px #00265d40;
+  overflow: hidden;
+}
+
+/* Navy benefits panel */
+.auth-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--syscon-space-4);
+  padding: var(--syscon-space-8);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 75% 15%, #3b72b84d 0, transparent 45%),
+    var(--syscon-surface-brand-gradient);
+  color: #fff;
+}
+.auth-panel-eyebrow {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: 1px solid #2dbcfe4d;
+  border-radius: 999px;
+  background: #2dbcfe14;
+  color: #7fd3ff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.auth-panel-eyebrow i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2dbcfe;
+}
+.auth-panel h1 {
+  margin: 4px 0 0;
+  font-size: 30px;
+  line-height: 37px;
+  letter-spacing: -0.02em;
+}
+.auth-panel > p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: #c9d6ea;
+}
+.auth-panel ul {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.auth-panel li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  border: 1px solid #ffffff14;
+  border-radius: 8px;
+  background: #ffffff0d;
+  font-size: 12px;
+  line-height: 17px;
+  color: #e6edf7;
+}
+.auth-panel li strong {
+  display: block;
+  font-size: 12px;
+  color: #fff;
+}
+.auth-panel-icon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #2dbcfe26;
+  color: #7fd3ff;
+}
+.auth-panel-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: auto 0 0 !important;
+  padding-top: 18px;
+  border-top: 1px solid #ffffff1a;
+  font-size: 11px !important;
+  color: #9fb3d1 !important;
+}
+.auth-panel-foot svg {
+  color: #4edea3;
+}
+
+/* Form column */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--syscon-space-4);
+  padding: var(--syscon-space-8);
+}
+.auth-footer {
+  background: #fff;
+  border-top: 1px solid #e3e8f2;
+}
+.auth-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  min-height: 48px;
+  padding: 10px 0;
+  font-size: 11px;
+  color: #59616c;
+}
+.auth-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.auth-footer a:hover {
+  color: #00265d;
+  text-decoration: underline;
+}
+.auth-footer-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.auth-form h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 28px;
+  letter-spacing: -0.01em;
+  color: #111c2d;
+}
+.auth-lead {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 18px;
+  color: #59616c;
+}
+.auth-title-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+.auth-segmented {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 8px;
+  background: #f0f3ff;
+}
+.auth-segmented button {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: #59616c;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.auth-segmented button.is-active {
+  background: #fff;
+  color: #00265d;
+  box-shadow: 0 1px 3px #00265d1f;
+}
+.auth-title-row .auth-segmented {
+  width: 100%;
+}
+.auth-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.auth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--syscon-space-4);
+}
+.auth-grid > .auth-field:only-child {
+  grid-column: 1 / -1;
+}
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.auth-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #333b47;
+}
+.auth-label em {
+  font-style: normal;
+  color: #b42318;
+}
+.auth-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--syscon-control-height);
+  padding: 0 12px;
+  border: 1px solid #dbe3ed;
+  border-radius: 8px;
+  background: #fafbfc;
+  color: var(--syscon-text-secondary);
+}
+.auth-input:focus-within {
+  border-color: #0d3b82;
+  box-shadow: 0 0 0 1px #0d3b82;
+  background: #fff;
+}
+.auth-input input,
+.auth-input select {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 0;
+  border: 0;
+  background: transparent;
+  color: #111c2d;
+  font-size: 13px;
+  box-shadow: none;
+}
+.auth-input input:focus,
+.auth-input select:focus {
+  box-shadow: none;
+  outline: none;
+}
+.auth-prefix {
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: #e7eeff;
+  color: #00265d;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.auth-eye {
+  display: grid;
+  place-items: center;
+  padding: 4px;
+  border: 0;
+  background: none;
+  color: var(--syscon-text-secondary);
+}
+.auth-eye:hover {
+  color: #00265d;
+}
+.auth-hint {
+  margin: -8px 0 0;
+  font-size: 11px;
+  color: #59616c;
+}
+.auth-row-end {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -4px;
+}
+.auth-row-end a,
+.auth-switch a {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0d3b82;
+}
+.auth-row-end a:hover,
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+.auth-submit,
+.auth-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.auth-submit {
+  border: 0;
+  background: #0d3b82;
+  color: #fff;
+  box-shadow: 0 8px 18px -8px #0d3b82;
+}
+.auth-submit:hover:not(:disabled) {
+  background: #00265d;
+}
+.auth-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.auth-secondary {
+  border: 1px solid #dbe3ed;
+  background: #fff;
+  color: #00265d;
+}
+.auth-secondary:hover {
+  border-color: #0d3b82;
+}
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--syscon-text-secondary);
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e3e8f2;
+}
+.auth-form .signin-google {
+  display: flex;
+  justify-content: center;
+}
+.auth-switch {
+  margin: 4px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid #eef1f6;
+  font-size: 12px;
+  text-align: center;
+  color: #434751;
+}
+
+/* Password strength meter */
+.auth-strength {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f6f8fc;
+}
+.auth-strength-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #59616c;
+}
+.auth-strength-head b {
+  margin-left: 4px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0;
+  color: #fff;
+  background: #b42318;
+}
+.auth-strength-head b.is-2,
+.auth-strength-head b.is-3 {
+  background: #9a6700;
+}
+.auth-strength-head b.is-4 {
+  background: #177245;
+}
+.auth-strength-head b.is-valid {
+  background: #177245;
+}
+.auth-match {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0;
+  color: #177245;
+}
+.auth-strength-bars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 8px 0;
+}
+.auth-strength-bars i {
+  height: 4px;
+  border-radius: 4px;
+  background: #dbe3ed;
+}
+.auth-strength-bars i.is-on {
+  background: #177245;
+}
+.auth-strength ul {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  justify-content: space-between;
+  gap: 4px 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 10px;
+  color: var(--syscon-text-secondary);
+}
+.auth-strength li {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.auth-strength li.is-ok {
+  color: #177245;
+}
+.auth-strength .auth-password-checklist {
+  display: flex;
+  justify-content: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.auth-password-guidance {
+  margin: 6px 0 0;
+  color: var(--syscon-text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* Account created and recovery step */
+.auth-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: auto 0;
+  text-align: center;
+}
+.auth-done p {
+  margin: 0;
+  font-size: 13px;
+  color: #59616c;
+}
+.auth-done .auth-submit {
+  min-width: 220px;
+}
+.auth-done-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #e6f5ee;
+  color: #177245;
+}
+.auth-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+.auth-step-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #e7eeff;
+  color: #00265d;
+}
+.auth-step-label {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #00658d;
+}
+.auth-assurance {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  max-width: 940px;
+  margin: 24px auto 0;
+  padding: 0;
+  list-style: none;
+}
+.auth-assurance li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 4px;
+  border-bottom: 1px solid #e3e8f2;
+  font-size: 11px;
+  color: #59616c;
+}
+.auth-assurance svg {
+  flex-shrink: 0;
+  color: #00265d;
+}
+.auth-assurance strong {
+  display: block;
+  font-size: 12px;
+  color: #111c2d;
+}
+
+@media (max-width: 860px) {
+  .auth-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .auth-panel ul {
+    display: none;
+  }
+  .auth-panel-foot {
+    display: none !important;
+  }
+}
+@media (max-width: 560px) {
+  .auth-main {
+    padding: var(--syscon-space-6) 0 0;
+  }
+  .auth-form,
+  .auth-panel {
+    padding: var(--syscon-space-6) var(--syscon-space-4);
+  }
+  .auth-grid,
+  .auth-assurance {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .auth-strength ul {
+    grid-template-columns: repeat(2, auto);
+  }
+  .auth-footer-row {
+    justify-content: center;
+    text-align: center;
+  }
+  .auth-footer nav {
+    justify-content: center;
+  }
+}
+
+/* Sign-up: brand band with the title and a centered card that overlaps it. */
+.signup-main {
+  flex: 1;
+  position: relative;
+  padding-bottom: var(--syscon-space-12);
+}
+.signup-band {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 250px;
+  padding: 0 var(--syscon-page-gutter);
+  background:
+    radial-gradient(circle at 80% 20%, #3b72b84d 0, transparent 45%),
+    var(--syscon-surface-brand-gradient);
+}
+.signup-band h1 {
+  max-width: 560px;
+  margin: 0 auto;
+  padding-top: 36px;
+  color: #fff;
+  font-size: 26px;
+  line-height: 34px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-align: center;
+  text-wrap: balance;
+}
+.signup-main > .container {
+  position: relative;
+  padding-top: 124px;
+}
+.signup-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 28px 32px;
+  border: 1px solid var(--syscon-border-default);
+  border-radius: var(--syscon-radius-lg);
+  background: #fff;
+  box-shadow: 0 24px 50px -24px #00265d40;
+}
+.signup-card .signin-google {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+.signup-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--syscon-text-secondary);
+}
+.signup-divider::before,
+.signup-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--syscon-border-default);
+}
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.signup-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.signup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.signup-field > span:first-child {
+  padding-left: 4px;
+  font-size: 14px;
+  color: var(--syscon-text-primary);
+}
+.signup-field small {
+  padding-left: 4px;
+  font-size: 12px;
+  color: var(--syscon-text-secondary);
+}
+.signup-field > input,
+.signup-phone,
+.signup-password {
+  height: 46px;
+  border: 1px solid #bfc6d1;
+  border-radius: 8px;
+  background: #fff;
+}
+.signup-field input {
+  min-width: 0;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: var(--syscon-text-primary);
+  font-size: 15px;
+  box-shadow: none;
+}
+.signup-field > input {
+  border: 1px solid #bfc6d1;
+  background: #fff;
+}
+.signup-field input:focus {
+  outline: none;
+  box-shadow: none;
+}
+.signup-field > input:focus,
+.signup-phone:focus-within,
+.signup-password:focus-within {
+  border-color: #0d3b82;
+  box-shadow: 0 0 0 1px #0d3b82;
+}
+.signup-phone,
+.signup-password {
+  display: flex;
+  align-items: center;
+}
+.signup-phone input,
+.signup-password input {
+  flex: 1;
+  height: 100%;
+}
+.signup-phone-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 12px 0 14px;
+  border-right: 1px solid var(--syscon-border-default);
+  font-size: 15px;
+  color: var(--syscon-text-primary);
+}
+.signup-phone-code svg {
+  border: 1px solid #e5e7eb;
+}
+.signup-password button {
+  display: grid;
+  place-items: center;
+  margin-right: 8px;
+  padding: 8px;
+  border: 0;
+  background: none;
+  color: var(--syscon-text-secondary);
+}
+.signup-password button:hover {
+  color: #0d3b82;
+}
+.signup-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--syscon-text-primary);
+  cursor: pointer;
+}
+.signup-check input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: #0d3b82;
+}
+.signup-terms {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--syscon-text-primary);
+}
+.signup-terms a {
+  color: #0d6fd1;
+}
+.signup-terms a:hover {
+  text-decoration: underline;
+}
+.signup-card .auth-submit {
+  min-height: 44px;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+.signup-switch {
+  margin: 0;
+  font-size: 13px;
+  text-align: center;
+  color: var(--syscon-text-secondary);
+}
+.signup-switch a {
+  font-weight: 700;
+  color: #0d3b82;
+}
+.signup-switch a:hover {
+  text-decoration: underline;
+}
+@media (max-width: 560px) {
+  .signup-band {
+    height: 220px;
+  }
+  .signup-band h1 {
+    padding-top: 32px;
+    font-size: 22px;
+    line-height: 29px;
+  }
+  .signup-main > .container {
+    padding-top: 112px;
+  }
+  .signup-card {
+    padding: 22px 16px;
+  }
+  .signup-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Stand-in for Google's "Registrarse con Google" button when no OAuth client is configured. */
+.signup-google {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 42px;
+  padding: 0 44px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  background: #fff;
+  color: #3c4043;
+  font-size: 14px;
+  font-weight: 500;
+}
+.signup-google svg {
+  position: absolute;
+  left: 15px;
+}
+.signup-google:hover {
+  border-color: #d2e3fc;
+  background: #f8faff;
+}
+.signup-card .signin-google-error {
+  margin: -12px 0 0;
+  font-size: 13px;
+  color: var(--syscon-text-secondary);
+  text-align: center;
+}
+
+/* E-mail already registered: notice under the field and a red outline on it. */
+.signup-field > input[aria-invalid='true'] {
+  border-color: #b42318;
+  box-shadow: 0 0 0 1px #b42318;
+}
+.signup-taken {
+  margin: -8px 0 0;
+  padding: 10px 12px;
+  border: 1px solid #f4c7c3;
+  border-radius: 8px;
+  background: #fef3f2;
+  color: #7a271a;
+  font-size: 13px;
+  line-height: 19px;
+}
+.signup-taken strong {
+  color: #b42318;
+}
+.signup-taken a {
+  font-weight: 700;
+  color: #0d3b82;
+  text-decoration: underline;
+}
+
+/* Strong password suggested under the password field. */
+.signup-suggest {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: -8px;
+  padding: 10px 12px;
+  border: 1px solid #cfe0f5;
+  border-radius: 8px;
+  background: #f2f7fd;
+  color: var(--syscon-text-primary);
+}
+.signup-suggest > svg {
+  flex-shrink: 0;
+  color: #1b4279;
+}
+.signup-suggest p {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+}
+.signup-suggest strong {
+  display: block;
+  font-size: 12px;
+  color: #1b4279;
+}
+.signup-suggest code {
+  display: block;
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  overflow-wrap: anywhere;
+}
+.signup-suggest button {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border: 1px solid #1b4279;
+  border-radius: 6px;
+  background: #1b4279;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+.signup-suggest button:hover {
+  background: #0d3b82;
+}
+.signup-suggest .signup-suggest-other {
+  padding: 5px 9px;
+  border-color: #cfe0f5;
+  background: #fff;
+  color: #1b4279;
+  font-size: 16px;
+  line-height: 1;
+}
+.signup-suggest .signup-suggest-other:hover {
+  background: #e6effa;
+}
+
+/* Sign-in: title on the left, bordered card on the right (stacked on phones). */
+.login-main {
+  flex: 1;
+  padding: 48px 0 64px;
+  background: #fff;
+}
+.login-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
+  align-items: start;
+  gap: 48px;
+  max-width: 1100px;
+}
+.login-grid h1 {
+  margin: 20px 0 0;
+  max-width: 480px;
+  font-size: 32px;
+  line-height: 42px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--syscon-text-primary);
+}
+.login-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 36px 40px;
+  border: 1px solid var(--syscon-border-default);
+  border-radius: var(--syscon-radius-md);
+  background: #fff;
+}
+.login-card .auth-submit {
+  min-height: 46px;
+  font-size: 15px;
+  letter-spacing: 0;
+}
+.login-card .signin-google {
+  display: flex;
+  justify-content: center;
+}
+.signup-field > input[aria-invalid='true'] {
+  border-color: #b42318;
+}
+.login-create {
+  align-self: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0d6fd1;
+}
+.login-create:hover,
+.login-forgot:hover {
+  text-decoration: underline;
+}
+.login-who {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--syscon-surface-soft);
+  font-size: 15px;
+  color: var(--syscon-text-primary);
+}
+.login-who span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.login-who button {
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0d6fd1;
+}
+.login-forgot {
+  align-self: flex-start;
+  margin-top: -6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0d6fd1;
+}
+
+@media (max-width: 860px) {
+  .login-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .login-grid h1 {
+    margin: 0;
+    font-size: 24px;
+    line-height: 32px;
+  }
+  .login-card {
+    padding: 24px 16px;
+  }
+}
+
+/* Google renders its button at a fixed width when the page loads; never let it overflow. */
+.signin-google {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Sign-in: help links under the title, and the reCAPTCHA box. */
+.login-aside {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+.login-help {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  margin-top: auto;
+  padding-top: 40px;
+}
+.login-help > a {
+  font-size: 15px;
+  color: #0d6fd1;
+}
+.login-help > a:hover {
+  text-decoration: underline;
+}
+.login-recaptcha {
+  min-height: 78px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: 860px) {
+  .login-help {
+    order: 2;
+    padding-top: 8px;
+  }
+}
+
+/* Account created: automatic redirect with a visible countdown. */
+.auth-done-redirect {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--syscon-text-secondary);
+}
+.auth-done-progress {
+  display: block;
+  width: min(100%, 260px);
+  height: 4px;
+  margin: 2px auto 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e3e9f2;
+}
+.auth-done-progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #177245;
+  transform-origin: left;
+  animation: auth-done-progress linear forwards;
+}
+@keyframes auth-done-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-done-progress {
+    display: none;
+  }
+}

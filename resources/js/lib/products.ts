@@ -1,4 +1,4 @@
-import type { Product } from '../types';
+import type { AdminProduct, Product } from '../types';
 import { isHttpUrl } from './validation';
 
 export type ProductInput = Omit<Product, 'id'>;
@@ -14,9 +14,15 @@ export const emptyProduct: ProductInput = {
   active: true,
 };
 
-export const toProductInput = ({ id: _id, ...product }: Product): ProductInput => ({
+export const toProductInput = ({
+  id: _id,
+  physicalStock,
+  reservedStock: _reserved,
+  ...product
+}: AdminProduct): ProductInput => ({
   ...product,
   price: Number(product.price),
+  stock: physicalStock,
 });
 
 /** Mirrors the rules of CatalogGatewayController::saveProduct and CatalogService.ProductInput. */
@@ -34,6 +40,8 @@ export function validateProduct(input: ProductInput): Partial<Record<keyof Produ
     errors.imageUrl = 'Ingresa una URL válida (http o https).';
   if (input.category && input.category.length > 100) errors.category = 'Máximo 100 caracteres.';
   if (input.brand && input.brand.length > 100) errors.brand = 'Máximo 100 caracteres.';
+  for (const field of ['description', 'specifications'] as const)
+    if (input[field] && input[field].length > 5000) errors[field] = 'Máximo 5000 caracteres.';
   return errors;
 }
 

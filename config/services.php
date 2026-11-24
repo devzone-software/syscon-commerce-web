@@ -3,8 +3,21 @@
 return [
 
     'java' => [
-        'url' => env('JAVA_API_URL', 'http://localhost'),
+        // API de la plataforma Laravel. JAVA_API_URL es el nombre anterior y se acepta mientras
+        // los despliegues existentes no definan PLATFORM_API_URL.
+        'url' => env('PLATFORM_API_URL', env('JAVA_API_URL', 'http://localhost')),
         'jwt_secret' => env('JWT_SECRET'),
+    ],
+
+    // Public OAuth client id for Google Identity Services; empty hides the Google button.
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+    ],
+
+    // reCAPTCHA v2 ("No soy un robot") on sign-in; both keys empty turns it off.
+    'recaptcha' => [
+        'site_key' => env('RECAPTCHA_SITE_KEY'),
+        'secret' => env('RECAPTCHA_SECRET_KEY'),
     ],
 
     /*

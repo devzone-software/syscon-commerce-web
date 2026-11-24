@@ -1,14 +1,20 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { money, useShop } from './state';
+import { useConfirmAdd } from './components/cart/AddToCartDialog';
 import type { Product } from './types';
+import cartAddIcon from '../images/home/cart-add.svg';
 import { ProductImage } from './components/ProductImage';
-import { CartIcon } from './components/icons';
-import { StockBadge } from './components/product/StockBadge';
 import { Footer } from './components/layout/Footer';
 import { Header } from './components/layout/Header';
+import { PageMain } from './components/layout/PageMain';
+import { isServicePlan, planInquiryUrl, planPriceSuffix } from './lib/servicePlans';
 
-export function useData<T>(load: () => Promise<T>, deps: unknown[] = []) {
+export function useData<T>(
+  load: () => Promise<T>,
+  deps: unknown[] = [],
+  options: { keepPreviousData?: boolean } = {},
+) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -31,14 +37,20 @@ export function useData<T>(load: () => Promise<T>, deps: unknown[] = []) {
       live = false;
     };
   }, [...deps, retry]);
-  return { data, error, loading, reload: () => setRetry((n) => n + 1) };
+  return {
+    data,
+    error,
+    loading: loading && (!options.keepPreviousData || data === null),
+    refreshing: loading && Boolean(options.keepPreviousData) && data !== null,
+    reload: () => setRetry((n) => n + 1),
+  };
 }
 export function ErrorBox({ message, retry }: { message: string; retry?: () => void }) {
   return (
     <div className="notice error" role="alert">
       {message}{' '}
       {retry && (
-        <button className="link-button" onClick={retry}>
+        <button type="button" className="link-button" onClick={retry}>
           Reintentar
         </button>
       )}
@@ -48,7 +60,12 @@ export function ErrorBox({ message, retry }: { message: string; retry?: () => vo
 export function Loading() {
   return (
     <div className="loading" role="status">
-      Cargando…
+      <span>Cargando…</span>
+      <div className="loading-skeleton" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </div>
     </div>
   );
 }
@@ -70,41 +87,50 @@ export function Empty({
     </div>
   );
 }
-export function ProductCard({ product }: { product: Product }) {
-  const { add } = useShop();
+/**
+ * Product card from the Figma home: image with availability, category, name, price and the
+ * "Ver producto" / "Agregar" actions. `compact` is the smaller variant of the catalog grid.
+ */
+export function ProductCard({ product, compact = false }: { product: Product; compact?: boolean }) {
+  const add = useConfirmAdd();
+  const available = product.stock > 0;
+  const details = [product.brand, `SKU ${product.sku}`].filter(Boolean).join(' · ');
+  const url = `/producto/${product.id}`;
   return (
-    <article className="card-product">
-      <Link
-        to={`/producto/${product.id}`}
-        className="card-product-media"
-        tabIndex={-1}
-        aria-hidden="true"
-      >
+    <article className={`card-product${compact ? ' is-compact' : ''}`}>
+      <Link to={url} className="card-product-media" tabIndex={-1} aria-hidden="true">
         <ProductImage product={product} />
+        {!available && <span className="card-product-stock out">AGOTADO</span>}
       </Link>
-      <div className="card-product-body">
-        {product.brand && <span className="card-product-brand">{product.brand}</span>}
-        <Link className="card-product-title" to={`/producto/${product.id}`}>
-          {product.name}
+      {product.category && <span className="card-product-category">{product.category}</span>}
+      <Link className="card-product-title" to={url}>
+        {product.name}
+      </Link>
+      <span className="card-product-meta">{details}</span>
+      <strong className="card-product-price">
+        {money(Number(product.price))}
+        {planPriceSuffix(product) && <small>{planPriceSuffix(product)}</small>}
+      </strong>
+      <div className="card-product-actions">
+        <Link className="card-product-view" to={url}>
+          {compact ? 'Ver' : 'Ver producto'}
         </Link>
-        <span className="card-product-meta">
-          {product.category ? `${product.category} · ` : ''}SKU {product.sku}
-        </span>
-        <div className="card-product-footer">
-          <div>
-            <strong className="card-product-price">{money(Number(product.price))}</strong>
-            <StockBadge stock={product.stock} />
-          </div>
+        {isServicePlan(product) ? (
+          <Link className="card-product-add" to={planInquiryUrl(product)}>
+            Consultar
+          </Link>
+        ) : (
           <button
             type="button"
             className="card-product-add"
             onClick={() => add(product)}
-            disabled={product.stock < 1}
+            disabled={!available}
             aria-label={`Agregar ${product.name} al carrito`}
           >
-            <CartIcon />
+            <img src={cartAddIcon} alt="" />
+            Agregar
           </button>
-        </div>
+        )}
       </div>
     </article>
   );
@@ -113,7 +139,7 @@ export function Layout({ children }: { children: ReactNode }) {
   return (
     <>
       <Header />
-      <main>{children}</main>
+      <PageMain>{children}</PageMain>
       <Footer />
     </>
   );

@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import type { Product } from '../types';
-import { addToCart, cartTotal, cartUnits, reviewCart, setCartQuantity, syncCart } from './cart';
+import {
+  addToCart,
+  cartAvailability,
+  cartTotal,
+  cartUnits,
+  reviewCart,
+  setCartQuantity,
+  syncCart,
+} from './cart';
 import { relatedProducts } from './catalog';
 
 const product = (id: string, patch: Partial<Product> = {}): Product => ({
@@ -17,6 +25,20 @@ const product = (id: string, patch: Partial<Product> = {}): Product => ({
 });
 
 describe('cart operations', () => {
+  it('rejects an unpublished product even when it still has physical stock', () => {
+    const inactive = product('hidden', { active: false, stock: 10 });
+    expect(addToCart([], inactive)).toEqual([]);
+    expect(cartAvailability([], inactive).remaining).toBe(0);
+    expect(reviewCart([{ product: inactive, quantity: 1 }], null).get('hidden')).toBe(
+      'unavailable',
+    );
+  });
+  it('reports units in the cart and the ones still available to add', () => {
+    const item = product('a', { stock: 5 });
+    expect(cartAvailability([], item)).toEqual({ inCart: 0, remaining: 5 });
+    expect(cartAvailability(addToCart([], item, 4), item)).toEqual({ inCart: 4, remaining: 1 });
+    expect(cartAvailability(addToCart([], item, 9), item)).toEqual({ inCart: 5, remaining: 0 });
+  });
   it('adds several units without exceeding stock', () => {
     const lines = addToCart([], product('a'), 2);
     expect(lines).toEqual([{ product: product('a'), quantity: 2 }]);
